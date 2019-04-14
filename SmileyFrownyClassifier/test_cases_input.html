@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div>
+ <canvas id="canvas" width="200" height="200" style="border:1px solid #d3d3d3;">
+</canvas>
+</div>
+<div>
+ <button onclick="clearSample()">Clear</button>
+ <button onclick="saveSample()">Save</button>
+ <span id="samples_count">
+	 Samples Saved: 0
+ </span>
+ <button onclick="downloadSamples()">Download</button>
+</div>
+
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+
+// last known position
+var pos = { x: 0, y: 0 };
+
+// Set up the current image data
+var imgWidth = 20;
+var imgHeight = 20;
+var rawPxls = Array.from(Array(imgWidth*imgHeight), () => false);
+function putPxl(x, y) {
+  rawPxls[y*imgWidth + x] = true;
+}
+function getPxl(x, y) {
+	return rawPxls[y*imgWidth + x];
+}
+
+canvas.addEventListener('mousemove', drawPxl);
+canvas.addEventListener('mousedown', drawPxl);
+canvas.addEventListener('mouseenter', drawPxl);
+
+function setPosition(e) {
+  pos.x = Math.max(0, Math.min(e.clientX - canvas.offsetLeft - 2, canvas.width-1));
+  pos.y = Math.max(0, Math.min(e.clientY - canvas.offsetTop - 2, canvas.height-1));
+}
+
+function drawPxl(e) {
+  // mouse left button must be pressed
+  if (e.buttons !== 1) return;
+
+	setPosition(e);
+	var pxlX = Math.floor(pos.x*imgWidth/canvas.width);
+	var pxlY = Math.floor(pos.y*imgHeight/canvas.height);
+	putPxl(pxlX, pxlY);
+
+  draw(e)
+}
+
+function draw(e) {
+	var imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+	var data = imgData.data;
+	for (var i = 0; i < data.length; i+=4) {
+		var pi = Math.floor(i/4);
+		var x = pi%canvas.width;
+		var y = Math.floor(pi/canvas.width);
+		var px = Math.floor(x*imgWidth/canvas.width);
+		var py = Math.floor(y*imgHeight/canvas.height);
+		if (getPxl(px,py)) {
+			data[i] = 0;
+			data[i+1] = 0;
+			data[i+2] = 0;
+		} else {
+			data[i] = 255;
+			data[i+1] = 255;
+			data[i+2] = 255;
+		}
+		data[i+3] = 255;
+	}
+	ctx.putImageData(imgData, 0, 0);
+}
+
+// Sourced from Matěj Pokorný at:
+// https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
+function download(filename, text) {
+  var element = document.createElement('a');
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+var samples = [];
+
+function clearSample() {
+	for(var i = 0; i < rawPxls.length; i++) {
+    rawPxls[i] = false;
+	}
+	draw(canvas);
+}
+function saveSample() {
+	samples.push(Array.from(rawPxls, (p) => p ? "1" : "0").join(""));
+	document.getElementById("samples_count").innerHTML="Samples Saved: "+samples.length;
+  clearSample()
+}
+function downloadSamples() {
+	download("img_samples.txt", samples.join("\n"));
+}
+</script>
+
+</body>
+</html>
+

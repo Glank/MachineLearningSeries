@@ -1,2 +1,3 @@
 # MachineLearningSeries
-All the code shown in my machine learning series on youtube.
+
+All the code shown in my machine learning series on youtube (not yet published).
