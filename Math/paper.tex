@@ -1,0 +1,560 @@
+\documentclass[12pt]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{mathtools}
+
+\title{Multimatrices and Their Derivatives}
+\author{Ernest Kirstein}
+\date{\today}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
+
+\DeclareMathOperator{\Dim}{Dim}
+%\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
+%\newcommand{\mmult}[1]{\underset{#1}{\times}}
+\newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+I was working my way through the implementation of a machine learning system as
+a hobby project and I was having a hell of a time wrapping my head around the
+existing notation for derivatives of matrix equations. Every notation system
+either requires users to pull apart the matricies they're working with or otherwise
+bypass the issue of taking derivatives of matrix equations.
+
+So, I came up with a system of my own. And, much to my surprise, some of the
+results I came up with were surprisingly elegant. For example, I proved a
+multidimensional version of the derivative chain rule (Thm. \ref{mmm_chain_rule})
+that's more consise than anything I've found in other works.
+
+This book is about my exploration into multidimensional matricies - multimatricies -
+and how they can simplify derivatives of matrix equations.
+\end{abstract}
+
+\section{Defining the Derivative}
+
+Let's consider a traditional matrix equation.
+We'll define some matricies $M$ and $X$ such that
+$|M| = |X| = \left< 3,5 \right>$
+and \[M_{r,c} = \sin(X_{r,c})\]
+Or more simply, \[M = \sin(X)\]
+
+\noindent
+The partial derivatives of this equation are simple enough. Assuming that all elements
+of $X$ are independent,
+\[
+\frac{\partial M_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
+\left\{
+	\begin{array}{ll}
+		\cos(X_{r_2,c_2})  & \mbox{if } r_1 = r_2 \mbox{ and } c_1 = c_2 \\
+		0 & \mbox{otherwise}
+	\end{array}
+\right.
+\]
+Which can also be writen more simply using Kronecker deltas,
+\[
+\frac{\partial M_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
+\cos (X_{r_2, c_2}) \delta_{r_1 r_2} \delta_{c_1 c_2}
+\]
+
+\noindent
+But what about the complete deriative? What would that even mean? What sort of
+mathmatical object would represent the entire derivative of $M$ with respect to $X$.
+
+\[\frac{dM}{dX} = \mbox{ ? }\]
+
+If this were a function that mapped a vector to a scalar, you might say that the
+complete derivate was the gradient. But in this case, our function's output is more
+than a simple scalar and even our dependent variable is more complex than a vector.
+
+By looking at the partial derivatives, we can come to some understanding of the
+dimensionality of the complete derivative. Each combination of input and output
+element has its own partial derivative, so it makes sense that the total size
+of the complete derivative should be the product of the size of $M$ and the size
+of $X$.
+
+And so, the size of the complete derivate would be,
+\[
+\mbox{size}\left(\frac{dM}{dX}\right) = \mbox{size}(M) \mbox{size}(X)
+\]
+And perhaps we could even let this help us define the 'shape' of the complete
+derivative. This complete derivative would need to be composed of partial
+derivatives, so it would make sense to just smush the shapes of the input
+matrix and the output matrix together,
+\begin{align*}
+\left|\frac{dM}{dX}\right| &= |M| \oplus |X| \\
+ &= \left< 3, 5 \right> \oplus \left< 3, 5 \right> \\
+ &= \left< 3, 5, 3, 5 \right>
+\end{align*}
+Where $\oplus$ is the concatenate operator.
+
+The ordering here is arbitrary, there is no reason why the dimensionality of
+of the independent variable \textit{needs} to be concatenated with to the right of the
+dimensionality of the output. What's important is that the dimensionality of
+both output and indepenedent variable are preserved - but let us declare this to
+be our convention for the remainder of this article.
+
+We have, therefore, a multidimensional object with four indicies. Suppose we try to
+pull a single partial derivative from this complete derivative, what could our
+notation look like? Four underscript indicies would be unwieldy, so maybe something
+like this:
+\[
+\frac{dM}{dX}[1,2,3,4] = \frac{\partial M_{1,2}}{\partial X_{3,4}}
+\]
+
+And since we're defining our own notation, let's go ahead and define our original
+matricies in a similar manner:
+\[
+\frac{dM}{dX}[1,2,3,4] = \frac{\partial M[1,2]}{\partial X[3,4]}
+\]
+
+So what is this object we've defined? In all ways that matter, it seams to be
+a multidimensional matrix. It has four dimensions of indices, rather than just
+a row and column, but each uniquely indexed cell in this object may have a
+unique value, just like a standard two dimensional matrix.
+
+\begin{definition}[Multimatrix]
+Let's define a bit of notation. A multimatrix $M$ is a multidimensional matrix
+that has some shape, $|M| \in \mathbb{N}^n$, where $n$ is the number of
+dimensions of $M$.
+
+We'll say that if $\vec{v} = |M|$, then any $\bar{v} \in \mathbb{N}^n$ is a valid
+index of $M$ if and only if value of $\bar{v}$ is less than or equal to the value
+of it's parallel index in $\vec{v}$. That is, $\forall i: 1 \le \bar{v}_i \le \vec{v}_i$.
+
+We can further simplify that notation for our set of valid indicies. Let's say we have
+some $\vec{v} \in \mathbb{N}^n$ that defines the shape of some matrix. Then well
+define the set of valid indicies of that matrix to be $\Dim(\vec{v})$. 
+
+Each value of $M$ is a real value, so we'll define the set of all real valued
+multidimensional matricies with shape $\vec{v}$ as $\mathbb{R}^{\vec{v}}$.
+
+We'll use the notation $M[\bar{v}]$ to reference any individual scalar value of $M$
+at indicies $\bar{v} \in \Dim(|M|)$. 
+\end{definition}
+
+Going back to our original motivating problem, we can express our derivative
+notation thusly,
+
+\begin{definition}[Multimatrix on Multimatrix Derivative]
+\label{mm_derivative}
+Let $F(X)$ be some function from $\mathbb{R}^{\vec{x}}$ to $\mathbb{R}^{\vec{f}}$.
+The complete derivative of $F$ with respect to $X$ is therefore in
+$\mathbb{R}^{\vec{f} \oplus \vec{x}}$. That is,
+\[ |F(X)| = \vec{f} \]
+\[ |X| = \vec{x} \]
+\[ \left|\frac{dF}{dX}\right| = \vec{f} \oplus \vec{x} \]
+\[
+\forall \bar{f} \in \Dim(\vec{f}),
+        \bar{x} \in \Dim(\vec{x}):
+\]
+\[
+\frac{dF}{dX}[\bar{f} \oplus \bar{x}] =
+\frac{\partial F[\bar{f}]}{\partial X[\bar{x}]}
+\]
+\end{definition}
+
+But, of course, there are other combinations of functions than from one
+multimatrix to another. You might have a function from a multimatrix to a
+scalar (such as summing up all the values of a multimatrix), or from a scalar
+to a multimatrix (such as filling a multimatrix with a single scalar value).
+
+We can define the total derivative for those cases as well.
+
+\begin{definition}[Scalar on Multimatrix Derivative]
+\label{sm_derivative}
+Let $f(X)$ be some function from $\mathbb{R}^{\vec{x}}$ to $\mathbb{R}$.
+The complete derivative of $f$ with respect to $X$ is therefore in
+$\mathbb{R}^{\vec{x}}$. That is,
+\begin{align*}
+f(X) &\in \mathbb{R} \\
+|X| &= \vec{x} \\
+\left|\frac{df}{dX}\right| &= \vec{x}
+\end{align*}
+\[
+\forall \bar{x} \in \Dim(\vec{x}):
+        \frac{df}{dX}[\bar{x}] =
+        \frac{\partial f}{\partial X[\bar{x}]}
+\]
+\end{definition}
+
+\begin{definition}[Multimatrix on Scalar Derivative]
+\label{ms_derivative}
+Let $F(x)$ be some function from $\mathbb{R}$ to $\mathbb{R}^{\vec{f}}$.
+The complete derivative of $F$ with respect to $X$ is therefore in
+$\mathbb{R}^{\vec{f}}$. That is,
+\begin{align*}
+|F(x)| &= \vec{f} \\
+x &\in \mathbb{R} \\
+\left|\frac{dF}{dx}\right| &= \vec{f}
+\end{align*}
+\[
+\forall \bar{f} \in \Dim(\vec{f}):
+        \frac{dF}{dx}[\bar{f}] =
+        \frac{\partial F[\bar{f}]}{\partial x}
+\]
+\end{definition}
+
+Ok, that's neat and all but what does that actually mean? Can we answer our motivating 
+question?
+\[\frac{dM}{dX} = ? \]
+Well... sort of. We can say that the total derivative of $M$ with respect to $X$ is
+a matrix with shape $|M| \oplus |X|$, who's elements we can define as,
+\[\forall \bar{m} \in \Dim(|M|), \bar{x} \in \Dim(|X|):\]
+\begin{align*}
+\left( \frac{dM}{dX} \right)[\bar{m} \oplus \bar{x}]
+&= \frac{\partial M[\bar{m}]}{\partial X[\bar{x}]} \\
+&= \delta_{\bar{m}\bar{x}}\cos(\bar{x})
+\end{align*}
+
+Which isn't a huge improvement over our original notation. What would be great is
+if we could define the total derivative without going down into the partial derivatives
+at all, which we'll be able to do in later sections. As a sneak peak, that'll look
+like this:
+\[
+\frac{dM}{dX} = I^3(|X|) \mmult{||X||} \cos(X)
+\]
+
+But that single line will require defining something I'm going to call a cubic
+identity, $I^3(|X|)$, as well as multimatrix multiplication.
+
+\subsection*{Sample Problems}
+TODO
+
+\section{Multimatrix Multiplication}
+
+Multiplication of traditional matricies is one of those things that, when you
+first learn about it, you wonder "Who the hell defined it this way?" And then
+when you see it used in practice, you slowly come to understand they why behind
+it.
+
+Just to review, for two matricies $A$ and $B$, multipication is only defined
+for $A \times B = C$ if $A$ has the same number of columns as $B$ has rows.
+That is, if $|A| = \left< r_a, c_a \right>$ and $|B| = \left< r_b, c_b \right>$
+then $A \times B$ is valid if and only if $c_a = r_b$. And furthermore,
+the remaining dimensions of $A$ and $B$ define the diminsions of $C$,
+$|C| = \left< r_a, c_b \right>$. Each element of $C$ is a sum of the product of
+every combination of the corresponding row of $A$ and the corresponding column of
+$B$,
+
+\[ C[r_a, c_b] = \sum_{\forall i} A[r_a, i] B[i, c_b] \]
+
+So now consider how we would multiply two matricies $A$ and $B$ if they had more
+than two dimensions. Let's use a concrete example to make the problems more apparent.
+Let $|A| = \left<5,7,7\right>$ and $|B| = \left<7,7,2,4\right>$.
+First of all, can we even multiply the two together? Hm... maybe? $|A|$ ends with
+$\left<\ldots, 7\right>$ and $|B|$ starts with $\left<7,\ldots\right>$ so it would
+make sense that we can somehow squish them together into something. By that reasoning,
+the shape of our after-multiplication output would use the remaining dimensions
+$\left<5, 7, 7, 2, 4\right> = |A \times B|$.
+
+But $|A|$ also ends with $\left<\ldots, 7, 7\right>$ and $|B|$ starts with
+$\left<7, 7\ldots\right>$ so maybe our multiplication operation should work on that
+additional dimension, leaving us with $\left<5, 2, 4\right> = |A \times B|$.
+But the first definition looks like it could still be useful! It could let us cover 
+two dimensional matrix multiplication completely within our definition. This second
+definition seems more... multidimensional but it also seems to arbitrarily depend
+on the shape of the two matricies.
+
+So - a compromize. Maybe multimatrix isn't a binary operation. Maybe it's a trinary
+operation. There's some component of, ``How many dimensions are you combining?'' inherent
+in the operation. So we can distinguish our two types of multiplication, and indeed
+an infinite number of types of multiplication, with a new operator, $\mmult{n}$ where
+$|A \mmult{1} B| = \left<5, 7, 7, 2, 4\right>$ and 
+$|A \mmult{2} B| = \left<5, 2, 4\right>$.
+
+But the shape is only a small component of the multipliation  operation. Let's
+just jump into the formal definition and I'll explain with an example:
+
+\begin{definition}[Multimatrix Multiplication]
+\label{mm_mult}
+Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$,
+$|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$.
+Then $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$ and
+\[
+\forall \bar{a} \in \Dim(\vec{a}), \bar{b} \in \Dim(\vec{b}):
+(A \mmult{n}  B)[\bar{a} \oplus \bar{b}] =
+\sum_{\forall \bar{c} \in \Dim(\vec{c})}
+  A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}]
+\]
+\end{definition}
+
+Like two dimensional matrix multiplication, multimatrix multiplication is
+\textit{not} communicative. And it is only weakly associative. That sounds like
+nonsense, but here's what I mean:
+
+\begin{theorem}[Associativity of Multimatrix Multiplication]
+\label{mm_associativity}
+Let $A$, $B$, and $C$ be multimatricies and $n$ and $m$ in
+$\left\{ 0 \right\} \cup \mathbb{Z}^{+}$.
+If both operations $(A \mmult{n} B) \mmult{m} C$ and $A \mmult{n} (B \mmult{m} C)$
+are valid dimensionally, then
+\[ (A \mmult{n} B) \mmult{m} C = A \mmult{n} (B \mmult{m} C) \]
+\end{theorem}
+\begin{proof}
+Let $A$, $B$, and $C$ be matricies such that the calculations
+$(A \mmult{n} B) \mmult{m} C$ and $A \mmult{n} (B \mmult{m} C)$ are both valid.
+Then the following vectors must be true by the definiton of multimatrix
+multiplication (Thm. \ref{mm_mult}).
+
+\noindent
+Since $A \mmult{n} B$ is defined,
+\[
+  \exists \vec{a}, \vec{n}, \vec{b_1} :
+  |\vec{n}| = n \land |A| = \vec{a} \oplus \vec{n} \land |B| = \vec{n} \oplus \vec{b_1} 
+\]
+Since $B \mmult{m} C$ is defined,
+\[
+  \exists \vec{b_2}, \vec{m}, \vec{c} :
+  |\vec{m}| = m \land |B| = \vec{b_2} \oplus \vec{m} \land |C| = \vec{m} \oplus \vec{c}
+\]
+Since $(A \mmult{n} B) \mmult{m} C$ is defined, $|\vec{m}| = m$, and $\vec{m}$ is
+already established as the left $m$ length portion of $|C|$,
+\[ \exists \vec{l} : |A \mmult{n} B| = \vec{l} \oplus \vec{m} \]
+Since $A \mmult{n} (B \mmult{m} C)$ is defined, $|\vec{n}| = n$, and $\vec{n}$ is
+already established as the right $n$ length portion of $|A|$,
+\[ \exists \vec{r} : |B \mmult{m} C| = \vec{n} \oplus \vec{r} \]
+We can see that,
+\begin{align*}
+  |B| &= \vec{n} \oplus \vec{b_1} \\
+      &= \vec{b_2} \oplus \vec{m}
+\end{align*}
+\[ \therefore \vec{n} \oplus \vec{b_1} = \vec{b_2} \oplus \vec{m} \]
+So we end up with two cases. Either $\vec{n}$ and $\vec{m}$ overlap in $|B|$, or
+they don't.
+\begin{case}
+$\vec{n}$ and $\vec{m}$ overlap. So we can suppose the existence of
+three vectors, $\vec{n_l}$, $\vec{x}$, and $\vec{m_r}$ such that $\vec{x}$
+represents the overlapping portion of $\vec{n}$ and $\vec{m}$, so
+\[ |B| =  \vec{n_l} \oplus \vec{x} \oplus \vec{m_r} \]
+\[ \vec{n} = \vec{n_l} \oplus \vec{x} \]
+And,
+\[ \vec{m} = \vec{x} \oplus \vec{m_r} \]
+
+Since $|A| = \vec{a} \oplus \vec{n}$ and $|C| = \vec{m} \oplus \vec{c}$,
+by the definition of multimatrix multiplication,
+\[ |A \mmult{n} B| = \vec{a} \oplus \vec{m_r} \]
+And,
+\[ |B \mmult{m} C| = \vec{n_l} \oplus \vec{c} \]
+But because we've presupposed that $(A \mmult{n} B) \mmult{m} C$ is a valid operation,
+we know that the rightmost porton of $|A \mmult{n} B|$ must be $\vec{m}$, so
+$\vec{a}$ must be divisible into some vector $\vec{a_l}$ and $\vec{x}$ so that
+\[ |A \mmult{n} B| = \vec{a_l} \oplus \vec{x} \oplus \vec{m_r} \]
+\[ \vec{a} = \vec{a_l} \oplus \vec{x} \]
+By the same reasoning, since $A \mmult{m} (B \mmult{m} C)$ is a valid operation,
+there must exist some $\vec{c_r}$ such that
+\[ |B \mmult{m} C| = \vec{n_l} \oplus \vec{x} \oplus \vec{c_r} \]
+and
+\[ \vec{c} = \vec{x} \oplus \vec{c_r} \]
+
+Subsituting in those derived values, we'll see that the expanded version of
+our multimatrix shapes become,
+\[ |A| = \vec{a_l} \oplus \vec{x} \oplus \vec{n_l} \oplus \vec{x} \]
+\[ |B| = \vec{n_l} \oplus \vec{x} \oplus \vec{m_r} \]
+\[ |C| = \vec{x} \oplus \vec{m_r} \oplus \vec{x} \oplus \vec{c_r} \]
+
+It's then clear that the shapes of both associations are equal,
+\[ |(A \mmult{m} B) \mmult{n} C| = \vec{a_l} \oplus \vec{x} \oplus \vec{c_r} \]
+\[ |A \mmult{m} (B \mmult{n} C)| = \vec{a_l} \oplus \vec{x} \oplus \vec{c_r} \]
+Which is a necessary, but not sufficient condition for our proof that
+$(A \mmult{m} B) \mmult{n} C = A \mmult{m} (B \mmult{n} C)$. We now need to prove
+that each of the elements of each resulting multimatrix are the same.
+
+
+\end{case}
+
+\[
+  \vec{b_2} \oplus \vec{c} = \vec{n} \oplus \vec{r}
+\]
+\[
+  \vec{l} \oplus \vec{c} = \vec{a} \oplus \vec{r}
+\]
+\[
+  ((A \mmult{n} B) \mmult{m} C)[\bar{l} \oplus \bar{c}] =
+	\sum_{\forall \bar{m}} (A \mmult{n} B)[\bar{l} \oplus \bar{m}]C[\bar{m} \oplus \bar{c}]
+\]
+
+\end{proof}
+
+\begin{theorem}[M.M.M. Chain Rule]
+\label{mmm_chain_rule}
+Let $F(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}^{\vec{f}}$
+and $G(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}^{\vec{g}}$.
+\[
+\frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
+\]
+\end{theorem}
+\begin{proof}
+By the definition of a derivative (\ref{mm_derivative}),
+\[
+\forall \bar{f} \in \Dim(\vec{f}), \bar{g} \in \Dim(\vec{g}):
+\frac{dF(G)}{dG}[\bar{f} \oplus \bar{g}]
+= \frac{\partial F(G)[\bar{f}]}{\partial G[\bar{g}]}
+\]
+\[
+\forall \bar{g} \in \Dim(\vec{g}), \bar{x} \in \Dim(\vec{x}):
+\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
+= \frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
+\]
+By the scalar total derivative rule,
+\[
+\frac{\partial F(G(X))[\bar{f}]}{\partial X[\bar{x}]}
+= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
+\frac{\partial F(G)[\bar{f}]}{\partial G[\bar{g}]}
+\frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
+\]
+Substituting in our above definitions this yields,
+\[
+\frac{\partial F(G(X))[\bar{f}]}{\partial X[\bar{x}]}
+= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
+\frac{dF(G)}{dG}[\bar{f} \oplus \bar{g}]
+\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
+\]
+And again, by the definition of a derivative (\ref{mm_derivative}),
+\[
+\forall \bar{f} \in \Dim(\vec{f}), \bar{x} \in \Dim(\vec{x}):
+\frac{dF(G(X))}{dX}[\bar{f} \oplus \bar{x}]
+= \frac{\partial F(G(X))[\bar{f}]}{\partial X[\bar{x}]}
+\]
+Therefore,
+\[
+\frac{dF(G(X))}{dX}[\bar{f} \oplus \bar{x}]
+= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
+\frac{dF(G)}{dG}[\bar{f} \oplus \bar{g}]
+\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
+\]
+Which, taking a look at the definition of multidimensional matrix multiplication
+(\ref{mm_mult}), tells us that,
+\[
+\frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
+\]
+\end{proof}
+
+\begin{theorem}[S.M.M. Chain Rule]
+\label{smm_chain_rule}
+Let $f(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}$
+and $G(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}^{\vec{g}}$.
+\[
+\frac{df(G(X))}{dX} = \frac{df}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
+\]
+\end{theorem}
+\begin{proof}
+By the definitions of a derivative
+(\ref{sm_derivative} and \ref{mm_derivative} respectively),
+\[
+\forall \bar{g} \in \Dim(\vec{g}):
+\frac{df(G)}{dG}[\bar{g}]
+= \frac{\partial f(G)}{\partial G[\bar{g}]}
+\]
+\[
+\forall \bar{g} \in \Dim(\vec{g}), \bar{x} \in \Dim(\vec{x}):
+\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
+= \frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
+\]
+By the scalar total derivative rule,
+\[
+\frac{\partial f(G(X))}{\partial X[\bar{x}]}
+= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
+\frac{\partial f(G)}{\partial G[\bar{g}]}
+\frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
+\]
+Substituting in our above definitions this yields,
+\[
+\frac{\partial f(G(X))}{\partial X[\bar{x}]}
+= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
+\frac{df(G)}{dG}[\bar{g}]
+\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
+\]
+Again, by the definition of a derivative (\ref{sm_derivative}),
+\[
+\frac{df(G(X))}{dX}[\bar{x}] =
+\frac{\partial f(G(X))}{\partial X[\bar{x}]}
+\]
+Therefore,
+\[
+\frac{df(G(X))}{dX}[\bar{x}]
+= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
+\frac{df(G)}{dG}[\bar{g}]
+\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
+\]
+Which, by the definition of multidimensional multipliction (\ref{mm_mult}),
+implies that,
+\[
+\frac{df(G(X))}{dX} = \frac{df(G)}{dG} \mmult{|\vec{g}|} \frac{dG(X)}{dX}
+\]
+\end{proof}
+
+\begin{theorem}[M.S.M. Chain Rule]
+\label{msm_chain_rule}
+Let $F(g)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{f}}$
+and $g(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}$.
+\[
+\frac{dF(g(X))}{dX} = \frac{dF}{dg} \mmult{0} \frac{dg}{dX}
+\]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[M.M.S. Chain Rule]
+\label{mms_chain_rule}
+Let $F(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}^{\vec{f}}$
+and $G(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{g}}$.
+\[
+\frac{dF(G(x))}{dx} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dx}
+\]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[S.S.M. Chain Rule]
+\label{ssm_chain_rule}
+Let $f(g)$ be a function $\mathbb{R} \rightarrow \mathbb{R}$
+and $g(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}$.
+\[
+\frac{df(g(X))}{dX} = \frac{df}{dg} \frac{dg}{dX}
+\]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[S.M.S. Chain Rule]
+\label{sms_chain_rule}
+Let $f(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}$
+and $G(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{g}}$.
+\[
+\frac{df(G(X))}{dx} = \frac{df}{dG} \mmult{|\vec{g}|} \frac{dG}{dx}
+\]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[M.S.S. Chain Rule]
+\label{mss_chain_rule}
+Let $F(g)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{f}}$
+and $g(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}$.
+\[
+\frac{dF(g(x))}{dx} = \frac{dF}{dg} \frac{dg}{dx}
+\]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\end{document}

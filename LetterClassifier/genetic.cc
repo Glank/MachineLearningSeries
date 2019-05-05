@@ -2,24 +2,26 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
 using std::string;
 using std::vector;
 
-namespace smiley {
+namespace genetic {
 
 constexpr int kWidth = 20;
 constexpr int kHeight = 20;
+constexpr int kNumLetters = 26;
 
 struct Sample {
   vector<float> data;
-  bool isSmiley;
+  char letter;
 };
 
-void ParseSample(const string& line, bool isSmiley, Sample* out) {
-  out->isSmiley = isSmiley;
+void ParseSample(const string& line, char letter, Sample* out) {
+  out->letter = letter;
   for (const auto& c : line) {
     if (c == '0') {
       out->data.push_back(0);
@@ -37,11 +39,7 @@ void ParseSample(const string& line, bool isSmiley, Sample* out) {
 }
 
 std::ostream& operator<<(std::ostream& o, const Sample& s) {
-  if (s.isSmiley) {
-    o << "=)";
-  } else {
-    o << "=(";
-  }
+  o << "Letter: " << s.letter;
   for (int y = 0; y < kHeight; y++) {
     o << std::endl;
     for (int x = 0; x < kWidth; x++) {
@@ -51,7 +49,7 @@ std::ostream& operator<<(std::ostream& o, const Sample& s) {
   return o;
 }
 
-void ReadSamples(const string& file, bool areSmiles, vector<Sample>* out) {
+void ReadSamples(const string& file, char letter, vector<Sample>* out) {
   string line;
   std::ifstream in(file);
   if (!in.is_open()) {
@@ -60,13 +58,13 @@ void ReadSamples(const string& file, bool areSmiles, vector<Sample>* out) {
   }
   while (std::getline(in, line)) {
     Sample sample;
-    ParseSample(line, areSmiles, &sample);
+    ParseSample(line, letter, &sample);
     out->push_back(std::move(sample));
   }
 }
 
 struct ModelState {
-  float weights[kWidth*kHeight];
+  float weights[kWidth*kHeight*kNumLetters];
 };
 
 // Get the initial weights, each as an independent normal variable.
@@ -76,63 +74,47 @@ ModelState InitModel() {
   std::normal_distribution<float> randNorm(0, 1);
   
   ModelState state;
-  for (int i = 0; i < kWidth*kHeight; i++) {
+  for (int i = 0; i < kWidth*kHeight*kNumLetters; i++) {
     state.weights[i] = randNorm(gen);
   }
   return state;
 };
 
-std::ostream& operator<<(std::ostream& o, const ModelState& s) {
-  for (int y = 0; y < kHeight; y++) {
-    if (y != 0) {
-      o << std::endl;
-    }
-    for (int x = 0; x < kWidth; x++) {
-      float w = s.weights[x+kWidth*y];
-      if (w < -1) {
-        o << '-';
-      } else if (w > 1) {
-        o << '+';
-      } else {
-        o << '0';
-      }
+void Evaluate(const Sample& sample, const ModelState& s, float* result) {
+  for (int l = 0; l < kNumLetters; l++) {
+    result[l] = 0;
+    for (int i = 0; i < kWidth*kHeight; i++) {
+      result[l] += sample.data[i]*s.weights[l*kWidth*kHeight+i];
     }
   }
-  return o;
-}
-
-float Evaluate(const Sample& sample, const ModelState& s) {
-  float result = 0;
-  for (int i = 0; i < kWidth*kHeight; i++) {
-    result += sample.data[i]*s.weights[i];
-  }
-  return result;
 }
 
 float Error(const Sample& sample, const ModelState& s) {
-  float evaluation = Evaluate(sample, s);
-  if (-1 < evaluation && evaluation < 1) {
-    // The evaluation was too close to call.
-    return 0.5;
+  float letters[kNumLetters];
+  Evaluate(sample, s, letters);
+  int expected = (int)(sample.letter-'A');
+  float error = 0;
+  for(int l = 0; l < kNumLetters; l++) {
+    if (-1 < letters[l] && letters[l] < 1) {
+      error += 0.5;
+    } else if ((letters[l] > 0) != (l == expected)) {
+      if (l == expected) {
+        error += 10;
+      } else {
+        error += 1;
+      }
+    }
   }
-  if ((evaluation > 0) != sample.isSmiley) {
-    // The evaluation was wrong.
-    return 1;
-  }
-  // The evaluation was correct.
-  return 0;
+  error /= kNumLetters;
+  return error;
 }
 
-float TotalError(const vector<Sample> samples, const ModelState& state) {
+float TotalError(const vector<Sample> samples, const ModelState& s) {
   float err = 0;
   for (const Sample& sample : samples) {
-    err += Error(sample, state);
+    err += Error(sample, s);
   }
   return err;
-}
-
-float AverageError(const vector<Sample> samples, const ModelState& state) {
-  return TotalError(samples, state) / samples.size();
 }
 
 // Mutates the current state into the given output mem.
@@ -148,7 +130,7 @@ class Mutator {
   Mutator() :rd_(), gen_(rd_()), randNorm_(0,1), randUniform_(0,1) {}
   
   void Mutate(const ModelState& curState, ModelState* out) {
-    for (int i = 0; i < kWidth*kHeight; i++) {
+    for (int i = 0; i < kWidth*kHeight*kNumLetters; i++) {
       if (randUniform_(gen_) < kMutationRate) {
         // 10% of the time mutate the i'th weight by some
         // standard normally distributed amount.
@@ -174,58 +156,62 @@ void Pop10Percent(vector<Sample>* allSamples, vector<Sample>* verificationSample
   }
 }
 
-// Export the weights to std::out to be used in our application.
-void PrintWeights(const ModelState& s) {
-  for (int i = 0; i < kWidth*kHeight; i++) {
-    if (i != 0) {
-      std::cout << ", ";
-    }
-    std::cout << s.weights[i];
+// Export the weights to a file to be used in our application.
+void SaveWeights(const ModelState& s) {
+  std::ofstream out("weights.js");
+  if (!out.is_open()) {
+    std::cout << "Error opening 'weights.js'" << std::endl;
+    std::exit(1);
   }
+  out << "var weights = [";
+  for (int i = 0; i < kWidth*kHeight*kNumLetters; i++) {
+    if (i != 0) {
+      out << ", ";
+    }
+    out << s.weights[i];
+  }
+  out << "]\n";
 }
 
-} // namespace smiley
+} // namespace genetic
 
 int main() {
-  vector<smiley::Sample> samples;
-  smiley::ReadSamples("samples/smileys.txt", true, &samples);
-  smiley::ReadSamples("samples/frownies.txt", false, &samples);
-  smiley::Shuffle(&samples);
+  vector<genetic::Sample> samples;
+  for (int l = 0; l < genetic::kNumLetters; l++) {
+    std::stringstream fn;
+    fn << "samples/" << (char)('a'+l) << "_samples.txt";
+    genetic::ReadSamples(fn.str(), (char)('A'+l), &samples);
+  }
+  genetic::Shuffle(&samples);
 
   // Set aside 10% of sampes to ensure that the model isn't overtraining.
-  vector<smiley::Sample> verificationSamples;
+  vector<genetic::Sample> verificationSamples;
   Pop10Percent(&samples, &verificationSamples);
 
-  smiley::ModelState curState = smiley::InitModel(); 
+  genetic::ModelState curState = genetic::InitModel(); 
 
-  smiley::Mutator mut;
-  smiley::ModelState newState;
+  genetic::Mutator mut;
+  genetic::ModelState newState;
 
-  float curErr = smiley::TotalError(samples, curState);
-  for (int t = 0; t < 1000; t++) {
-    if (t%10 == 0) {
-      std::cout << "Trial " << t << ": " << curErr << std::endl;
-    }
+  float curErr = genetic::TotalError(samples, curState);
+  for (int t = 0; t < 10000; t++) {
+    std::cout << "Trial " << t << ": " << curErr << std::endl;
     mut.Mutate(curState, &newState);
-    float newErr = smiley::TotalError(samples, newState);
+    float newErr = genetic::TotalError(samples, newState);
     if (newErr <= curErr) {
       curState = newState;
       curErr = newErr;
     }
   }
 
-  std::cout << curState << std::endl;
-  
   std::cout << "Final training error: " <<
-    smiley::AverageError(samples, curState) << std::endl;
+    (genetic::TotalError(samples, curState)/samples.size()) <<
+    std::endl;
   std::cout << "Final verification error: " <<
-    smiley::AverageError(verificationSamples, curState) << std::endl;
+    (genetic::TotalError(verificationSamples, curState)/verificationSamples.size()) <<
+    std::endl;
 
-  /*
-  std::cout << std::endl << std::endl;
-  PrintWeights(curState);
-  std::cout << std::endl << std::endl;
-  // */
+  SaveWeights(curState);
   
   return 0;
 }

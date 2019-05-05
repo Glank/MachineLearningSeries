@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <html>
+<style>
+div {
+  display:block;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+span {
+  display:block;
+}
+</style>
+<script src="weights.js"></script>
 <body>
 
+<span id="error" style="display:None; background-color: red;"></span>
 <div>
  <canvas id="canvas" width="200" height="200" style="border:1px solid #d3d3d3;">
-</canvas>
+ </canvas>
+ <button onclick="clearSample()">Clear</button>
 </div>
 <div>
- <button onclick="clearSample()">Clear</button>
- <button onclick="saveSample()">Save</button>
- <span id="samples_count">
-   Samples Saved: 0
+ <button onclick="testSample()">Test Sample</button>
+ <span id="test_result">
+   ??? 
  </span>
- <button onclick="downloadSamples()">Download</button>
 </div>
 
 <script>
@@ -77,36 +88,39 @@ function draw(e) {
   ctx.putImageData(imgData, 0, 0);
 }
 
-// Sourced from Matěj Pokorný at:
-// https://stackoverflow.com/questions/3665115/create-a-file-in-memory-for-user-to-download-not-through-server
-function download(filename, text) {
-  var element = document.createElement('a');
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-  element.setAttribute('download', filename);
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
-}
-
-var samples = [];
-
 function clearSample() {
   for(var i = 0; i < rawPxls.length; i++) {
     rawPxls[i] = false;
   }
   draw(canvas);
 }
-function saveSample() {
-  samples.push(Array.from(rawPxls, (p) => p ? "1" : "0").join(""));
-  document.getElementById("samples_count").innerHTML="Samples Saved: "+samples.length;
-  clearSample()
-}
-function downloadSamples() {
-  download("img_samples.txt", samples.join("\n"));
+
+var numLetters = 26;
+
+function testSample() {
+  var results = [];
+  var maxIndex = -1;
+  var maxValue = 0;
+  for (var l = 0; l < numLetters; l++) {
+    results[l] = 0;
+    for (var i = 0; i < imgWidth*imgHeight; i++) {
+      if (rawPxls[i]) {
+        results[l] += weights[l*imgWidth*imgHeight+i];
+      }
+    }
+    if (maxIndex == -1 || maxValue < results[l]) {
+      maxValue = results[l];
+      maxIndex = l;
+    }
+  }
+
+  var r = document.getElementById("test_result");
+  var letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(maxIndex);
+  if (maxValue < 1) {
+    r.innerHTML = "["+results+"] " + maxValue + " -> ?..." + letter;
+  } else {
+    r.innerHTML = "["+results+"] " + maxValue + " -> " + letter;
+  }
 }
 </script>
 
