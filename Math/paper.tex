@@ -18,7 +18,12 @@
 \theoremstyle{case}
 \newtheorem{case}{Case}
 
+\newtheoremstyle{ppart}{}{}{}{}{}{:}{ }{}
+\theoremstyle{ppart}
+\newtheorem{ppart}{Part}
+
 \DeclareMathOperator{\Dim}{Dim}
+\DeclareMathOperator{\Ident}{I}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
@@ -225,11 +230,11 @@ if we could define the total derivative without going down into the partial deri
 at all, which we'll be able to do in later sections. As a sneak peak, that'll look
 like this:
 \[
-\frac{dM}{dX} = I^3(|X|) \mmult{||X||} \cos(X)
+\frac{dM}{dX} = \Ident^3(|X|) \mmult{||X||} \cos(X)
 \]
 
 But that single line will require defining something I'm going to call a cubic
-identity, $I^3(|X|)$, as well as multimatrix multiplication.
+identity, $\Ident^3(|X|)$, as well as multimatrix multiplication.
 
 \subsection*{Sample Problems}
 TODO
@@ -282,8 +287,11 @@ just jump into the formal definition and I'll explain with an example:
 \begin{definition}[Multimatrix Multiplication]
 \label{mm_mult}
 Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$,
-$|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$.
-Then $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$ and
+$|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$ with
+$n \in \left\{ 0 \right\} \cup \mathbb{Z}^{+}$. We shall call $n$ the 'size'
+of the multiplication operation.
+The shape of the result is defined, $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$
+and the value of the result is defined,
 \[
 \forall \bar{a} \in \Dim(\vec{a}), \bar{b} \in \Dim(\vec{b}):
 (A \mmult{n}  B)[\bar{a} \oplus \bar{b}] =
@@ -294,100 +302,412 @@ Then $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$ and
 
 Like two dimensional matrix multiplication, multimatrix multiplication is
 \textit{not} communicative. And it is only weakly associative. That sounds like
-nonsense, but here's what I mean:
+nonsense, but here's what I mean.
+
+Multimatrix multiplication may not even make sense dimensionally when you move
+around parentheses. Take for example multimatricies $A$, $B$, and $C$ such that,
+$|A| = \left<5,3,2\right>$,
+$|B| = \left<2,7\right>$, and
+$|C| = \left<3,7,2\right>$ where you should be able to see that
+$(A \mmult{1} B) \mmult{2} C$ is a valid operation since
+$|A \mmult{1} B| = \left<5,3,7\right>$ and
+$|(A \mmult{1} B) \mmult{2} C| = \left<5,7\right>$. But
+$A \mmult{1} (B \mmult{2} C)$ isn't a valid set of operations since even
+$B \mmult{2} C$ is an invalid operation.
+
+But even when the dimensional analysis makes sense, multimatrix multiplication
+may not be associative. Take, for example, multimatricies $A$, $B$, and $C$ such
+that $|A| = \left<2,2,2,2\right>$, $|B| = \left<2,2,2\right>$, and
+$|C| = \left<2,2,2,2\right>$. Let,
+\[
+ A[\bar{a}] = 
+	\left\{
+		\begin{array}{ll}
+			1 & \mbox{if } \bar{a} = \left<1,1,1,2\right> \\
+			0 & \mbox{otherwise}
+		\end{array}
+	\right.
+\]
+\[
+ B[\bar{b}] = 
+	\left\{
+		\begin{array}{ll}
+			1 & \mbox{if } \bar{b} = \left<1,2,1\right> \\
+			0 & \mbox{otherwise}
+		\end{array}
+	\right.
+\]
+And
+\[
+ C[\bar{c}] = 
+	\left\{
+		\begin{array}{ll}
+			1 & \mbox{if } \bar{c} = \left<1,1,1,1\right> \\
+			0 & \mbox{otherwise}
+		\end{array}
+	\right.
+\]
+Then,
+\[
+ (A \mmult{2} B)[\bar{x}] = 
+	\left\{
+		\begin{array}{ll}
+			1 & \mbox{if } \bar{x} = \left<1,1,1\right> \\
+			0 & \mbox{otherwise}
+		\end{array}
+	\right.
+\]
+So,
+\[
+ ((A \mmult{2} B) \mmult{2} C)[\bar{x}] = 
+	\left\{
+		\begin{array}{ll}
+			1 & \mbox{if } \bar{x} = \left<1,1\right> \\
+			0 & \mbox{otherwise}
+		\end{array}
+	\right.
+\]
+But, $(B \mmult{2} C)[\bar{x}] = 0$ so $(A \mmult{2} (B \mmult{2} C))[\bar{x}] = 0$
+Which goes to show that even though both $(A \mmult{2} B) \mmult{2} C$ and
+$A \mmult{2} (B \mmult{2} C)$ are valid calculations which result in multimatrixes
+of the same dimensionality, they are not equal so multiplicative associativity
+doesn't hold.
+
+However, there are a broad catagory of cases where associativity \textit{does} hold:
 
 \begin{theorem}[Associativity of Multimatrix Multiplication]
 \label{mm_associativity}
-Let $A$, $B$, and $C$ be multimatricies and $n$ and $m$ in
+Let $A$, $B$, and $C$ be multimatricies and $m$ and $n$ in
 $\left\{ 0 \right\} \cup \mathbb{Z}^{+}$.
-If both operations $(A \mmult{n} B) \mmult{m} C$ and $A \mmult{n} (B \mmult{m} C)$
-are valid dimensionally, then
-\[ (A \mmult{n} B) \mmult{m} C = A \mmult{n} (B \mmult{m} C) \]
+If both operations $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$
+are valid dimensionally and $m+n \le ||B||$, then,
+\[ (A \mmult{m} B) \mmult{n} C = A \mmult{m} (B \mmult{n} C) \]
 \end{theorem}
 \begin{proof}
 Let $A$, $B$, and $C$ be matricies such that the calculations
-$(A \mmult{n} B) \mmult{m} C$ and $A \mmult{n} (B \mmult{m} C)$ are both valid.
-Then the following vectors must be true by the definiton of multimatrix
-multiplication (Thm. \ref{mm_mult}).
+$(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$ are both valid
+and $m + n \le ||B||$.
+Then the following must be true by the definiton of multimatrix multiplication
+(Def. \ref{mm_mult}).
 
 \noindent
-Since $A \mmult{n} B$ is defined,
+Since $A \mmult{m} B$ is defined,
 \[
-  \exists \vec{a}, \vec{n}, \vec{b_1} :
-  |\vec{n}| = n \land |A| = \vec{a} \oplus \vec{n} \land |B| = \vec{n} \oplus \vec{b_1} 
+ \exists \vec{a}, \vec{m}, \vec{b_1} :
+ |\vec{m}| = m \land |A| = \vec{a} \oplus \vec{m} \land |B| = \vec{m} \oplus \vec{b_1} 
 \]
-Since $B \mmult{m} C$ is defined,
+Since $B \mmult{n} C$ is defined,
 \[
-  \exists \vec{b_2}, \vec{m}, \vec{c} :
-  |\vec{m}| = m \land |B| = \vec{b_2} \oplus \vec{m} \land |C| = \vec{m} \oplus \vec{c}
+ \exists \vec{b_2}, \vec{n}, \vec{c} :
+ |\vec{n}| = n \land |B| = \vec{b_2} \oplus \vec{n} \land |C| = \vec{n} \oplus \vec{c}
 \]
-Since $(A \mmult{n} B) \mmult{m} C$ is defined, $|\vec{m}| = m$, and $\vec{m}$ is
-already established as the left $m$ length portion of $|C|$,
-\[ \exists \vec{l} : |A \mmult{n} B| = \vec{l} \oplus \vec{m} \]
-Since $A \mmult{n} (B \mmult{m} C)$ is defined, $|\vec{n}| = n$, and $\vec{n}$ is
-already established as the right $n$ length portion of $|A|$,
-\[ \exists \vec{r} : |B \mmult{m} C| = \vec{n} \oplus \vec{r} \]
-We can see that,
+Since $|B| = \vec{m} \oplus \vec{b_1} = \vec{b_2} \oplus \vec{n}$ and
+$||B|| \ge |\vec{m}| + |\vec{n}|$, it must follow that,
+\[
+ \exists \vec{b} :
+ |B| = \vec{m} \oplus \vec{b} \oplus \vec{n}
+\]
+Even if $\vec{b}$ is an empty vector. Then,
+\[ |A \mmult{m} B| = \vec{a} \oplus \vec{b} \oplus \vec{n} \]
+\[ |(A \mmult{m} B) \mmult{n} C| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ |B \mmult{n} C| = \vec{m} \oplus \vec{b} \oplus \vec{c} \]
+\[ |A \mmult{m} (B \mmult{n} C)| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+So,
+\[ |(A \mmult{m} B) \mmult{n} C| = |A \mmult{m} (B \mmult{n} C)| \]
+Which is necessary, but not sufficient, for our proof.
+
+Looking at each element of the result matricies, let $j$ and $k$ be the values
+of some parallel cells in $(A \mmult{m} B) \mmult{n} C$ and
+$A \mmult{m} (B \mmult{n} C)$ respectively. Then for some indicies of those cells,
+$\bar{a} \oplus \bar{b} \oplus \bar{c} \in
+\Dim(\vec{a} \oplus \vec{b} \oplus \vec{c})$,
 \begin{align*}
-  |B| &= \vec{n} \oplus \vec{b_1} \\
-      &= \vec{b_2} \oplus \vec{m}
+ j
+ &= ((A \mmult{m} B) \mmult{n} C)[\bar{a} \oplus \bar{b} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+ (A \mmult{m} B)[\bar{a} \oplus \bar{b} \oplus \bar{n}]
+ C[\bar{n} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{n}}
+ \left(
+  \sum_{\forall \bar{m} \in \Dim(\vec{m})}
+	A[\bar{a} \oplus \bar{m}]B[\bar{m} \oplus \bar{b} \oplus \bar{n}]
+ \right)
+ C[\bar{n} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{n}, \bar{m}}
+ A[\bar{a} \oplus \bar{m}]
+ B[\bar{m} \oplus \bar{b} \oplus \bar{n}]
+ C[\bar{n} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{m}, \bar{n}}
+ A[\bar{a} \oplus \bar{m}]
+ B[\bar{m} \oplus \bar{b} \oplus \bar{n}]
+ C[\bar{n} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{m}}
+ A[\bar{a} \oplus \bar{m}]
+ \left(
+ \sum_{\forall \bar{n}}
+  B[\bar{m} \oplus \bar{b} \oplus \bar{n}]
+  C[\bar{n} \oplus \bar{c}]
+ \right) \\
+ &= \sum_{\forall \bar{m}}
+ A[\bar{a} \oplus \bar{m}]
+ (B \mmult{n} C)[\bar{m} \oplus \bar{b} \oplus \bar{c}] \\
+ &= (A \mmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{b} \oplus \bar{c}] \\
+ &= k
 \end{align*}
-\[ \therefore \vec{n} \oplus \vec{b_1} = \vec{b_2} \oplus \vec{m} \]
-So we end up with two cases. Either $\vec{n}$ and $\vec{m}$ overlap in $|B|$, or
-they don't.
-\begin{case}
-$\vec{n}$ and $\vec{m}$ overlap. So we can suppose the existence of
-three vectors, $\vec{n_l}$, $\vec{x}$, and $\vec{m_r}$ such that $\vec{x}$
-represents the overlapping portion of $\vec{n}$ and $\vec{m}$, so
-\[ |B| =  \vec{n_l} \oplus \vec{x} \oplus \vec{m_r} \]
-\[ \vec{n} = \vec{n_l} \oplus \vec{x} \]
-And,
-\[ \vec{m} = \vec{x} \oplus \vec{m_r} \]
-
-Since $|A| = \vec{a} \oplus \vec{n}$ and $|C| = \vec{m} \oplus \vec{c}$,
-by the definition of multimatrix multiplication,
-\[ |A \mmult{n} B| = \vec{a} \oplus \vec{m_r} \]
-And,
-\[ |B \mmult{m} C| = \vec{n_l} \oplus \vec{c} \]
-But because we've presupposed that $(A \mmult{n} B) \mmult{m} C$ is a valid operation,
-we know that the rightmost porton of $|A \mmult{n} B|$ must be $\vec{m}$, so
-$\vec{a}$ must be divisible into some vector $\vec{a_l}$ and $\vec{x}$ so that
-\[ |A \mmult{n} B| = \vec{a_l} \oplus \vec{x} \oplus \vec{m_r} \]
-\[ \vec{a} = \vec{a_l} \oplus \vec{x} \]
-By the same reasoning, since $A \mmult{m} (B \mmult{m} C)$ is a valid operation,
-there must exist some $\vec{c_r}$ such that
-\[ |B \mmult{m} C| = \vec{n_l} \oplus \vec{x} \oplus \vec{c_r} \]
-and
-\[ \vec{c} = \vec{x} \oplus \vec{c_r} \]
-
-Subsituting in those derived values, we'll see that the expanded version of
-our multimatrix shapes become,
-\[ |A| = \vec{a_l} \oplus \vec{x} \oplus \vec{n_l} \oplus \vec{x} \]
-\[ |B| = \vec{n_l} \oplus \vec{x} \oplus \vec{m_r} \]
-\[ |C| = \vec{x} \oplus \vec{m_r} \oplus \vec{x} \oplus \vec{c_r} \]
-
-It's then clear that the shapes of both associations are equal,
-\[ |(A \mmult{m} B) \mmult{n} C| = \vec{a_l} \oplus \vec{x} \oplus \vec{c_r} \]
-\[ |A \mmult{m} (B \mmult{n} C)| = \vec{a_l} \oplus \vec{x} \oplus \vec{c_r} \]
-Which is a necessary, but not sufficient condition for our proof that
-$(A \mmult{m} B) \mmult{n} C = A \mmult{m} (B \mmult{n} C)$. We now need to prove
-that each of the elements of each resulting multimatrix are the same.
-
-
-\end{case}
-
-\[
-  \vec{b_2} \oplus \vec{c} = \vec{n} \oplus \vec{r}
-\]
-\[
-  \vec{l} \oplus \vec{c} = \vec{a} \oplus \vec{r}
-\]
-\[
-  ((A \mmult{n} B) \mmult{m} C)[\bar{l} \oplus \bar{c}] =
-	\sum_{\forall \bar{m}} (A \mmult{n} B)[\bar{l} \oplus \bar{m}]C[\bar{m} \oplus \bar{c}]
-\]
-
+Since $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$ are both
+the same shape and every cell with the same index in each is equal, the two
+values must be equal.
 \end{proof}
+
+Multiplicative identities for multimatricies depend on the shape of the
+multimatrix they are being multiplied against, just as for regular matricies.
+However, the multiplicative identity also greatly depends on the size of
+the particular multiplication operation. 
+
+\begin{definition}[Multimatrix Identities]
+\label{mm_ident}
+Let us define $\Ident^n(\vec{v})$ as the $n^{\text{th}}$ order identity with base shape
+$\vec{v}$. This $\Ident^n(\vec{v})$ is a multimatrix with shape,
+\[ |\Ident^n(\vec{v})| = \bigoplus_{i \in [1, n]} \vec{v} \]
+That is, it's shape is $n$ successive concatinations of $\vec{v}$.
+Let each element of $\Ident^n(\vec{v})$ is defined as,
+\[ \forall \bar{v_1}, \bar{v_2}, \ldots, \bar{v_n} \text{ each in } \Dim(\vec{v}) : \]
+\[
+ \Ident^n(\vec{v})[\bar{v_1}, \bar{v_2}, \ldots, \bar{v_n}]
+ = \left\{
+	\begin{array}{ll}
+		1 & \mbox{if } \bar{v_1} = \bar{v_2} = \ldots = \bar{v_n} \\
+		0 & \mbox{otherwise}
+	\end{array}
+ \right.
+\]
+
+In particular, let us call $\Ident^2(\vec{v})$ the square identity of $\vec{v}$ and
+$\Ident^3(\vec{v})$ the cubic identity of $\vec{v}$.
+\end{definition}
+
+That definition seems rather arbitrary, but you'll see various orders of identity
+pop up in derivatives down the line. For now, let's just look at how the
+square identity it relates to a multiplication operation.
+
+\begin{theorem}[Multimatrix Multiplicative Identity]
+For all $\vec{m}$ and $\vec{n}$ on which the operations are valid,
+\[
+ A \mmult{|\vec{m}|} \Ident^2(\vec{m}) = A
+\]
+and
+\[
+ \Ident^2(\vec{n}) \mmult{|\vec{n}|} A = A
+\]
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $A$ be a matrix with shape $|A| = \vec{a} \oplus \vec{m}$.
+Then by the definition of multimatrix multiplication (Def. \ref{mm_mult}),
+\[ \forall \bar{a} \in \Dim(\vec{a}), \bar{m_1} \in \Dim(\vec{m}) : \]
+\[
+ (A \mmult{|\vec{m}|} \Ident^2(\vec{m}))[\bar{a} \oplus \bar{m_1}]
+ =
+ \sum_{\forall \bar{m_2} \in \Dim(\vec{m})}
+ A[\bar{a} \oplus \bar{m_2}] \Ident^2(\vec{m})[\bar{m_2} \oplus \bar{m_1}]
+\]
+Then, by the definition of $\Ident^2(\vec{m})$ (Def. \ref{mm_ident}) it follows
+that,
+\begin{align*}
+ (A \mmult{|\vec{m}|} \Ident^2(\vec{m}))[\bar{a} \oplus \bar{m_1}]
+ &=
+ \left(
+  \sum_{\forall \bar{m_2} \ne \bar{m_1}}
+  A[\bar{a} \oplus \bar{m_2}] (0)
+ \right)
+ +
+ \left(
+  \sum_{\forall \bar{m_2} = \bar{m_1}}
+  A[\bar{a} \oplus \bar{m_2}] (1)
+ \right) \\
+ \\
+ &= 0 + A[\bar{a} \oplus \bar{m_1}] \\
+ &= A[\bar{a} \oplus \bar{m_1}]
+\end{align*}
+Therefore $A \mmult{|\vec{m}|} \Ident^2(\vec{m}) = A$
+\end{ppart}
+\begin{ppart}
+Let $A$ be a matrix with shape $|A| = \vec{n} \oplus \vec{a}$.
+Then by the definition of multimatrix multiplication (Def. \ref{mm_mult}),
+\[ \forall  \bar{n_1} \in \Dim(\vec{n}), \bar{a} \in \Dim(\vec{a}) : \]
+\[
+ (\Ident^2(\vec{n}) \mmult{|\vec{n}|} A)[\bar{n_1} \oplus \bar{a}]
+ =
+ \sum_{\forall \bar{n_2} \in \Dim(\vec{n})}
+ \Ident^2(\vec{n})[\bar{n_1} \oplus \bar{n_2}]A[\bar{n_2} \oplus \bar{a}] 
+\]
+Then, by the definition of $\Ident^2(\vec{n})$ (Def. \ref{mm_ident}) it follows
+that,
+\begin{align*}
+ (\Ident^2(\vec{n}) \mmult{|\vec{n}|} A)[\bar{n_1} \oplus \bar{a}]
+ &=
+ \left(
+  \sum_{\forall \bar{n_2} \ne \bar{n_1}}
+  (0) A[\bar{n_2} \oplus \bar{a}]
+ \right)
+ +
+ \left(
+  \sum_{\forall \bar{n_2} = \bar{n_1}}
+  (1) A[\bar{n_2} \oplus \bar{a}]
+ \right) \\
+ \\
+ &= 0 + A[\bar{n_1} \oplus \bar{a}] \\
+ &= A[\bar{n_1} \oplus \bar{a}]
+\end{align*}
+Therefore $\Ident^2(\vec{n}) \mmult{|\vec{n}|} A = A$
+\end{ppart}
+\end{proof}
+
+The square identity also pops up in the derivative of a multimatrix
+with respect to itself.
+
+\begin{theorem}[Self Derivative]
+Let $X$ be a multimatrix with independent elements. Then,
+\[ \frac{dX}{dX} = \Ident^2(|X|) \]
+\end{theorem}
+\begin{proof}
+Let $X$ be a multimatrix of shape $|X|=\vec{x}$ with independent elements.
+By the derivative definition (Def. \ref{mm_derivative}),
+\[
+ \forall \bar{x_1} \in \Dim(\vec{x}),
+         \bar{x_2} \in \Dim(\vec{x}):
+\]
+\[
+ \frac{dX}{dX}[\bar{x_1} \oplus \bar{x_2}] = 
+ \frac{\partial X[\bar{x_1}]}{\partial X[\bar{x_2}]}
+\]
+Since each element of $X$ is independent with respect to itself,
+\begin{align*}
+ \frac{dX}{dX}[\bar{x_1} \oplus \bar{x_2}]
+ &= \left\{
+	\begin{array}{ll}
+		1 & \mbox{if } \bar{x_1} = \bar{x_2} \\
+		0 & \mbox{otherwise}
+	\end{array}
+ \right. \\
+ &= \Ident^2(\vec{x})[\bar{x_1} \oplus \bar{x_2}]
+\end{align*}
+Therefore $dX/dX = \Ident^2(|X|)$
+\end{proof}
+
+The cubic identity, strangely enough, pops up in the derivative of elementwise
+functions.
+
+\begin{theorem}[Elementwise Derivative]
+Let $M$ be an element wise function on $X$. That is, Let $M(X)$ be a function
+such that,
+\[ M(X) : \mathbb{R}^{\vec{x}} \to \mathbb{R}^{\vec{x}} \]
+And which applies the same scalar function to each element of $X$, 
+\[ M(X)[\bar{x}] = m(X[\bar{x}]) \]
+Also, let $M'$ be the elementwise function on $X$ which applies the derivative
+of $M$'s associated scalar function to each element of $X$. That is,
+\[ M'(X)[\bar{x}] = m'(X[\bar{x}]) \]
+Then,
+\[ \frac{dM}{dX} = \Ident^3(|X|) \mmult{||X||} M'(X) \]
+\end{theorem}
+\begin{proof}
+By the definition of a multimatrix derivative,
+\[ \forall \bar{m} \in \Dim(|M|), \bar{x} \in \Dim(|X|) : \]
+\begin{align*}
+ \frac{dM}{dX}[\bar{m} \oplus \bar{x}]
+ &= \frac{\partial M[\bar{m}]}{\partial X[\bar{x}]} \\
+ &= \frac{\partial m(X[\bar{m}])}{\partial X[\bar{x}]} \\
+ &= \left\{
+	\begin{array}{ll}
+		m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
+		0 & \mbox{otherwise}
+	\end{array}
+ \right. \\
+ &= \delta_{\bar{m} \bar{x}} m'(X[\bar{m}])
+\end{align*}
+Since, by our definition of elementwise function, $|M| = |X|$, we can
+say that, 
+\begin{align*}
+ (\Ident^3(|X|) \mmult{||X||} M'(X))[\bar{m} \oplus \bar{x}]
+ &= \sum_{\forall \bar{y} \in \Dim(|X|)}
+ \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] M'(X)[\bar{y}] \\
+ &= \sum_{\forall \bar{y} \in \Dim(|X|)}
+ \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
+ &= \sum_{\forall \bar{y} = \bar{m} = \bar{x}}
+ \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
+ &= \left\{
+	\begin{array}{ll}
+		m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
+		0 & \mbox{otherwise}
+	\end{array}
+ \right. \\
+ &= \delta_{\bar{m} \bar{x}} m'(X[\bar{m}])
+\end{align*}
+Therefore $dM/dX = \Ident^3(|X|) \mmult{||X||} M'(X)$
+\end{proof}
+
+\begin{theorem}[Identity Contraction]
+For all $m, n, k \in \mathbb{Z}^+$ and $\vec{x}$ as a valid multimatrix shape,
+where $m > k$ and $n > k$,
+\[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Communicative Identity Multiplication]
+\[ \Ident^n(\vec{x}) \mmult{k|\vec{x}|} A = A \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\subsection*{Sample Problems}
+TODO
+
+\section{Other Operations With Multimatricies}
+Other operations include...
+
+\begin{definition}[Multimatrix Scalar Multiplication]
+\[ sA = ...\]
+\end{definition}
+
+\subsection{Addition}
+
+\begin{definition}[Multimatrix Addition]
+Bla
+\[ A + B = C \]
+\end{definition}
+
+\begin{theorem}[Communicative Property of Multimatrix Addition]
+Bla
+\[ A + B = B + A \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Associative Property of Multimatrix Addition]
+\[ (A + B) + C = A + (B + C) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Multimatrix on Multimatrix Distributive Property]
+\[ A \mmult{n} (B + C) = A \mmult{n} B + A \mmult{n} C \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Scalar on Multimatrix Distributive Property]
+\[ s(A + B) = sA + sB \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
 
 \begin{theorem}[M.M.M. Chain Rule]
 \label{mmm_chain_rule}
@@ -557,4 +877,28 @@ and $g(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}$.
 TODO
 \end{proof}
 
+\section{Integration}
+
+I think, I'm not sure, but I think that the integral of a multimatrix function should
+be defined,
+
+\[
+ \int_A^B F(X) dX = \lim_{n \to \infty}
+ \sum_{i=1}^n
+  F\left(A+\frac{i}{n}(B-A)\right)
+  \mmult{||X||}
+  \left(\frac{B-A}{n}\right)
+\]
+
+Which, I have very little idea what that means geometriclly, but
+if you let $G(X) = \int_A^X F(Y) dY$ you seem to end up with $dG/dX = F(X)$.
+
+Maybe... well look at it this way. $F(X)$ is a function which produces some,
+afine-like transformation multimatrix for multimatricies of shape $|X|$,
+since it must have a right hand shape of $\ldots \oplus |X|$. This integration
+occures over a linear path of $X$ as it moves from $A$ to $B$ applying that
+transformation and adding up the results of the transformed multimatricies with
+a weight proportional to the step size.
+
+So, it's sort of like a line integral but not really. They're related somehow.
 \end{document}

@@ -14,4 +14,5 @@ mmatrix.o: mmatrix.cc mmatrix.h
 
 clean:
 	-rm genetic
+	-rm test_mmatrix
 	-rm *.o

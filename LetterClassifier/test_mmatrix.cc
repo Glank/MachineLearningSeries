@@ -96,10 +96,82 @@ void TestMMatrixMultiplication() {
   }
 }
 
+void TestMMatrixMultiplicationAssociation() {
+  std::cout << "TestMMatrixMultiplicationAssociation..." << std::endl;
+
+  DenseMMatrix a({2,2,2,2});
+  a.set({0,0,0,0}, 0);
+  a.set({0,0,0,1}, 1);
+  a.set({0,0,1,0}, 0);
+  a.set({0,0,1,1}, 0);
+  a.set({0,1,0,0}, 0);
+  a.set({0,1,0,1}, 0);
+  a.set({0,1,1,0}, 0);
+  a.set({0,1,1,1}, 0);
+  a.set({1,0,0,0}, 0);
+  a.set({1,0,0,1}, 0);
+  a.set({1,0,1,0}, 0);
+  a.set({1,0,1,1}, 0);
+  a.set({1,1,0,0}, 0);
+  a.set({1,1,0,1}, 0);
+  a.set({1,1,1,0}, 0);
+  a.set({1,1,1,1}, 0);
+
+  DenseMMatrix b({2,2,2});
+  b.set({0,0,0}, 0);
+  b.set({0,0,1}, 0);
+  b.set({0,1,0}, 1);
+  b.set({0,1,1}, 0);
+  b.set({1,0,0}, 0);
+  b.set({1,0,1}, 0);
+  b.set({1,1,0}, 0);
+  b.set({1,1,1}, 0);
+  
+  DenseMMatrix c({2,2,2,2});
+  c.set({0,0,0,0}, 1);
+  c.set({0,0,0,1}, 0);
+  c.set({0,0,1,0}, 0);
+  c.set({0,0,1,1}, 0);
+  c.set({0,1,0,0}, 0);
+  c.set({0,1,0,1}, 0);
+  c.set({0,1,1,0}, 0);
+  c.set({0,1,1,1}, 0);
+  c.set({1,0,0,0}, 0);
+  c.set({1,0,0,1}, 0);
+  c.set({1,0,1,0}, 0);
+  c.set({1,0,1,1}, 0);
+  c.set({1,1,0,0}, 0);
+  c.set({1,1,0,1}, 0);
+  c.set({1,1,1,0}, 0);
+  c.set({1,1,1,1}, 0);
+
+  DenseMMatrix ab({2,2,2});
+  DenseMMatrix bc({2,2,2});
+  DenseMMatrix ab_c({2,2,2});
+  DenseMMatrix a_bc({2,2,2});
+  Multiply(2, &a, &b, &ab);
+  Multiply(2, &b, &c, &bc);
+  Multiply(2, &ab, &c, &ab_c);
+  Multiply(2, &a, &bc, &a_bc);
+
+  for (int i = 0; i < 2; i++) {
+    for (int j = 0; j < 2; j++) {
+      for (int k = 0; k < 2; k++) {
+        if (ab_c.get({i,j,k}) != a_bc.get({i,j,k})) {
+          std::cout << i << ", " << j << ", " << k << std::endl;
+          std::cout << "  ab_c:" << ab_c.get({i,j,k}) << std::endl;
+          std::cout << "  a_bc:" << a_bc.get({i,j,k}) << std::endl;
+        }
+      }
+    }
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
   TestMMatrixMultiplication();
+  TestMMatrixMultiplicationAssociation();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }
