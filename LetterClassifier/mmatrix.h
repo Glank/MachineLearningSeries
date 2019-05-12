@@ -1,6 +1,7 @@
 #ifndef MMATRIX_H
 #define MMATRIX_H
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,12 @@ class MMatrixInterface {
   virtual ~MMatrixInterface() = default;
   // Returns the value stored at the given indices.
   virtual float get(const std::vector<int>& indices) const = 0;
+  // Returns the value stored at the given indices represented by i.
+  // See ToValueIndex.
+  virtual float get(int i) const;
+  // Stores a value at the given indicies represented by i.
+  // See ToValueIndex.
+  virtual void set(int i, float value);
   // Stores a value at the given indicies. Each index must be within it's
   // dimension defined by shape().
   virtual void set(const std::vector<int>& indices, float value) = 0;
@@ -39,6 +46,8 @@ class DenseMMatrix : public MMatrixInterface {
   DenseMMatrix(const std::vector<int>& shape);
   ~DenseMMatrix() = default;
 
+  float get(int i) const override;
+  void set(int i, float value) override;
   float get(const std::vector<int>& indices) const override;
   void set(const std::vector<int>& indices, float value) override;
   const std::vector<int>& shape() const override;
@@ -54,6 +63,16 @@ void FromValueIndex(const std::vector<int>& shape, int vindex,
 
 void Multiply(int n, const MMatrixInterface* a,
   const MMatrixInterface* b, MMatrixInterface* out);
+
+// Throws an error when matricies aren't even the same shape.
+// Epsilon is an optional small positive value under which differences are
+// still considered "equal". So, if epsilon=0.0001, then technically different
+// matricies a and b will still be considered equal if none of their elements
+// differ by more than 0.0001.
+bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon = 0);
+
+// Returns an n'th order identity with the given base_shape.
+std::unique_ptr<MMatrixInterface> Ident(int n, const std::vector<int>& base_shape);
 
 }  // namespace mmatrix
 

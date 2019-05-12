@@ -1,16 +1,28 @@
 #include "mmatrix.h"
 
+#include <cmath>
 #include <stdexcept>
 
 namespace mmatrix {
 
 using std::string;
+using std::unique_ptr;
 using std::vector;
 
 bool Type::implies(const string& other_class_name) const {
   return other_class_name == class_name_;
 }
 
+float MMatrixInterface::get(int i) const {
+  vector<int> indices(shape().size(), 0);
+  FromValueIndex(shape(), i, &indices);
+  return get(indices);
+}
+void MMatrixInterface::set(int i, float value) {
+  vector<int> indices(shape().size(), 0);
+  FromValueIndex(shape(), i, &indices);
+  set(indices, value);
+}
 const Type MMatrixInterface::type_ = Type("::mmatrix::MMatrixInterface");
 const Type* MMatrixInterface::type() const {
   return &type_;
@@ -22,6 +34,12 @@ DenseMMatrix::DenseMMatrix(const vector<int>& shape) : shape_(shape) {
     total_size *= shape[i];
   }
   values_ = vector<float>(total_size, 0);
+}
+float DenseMMatrix::get(int i) const {
+  return values_[i];
+}
+void DenseMMatrix::set(int i, float value) {
+  values_[i] = value;
 }
 float DenseMMatrix::get(const vector<int>& indices) const {
   return values_[ToValueIndex(shape_, indices)];
@@ -54,6 +72,9 @@ void FromValueIndex(const vector<int>& shape, int vindex, vector<int>* indices) 
 
 void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
     MMatrixInterface* out) {
+  if (a == nullptr || b == nullptr || out == nullptr) {
+    throw std::invalid_argument("Multiply cannot take null arguments.");
+  }
   // ||a|| = l + n
   // ||b|| = n + r
   int l = a->shape().size()-n;
@@ -82,24 +103,65 @@ void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
     }
     rBound *= b->shape()[n+i];
   }
-  vector<int> aIndices(a->shape().size(), 0);
-  vector<int> bIndices(b->shape().size(), 0);
-  vector<int> outIndices(out->shape().size(), 0);
   for (int vl = 0; vl < lBound; vl++) {
     for (int vr = 0; vr < rBound; vr++) {
       float sum = 0;
       for (int vm = 0; vm < midBound; vm++) {
         int va = vl+vm*lBound;
         int vb = vm+vr*midBound;
-        FromValueIndex(a->shape(), va, &aIndices);
-        FromValueIndex(b->shape(), vb, &bIndices);
-        sum += a->get(aIndices)*b->get(bIndices);
+        sum += a->get(va)*b->get(vb);
       }
       int vo = vl+vr*lBound;
-      FromValueIndex(out->shape(), vo, &outIndices);
-      out->set(outIndices, sum);
+      out->set(vo, sum);
     }
   }
+}
+
+bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon) {
+  if (a == nullptr || b == nullptr) {
+    throw std::invalid_argument("AreEqual cannot take null arguments.");
+  }
+  if (a->shape().size() != b->shape().size()) {
+    throw std::out_of_range("Mismatched AreEqual shapes.");
+  }
+  int num_elements = 1;
+  for (int i = 0; i < a->shape().size(); i++) {
+    if (a->shape()[i] != b->shape()[i]) {
+      throw std::out_of_range("Mismatched AreEqual shapes.");
+    }
+    num_elements*=a->shape()[i];
+  }
+  for (int i = 0; i < num_elements; i++) {
+    if (std::abs(a->get(i)-b->get(i)) > epsilon) {
+      return false;
+    }
+  }
+  return true;
+}
+
+unique_ptr<MMatrixInterface> Ident(int n, const vector<int>& base_shape) {
+  vector<int> shape(base_shape.size()*n, 0);
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < base_shape.size(); j++) {
+      shape[i*base_shape.size()+j] = base_shape[j];
+    }
+  }
+  int base_elements = 1;
+  for (int i = 0; i < base_shape.size(); i++) {
+    base_elements *= base_shape[i];
+  }
+  // TODO: use a sparse matrix instead
+  unique_ptr<MMatrixInterface> ident(new DenseMMatrix(shape));
+  for (int i = 0; i < base_elements; i++) {
+    int index = i;
+    int k = base_elements;
+    for (int j = 1; j < n; j++) {
+      index += k*i;
+      k*=base_elements;
+    }
+    ident->set(index, 1);
+  }
+  return ident;
 }
 
 }  // namespace mmatrix

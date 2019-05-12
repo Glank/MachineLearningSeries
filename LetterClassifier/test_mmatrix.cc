@@ -4,10 +4,9 @@
 #include <cstdlib>
 #include <vector>
 
-using mmatrix::DenseMMatrix;
-using mmatrix::ToValueIndex;
-using mmatrix::FromValueIndex;
+using namespace mmatrix;
 using std::vector;
+using std::unique_ptr;
 
 void TestToFromVIndex() {
   std::cout << "TestToFromVIndex..." << std::endl;
@@ -17,15 +16,15 @@ void TestToFromVIndex() {
   FromValueIndex(shape, vi, &indices);
   if (indices[0] != 5) {
     std::cerr << "TestToFromVIndex Err at 0 index." << std::endl;
-    exit(1);
+    std::exit(1);
   }
   if (indices[1] != 3) {
     std::cerr << "TestToFromVIndex Err at 1 index." << std::endl;
-    exit(1);
+    std::exit(1);
   }
   if (indices[2] != 1) {
     std::cerr << "TestToFromVIndex Err at 2 index." << std::endl;
-    exit(1);
+    std::exit(1);
   }
 }
 
@@ -154,16 +153,65 @@ void TestMMatrixMultiplicationAssociation() {
   Multiply(2, &ab, &c, &ab_c);
   Multiply(2, &a, &bc, &a_bc);
 
+  bool are_equal = true;
   for (int i = 0; i < 2; i++) {
     for (int j = 0; j < 2; j++) {
       for (int k = 0; k < 2; k++) {
         if (ab_c.get({i,j,k}) != a_bc.get({i,j,k})) {
-          std::cout << i << ", " << j << ", " << k << std::endl;
-          std::cout << "  ab_c:" << ab_c.get({i,j,k}) << std::endl;
-          std::cout << "  a_bc:" << a_bc.get({i,j,k}) << std::endl;
+          are_equal = false;
+          // std::cout << i << ", " << j << ", " << k << std::endl;
+          // std::cout << "  ab_c:" << ab_c.get({i,j,k}) << std::endl;
+          // std::cout << "  a_bc:" << a_bc.get({i,j,k}) << std::endl;
         }
       }
     }
+  }
+  if (are_equal) {
+    std::cerr << "ab_c and a_bc are equal but should not be" << std::endl;
+    std::exit(1);
+  }
+}
+
+void TestIdentityMultiplication() {
+  std::cout << "TestIdentityMultiplication..." << std::endl;
+
+  DenseMMatrix a({7,3,5});
+  for (int i = 0; i < 7*3*5; i++) {
+    a.set(i, i);
+  }
+  
+  unique_ptr<MMatrixInterface> ident = Ident(2, a.shape());
+  
+  DenseMMatrix a_ident(a.shape());
+  Multiply(a.shape().size(), &a, ident.get(), &a_ident);
+  for (int i0 = 0; i0 < 7; i0++) {
+    for (int i1 = 0; i1 < 3; i1++) {
+      for (int i2 = 0; i2 < 5; i2++) {
+        for (int i3 = 0; i3 < 7; i3++) {
+          for (int i4 = 0; i4 < 3; i4++) {
+            for (int i5 = 0; i5 < 5; i5++) {
+              float expected = 0;
+              if (i0 == i3 && i1 == i4 && i2 == i5) {
+                expected = 1;
+              }
+              float actual = ident->get({i0, i1, i2, i3, i4, i5});
+              if (actual != expected) {
+                std::cout << "Index: ";
+                for(int i : vector<int>{i0, i1, i2, i3, i4, i5}) {
+                  std::cout << i << " ";
+                }
+                std::cout << "= " << actual << " expected " << expected;
+                std::cout << std::endl;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (!AreEqual(&a, &a_ident)) {
+    std::cerr << "Error multiplying identity. Should be equal." << std::endl;
+    std::exit(1);
   }
 }
 
@@ -172,6 +220,7 @@ int main() {
   TestDenseMMatrixGetSet();
   TestMMatrixMultiplication();
   TestMMatrixMultiplicationAssociation();
+  TestIdentityMultiplication();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }
