@@ -4,6 +4,7 @@
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{mathtools}
+\usepackage{pdflscape}
 
 \title{Multimatrices and Their Derivatives}
 \author{Ernest Kirstein}
@@ -25,6 +26,7 @@
 
 \DeclareMathOperator{\Dim}{Dim}
 \DeclareMathOperator{\Ident}{I}
+\DeclareMathOperator{\Tran}{Tran}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
@@ -681,6 +683,8 @@ Bla
 \end{definition}
 
 \begin{definition}[Multimatrix Subtractin]
+\[ A - B = A + (-1)B \]
+\end{definition}
 
 \begin{theorem}[Communicative Property of Multimatrix Addition]
 Bla
@@ -711,6 +715,227 @@ TODO
 TODO
 \end{proof}
 
+\subsection{Transposition}
+
+\begin{definition}[Multimatrix Transposition]
+Let $|X| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = l$ and $|\vec{r}| = r$
+\[ |\Tran(X, l)| = \vec{r} \oplus \vec{l} \]
+And,
+\[ \forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : \]
+\[ \Tran(X, l)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
+\end{definition}
+
+\subsection*{Sample Problems}
+TODO
+
+\section{Derivative Rules}
+
+\begin{theorem}[Right Multiplicative Derivative]
+\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Left Multiplicative Derivative]
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Transpose Derivative]
+$|X| = \vec{l} \oplus \vec{r}$
+\[
+ \frac{d\Tran(X, |\vec{l}|)}{dX} =
+ \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), |\vec{r}|)
+\]
+\end{theorem}
+\begin{proof}
+\begin{align*}
+ \frac{d\Tran(X, |\vec{l}|)}{dX}
+ [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
+ &= \delta_{\bar{r_1}\bar{r_2}} \delta_{\bar{l_1}\bar{l_2}} \\
+ &= \delta_{\bar{r_2}\bar{r_1}} \delta_{\bar{l_1}\bar{l_2}} \\
+ &=
+  \Ident^2(|\vec{r}|)[\bar{r_2}\oplus\bar{r_1}]
+  \Ident^2(|\vec{l}|)[\bar{l_1}\oplus\bar{l_2}] \\
+ &=
+ 	\left(
+		\Ident^2(|\vec{r}|)
+		\mmult{0}
+		\Ident^2(|\vec{l}|)
+	\right)
+	[\bar{r_2}\oplus\bar{r_1}\oplus\bar{l_1}\oplus\bar{l_2}] \\
+ &=
+  \Tran(
+    \Ident^2(|\vec{r}|)
+	  \mmult{0}
+    \Ident^2(|\vec{l}|)
+  , |\vec{r}|) 
+ [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
+\end{align*}
+\end{proof}
+
+\begin{theorem}[Addition Rule]
+\[ \frac{d(F(X) + G(X))}{dX} = \frac{dF(X)}{dX} + \frac{dG(X)}{dX} \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Scalar Multiplication Rule]
+\[ \frac{d(sF(X))}{dX} = s\frac{dF(X)}{dX} \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{landscape}
+\begin{theorem}[Multiplication Rule]
+Let $|F| = \vec{f} \oplus \vec{c}$, $|G| = \vec{c} \oplus \vec{g}$,
+and $|X| = \vec{x}$. Then,
+\begin{align*}
+ \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX} =
+ F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} +
+ \Tran\left(
+   \Tran(G(X), |\vec{c}|)
+	   \mmult{|\vec{c}|}
+	 \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right),
+   |\vec{g} \oplus \vec{x}|
+ \right)
+\end{align*}
+\end{theorem}
+\begin{proof}
+\[
+ \forall
+  \bar{f} \in \Dim(\vec{f}),
+	\bar{g} \in \Dim(\vec{g}),
+	\bar{x} \in \Dim(\vec{x})
+ :
+\]
+\begin{align*}
+ \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX}
+  [\bar{f} \oplus \bar{g} \oplus \bar{x}]
+ &= \frac{
+ 			\partial \left(F(X) \mmult{|\vec{c}|} G(X)\right)[\bar{f} \oplus \bar{g}]
+		}{
+ 			\partial X[\bar{x}]
+		} \\
+ &= \frac{
+ 			\partial \left(
+				\sum_{\forall \bar{c} \in \Dim(\vec{c})}
+				 F(X)[\bar{f} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{g}]
+			\right)
+		}{
+ 			\partial X[\bar{x}]
+		} \\
+ &= \sum_{\forall \bar{c} \in \Dim(\vec{c})}
+    \frac{
+			\partial F(X)[\bar{f} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{g}]
+		}{
+		  \partial X[\bar{x}]
+	  }\\
+ &= \sum_{\forall \bar{c} \in \Dim(\vec{c})}
+		F(X)[\bar{f} \oplus \bar{c}]
+    \frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]}
+		+
+    \frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
+		G(X)[\bar{c} \oplus \bar{g}] \\
+ &=
+	 \left(
+		\sum_{\forall \bar{c}}
+			F(X)[\bar{f} \oplus \bar{c}]
+			\frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]}
+	 \right)
+	 +
+	 \left(
+		\sum_{\forall \bar{c}}
+			\frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
+			G(X)[\bar{c} \oplus \bar{g}]
+	 \right) \\
+ &=
+ 	 l + r
+\end{align*}
+\begin{align*}
+ l
+ &=
+	\sum_{\forall \bar{c}}
+		F(X)[\bar{f} \oplus \bar{c}]
+		\frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]} \\
+ &=
+	\sum_{\forall \bar{c}}
+		F(X)[\bar{f} \oplus \bar{c}]
+		\frac{dG(X)}{dX}[\bar{c} \oplus \bar{g} \oplus \bar{x}] \\
+ &=
+	 \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+	 [\bar{f} \oplus \bar{g} \oplus \bar{x}]
+\end{align*}
+\begin{align*}
+ r
+ &=
+	\sum_{\forall \bar{c}}
+		\frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
+		G(X)[\bar{c} \oplus \bar{g}] \\
+ &=
+	\sum_{\forall \bar{c}}
+		\frac{dF(X)}{dX}[\bar{f} \oplus \bar{c} \oplus \bar{x}]
+		G(X)[\bar{c} \oplus \bar{g}] \\
+ &=
+	\sum_{\forall \bar{c}}
+		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+			[\bar{c} \oplus \bar{x} \oplus \bar{f}]
+		\Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}] \\
+ &=
+	\sum_{\forall \bar{c}}
+		\Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}]
+		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+			[\bar{c} \oplus \bar{x} \oplus \bar{f}] \\
+ &=
+  \left(
+		\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+	\right)[\bar{g} \oplus \bar{x} \oplus \bar{f}] \\
+ &= 
+  \Tran\left(
+		\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+		, |\vec{g} \oplus \vec{x}|
+	\right)[\bar{f} \oplus \bar{g} \oplus \bar{x}]
+\end{align*}
+Therefore 
+\[
+ \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX}
+  [\bar{f} \oplus \bar{g} \oplus \bar{x}]
+\]
+\begin{align*}
+	=& 
+	\left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+	[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
+	&+
+  \Tran\left(
+		\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+		, |\vec{g} \oplus \vec{x}|
+	\right)[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
+\end{align*}
+\[
+	=
+  \left\{
+		\left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+		+
+		\Tran\left(
+			\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+			\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+			, |\vec{g} \oplus \vec{x}|
+		\right)
+	\right\}
+	[\bar{f} \oplus \bar{g} \oplus \bar{x}]
+\]
+\end{proof}
+\end{landscape}
+
+\subsection{Chain Rules}
 
 \begin{theorem}[M.M.M. Chain Rule]
 \label{mmm_chain_rule}
@@ -901,7 +1126,104 @@ afine-like transformation multimatrix for multimatricies of shape $|X|$,
 since it must have a right hand shape of $\ldots \oplus |X|$. This integration
 occures over a linear path of $X$ as it moves from $A$ to $B$ applying that
 transformation and adding up the results of the transformed multimatricies with
-a weight proportional to the step size.
+a weight proportional to the step size... and in the direction of the step.
 
 So, it's sort of like a line integral but not really. They're related somehow.
+
+\begin{landscape}
+Let's see if I can prove that theory,
+\begin{theorem}[Fundamental Rule of Multimatrix Calculus]
+Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
+\end{theorem}
+\begin{proof}
+\begin{align*}
+	G(X)
+	&= \int_A^X F(Y) dY \\
+	&= 
+		\lim_{n \to \infty}
+	 	\sum_{i=1}^n
+		  F\left(A+\frac{i}{n}(X-A)\right)
+		  \mmult{||Y||}
+		  \left(\frac{X-A}{n}\right)
+\end{align*}
+\begin{alignat*}{3}
+	\frac{dG(X)}{dX}
+	&=&&
+	  \frac{
+			d \left\{
+			\lim_{n \to \infty}
+			\sum_{i=1}^n
+				F\left(A+\frac{i}{n}(X-A)\right)
+				\mmult{||Y||}
+				\left(\frac{X-A}{n}\right)
+			\right\}
+		}{dX} \\
+	&=&&
+		\lim_{n \to \infty}
+		\frac{
+			d \left\{
+			\sum_{i=1}^n
+				F\left(A+\frac{i}{n}(X-A)\right)
+				\mmult{||Y||}
+				\left(\frac{X-A}{n}\right)
+			\right\}
+		}{dX} \\
+	&=&&
+		\lim_{n \to \infty}
+		\sum_{i=1}^n
+			\frac{
+				d \left\{
+					F\left(A+\frac{i}{n}(X-A)\right)
+					\mmult{||Y||}
+					\left(\frac{X-A}{n}\right)
+				\right\}
+			}{dX} \\
+	&=&&
+		\lim_{n \to \infty}
+			\sum_{i=1}^n
+				F\left(A+\frac{i}{n}(X-A)\right)
+					\mmult{||Y||}
+					\frac{d \left(\frac{X-A}{n}\right)}{dX}
+				\\&&&+
+				\Tran\left(
+					\Tran\left(\frac{X-A}{n}, ||Y||\right)
+					\mmult{||Y||}
+					\Tran\left(\frac{
+						d \left\{F\left(A+\frac{i}{n}(X-A)\right)\right\}
+					}{dX}, |\vec{f}|\right),
+					|\vec{x} \oplus \vec{x}|
+				\right) \\
+	&=&&
+		\lim_{n \to \infty}
+			\sum_{i=1}^n
+				F\left(A+\frac{i}{n}(X-A)\right)
+					\mmult{||Y||}
+					\frac{1}{n}\Ident^2(|X|)
+				\\&&&+
+				\Tran\left(
+					\frac{X-A}{n}
+					\mmult{||Y||}
+					\Tran\left(
+						\frac{dF(X)}{dX}
+						\mmult{|X|}
+						\frac{i}{n}\Ident^2(|X|), |\vec{f}|\right),
+					|\vec{x} \oplus \vec{x}|
+				\right) \\
+	&=&&
+		\lim_{n \to \infty}
+			\sum_{i=1}^n
+				\frac{1}{n}F\left(A+\frac{i}{n}(X-A)\right)
+				\\&&&+
+				\Tran\left(
+					\frac{X-A}{n}
+					\mmult{||Y||}
+					\Tran\left(
+						\frac{i}{n}\frac{dF(X)}{dX}
+						, |\vec{f}|\right),
+					|\vec{x} \oplus \vec{x}|
+				\right)
+\end{alignat*}
+At this point I'm fairly stuck.
+\end{proof}
+\end{landscape}
 \end{document}
