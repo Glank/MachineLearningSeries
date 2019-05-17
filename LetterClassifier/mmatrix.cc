@@ -9,9 +9,16 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-bool Type::implies(const string& other_class_name) const {
-  return other_class_name == class_name_;
+namespace internal {
+
+bool Type::hasProperty(TypeProperty property) const {
+  return properties_.find(property) != properties_.end();
 }
+void Type::addProperty(TypeProperty property) {
+  properties_.insert(property);
+}
+
+} // namespace internal
 
 float MMatrixInterface::get(int i) const {
   vector<int> indices(shape().size(), 0);
@@ -23,8 +30,15 @@ void MMatrixInterface::set(int i, float value) {
   FromValueIndex(shape(), i, &indices);
   set(indices, value);
 }
-const Type MMatrixInterface::type_ = Type("::mmatrix::MMatrixInterface");
-const Type* MMatrixInterface::type() const {
+float MMatrixInterface::get(const vector<int>& indices) const {
+  return get(ToValueIndex(shape(), indices));
+}
+void MMatrixInterface::set(const vector<int>& indices, float value) {
+  set(ToValueIndex(shape(), indices), value);
+}
+const internal::Type MMatrixInterface::type_ =
+  internal::Type("::mmatrix::MMatrixInterface");
+const internal::Type* MMatrixInterface::type() const {
   return &type_;
 }
 
@@ -41,15 +55,42 @@ float DenseMMatrix::get(int i) const {
 void DenseMMatrix::set(int i, float value) {
   values_[i] = value;
 }
-float DenseMMatrix::get(const vector<int>& indices) const {
-  return values_[ToValueIndex(shape_, indices)];
-}
-void DenseMMatrix::set(const vector<int>& indices, float value) {
-  values_[ToValueIndex(shape_, indices)] = value;
-}
 const vector<int>& DenseMMatrix::shape() const {
   return shape_;
 }
+
+SparseMMatrix::SparseMMatrix(const std::vector<int>& shape) : shape_(shape) {}
+float SparseMMatrix::get(int i) const {
+  const auto v = values_.find(i);
+  if (v != values_.end()) {
+    return v->second;
+  }
+  return 0;
+}
+void SparseMMatrix::set(int i, float value) {
+  if (value == 0) {
+    const auto it = values_.find(i);
+    if (it != values_.end()) {
+      values_.erase(it);
+    }
+  } else {
+    values_[i] = value;
+  }
+}
+const std::vector<int>& SparseMMatrix::shape() const {
+  return shape_;
+}
+const internal::Type* SparseMMatrix::type() const {
+  return &type_;
+}
+namespace {
+internal::Type InitSparseMMatrixType() {
+  internal::Type type("::mmatrix::SparseMMatrix");
+  type.addProperty(internal::kTypeProperty_Sparse);
+  return type;
+}
+} // namespace
+const internal::Type SparseMMatrix::type_ = InitSparseMMatrixType();
 
 int ToValueIndex(const vector<int>& shape, const vector<int>& indices) {
   int vindex = 0;
@@ -150,8 +191,7 @@ unique_ptr<MMatrixInterface> Ident(int n, const vector<int>& base_shape) {
   for (int i = 0; i < base_shape.size(); i++) {
     base_elements *= base_shape[i];
   }
-  // TODO: use a sparse matrix instead
-  unique_ptr<MMatrixInterface> ident(new DenseMMatrix(shape));
+  unique_ptr<MMatrixInterface> ident(new SparseMMatrix(shape));
   for (int i = 0; i < base_elements; i++) {
     int index = i;
     int k = base_elements;
