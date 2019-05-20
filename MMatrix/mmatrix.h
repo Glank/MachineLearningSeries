@@ -1,9 +1,9 @@
 #ifndef MMATRIX_H
 #define MMATRIX_H
 
+#include <map>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -80,9 +80,17 @@ class SparseMMatrix : public MMatrixInterface {
   const std::vector<int>& shape() const override;
 
   const internal::Type* type() const override;
+
+  std::map<int, float>::iterator begin() { return values_.begin(); }
+  std::map<int, float>::iterator end() { return values_.end(); }
+  std::map<int, float>::const_iterator cbegin() { return values_.cbegin(); }
+  std::map<int, float>::const_iterator cend() { return values_.cend(); }
+  std::map<int, float>::const_iterator begin() const { return values_.cbegin(); }
+  std::map<int, float>::const_iterator end() const { return values_.cend(); }
  private:
   // Maps the value index to non-zero values.
-  std::unordered_map<int, float> values_;
+  std::map<int, float> values_;
+
   std::vector<int> shape_;
   const static internal::Type type_;
 };
@@ -93,6 +101,9 @@ void FromValueIndex(const std::vector<int>& shape, int vindex,
 
 void Multiply(int n, const MMatrixInterface* a,
   const MMatrixInterface* b, MMatrixInterface* out);
+
+void Multiply(int n, const SparseMMatrix* a, const SparseMMatrix* b,
+  MMatrixInterface* out);
 
 // Throws an error when matricies aren't even the same shape.
 // Epsilon is an optional small positive value under which differences are

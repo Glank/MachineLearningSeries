@@ -158,6 +158,54 @@ void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
   }
 }
 
+void Multiply(int n, const SparseMMatrix* a, const SparseMMatrix* b,
+    MMatrixInterface* out) {
+  if (a == nullptr || b == nullptr || out == nullptr) {
+    throw std::invalid_argument("Multiply cannot take null arguments.");
+  }
+  // ||a|| = l + n
+  // ||b|| = n + r
+  int l = a->shape().size()-n;
+  int r = b->shape().size()-n;
+  if (l < 0 || r < 0) {
+    throw std::out_of_range("Invalid multiplication size");
+  }
+  int midBound = 1;
+  for (int i = 0; i < n; i++) {
+    if (a->shape()[l+i] != b->shape()[i]) {
+      throw std::out_of_range("Invalid multiplication shapes.");
+    }
+    midBound *= b->shape()[i];
+  }
+  int lBound  = 1;
+  for (int i = 0; i < l; i++) {
+    if (a->shape()[i] != out->shape()[i]) {
+      throw std::out_of_range("Invalid left output multiplication shape.");
+    }
+    lBound *= a->shape()[i];
+  }
+  int rBound = 1;
+  for (int i = 0; i < r; i++) {
+    if (b->shape()[n+i] != out->shape()[l+i]) {
+      throw std::out_of_range("Invalid right output multiplication shape.");
+    }
+    rBound *= b->shape()[n+i];
+  }
+  // TODO: take advantage of sparse multiplication
+  for (int vl = 0; vl < lBound; vl++) {
+    for (int vr = 0; vr < rBound; vr++) {
+      float sum = 0;
+      for (int vm = 0; vm < midBound; vm++) {
+        int va = vl+vm*lBound;
+        int vb = vm+vr*midBound;
+        sum += a->get(va)*b->get(vb);
+      }
+      int vo = vl+vr*lBound;
+      out->set(vo, sum);
+    }
+  }
+}
+
 bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon) {
   if (a == nullptr || b == nullptr) {
     throw std::invalid_argument("AreEqual cannot take null arguments.");
