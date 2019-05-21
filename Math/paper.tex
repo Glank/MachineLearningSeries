@@ -5,6 +5,7 @@
 \usepackage{amssymb}
 \usepackage{mathtools}
 \usepackage{pdflscape}
+\usepackage{etoolbox}
 
 \title{Multimatrices and Their Derivatives}
 \author{Ernest Kirstein}
@@ -15,14 +16,12 @@
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
-
-\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
-\theoremstyle{case}
-\newtheorem{case}{Case}
+\newtheorem{lemma}[theorem]{Lemma}
 
 \newtheoremstyle{ppart}{}{}{}{}{}{:}{ }{}
 \theoremstyle{ppart}
 \newtheorem{ppart}{Part}
+\AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
 
 \DeclareMathOperator{\Dim}{Dim}
 \DeclareMathOperator{\Ident}{I}
@@ -66,10 +65,10 @@ of $X$ are independent,
 \[
 \frac{\partial M_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
 \left\{
-	\begin{array}{ll}
-		\cos(X_{r_2,c_2})  & \mbox{if } r_1 = r_2 \mbox{ and } c_1 = c_2 \\
-		0 & \mbox{otherwise}
-	\end{array}
+  \begin{array}{ll}
+    \cos(X_{r_2,c_2})  & \mbox{if } r_1 = r_2 \mbox{ and } c_1 = c_2 \\
+    0 & \mbox{otherwise}
+  \end{array}
 \right.
 \]
 Which can also be writen more simply using Kronecker deltas,
@@ -324,51 +323,51 @@ that $|A| = \left<2,2,2,2\right>$, $|B| = \left<2,2,2\right>$, and
 $|C| = \left<2,2,2,2\right>$. Let,
 \[
  A[\bar{a}] = 
-	\left\{
-		\begin{array}{ll}
-			1 & \mbox{if } \bar{a} = \left<1,1,1,2\right> \\
-			0 & \mbox{otherwise}
-		\end{array}
-	\right.
+  \left\{
+    \begin{array}{ll}
+      1 & \mbox{if } \bar{a} = \left<1,1,1,2\right> \\
+      0 & \mbox{otherwise}
+    \end{array}
+  \right.
 \]
 \[
  B[\bar{b}] = 
-	\left\{
-		\begin{array}{ll}
-			1 & \mbox{if } \bar{b} = \left<1,2,1\right> \\
-			0 & \mbox{otherwise}
-		\end{array}
-	\right.
+  \left\{
+    \begin{array}{ll}
+      1 & \mbox{if } \bar{b} = \left<1,2,1\right> \\
+      0 & \mbox{otherwise}
+    \end{array}
+  \right.
 \]
 And
 \[
  C[\bar{c}] = 
-	\left\{
-		\begin{array}{ll}
-			1 & \mbox{if } \bar{c} = \left<1,1,1,1\right> \\
-			0 & \mbox{otherwise}
-		\end{array}
-	\right.
+  \left\{
+    \begin{array}{ll}
+      1 & \mbox{if } \bar{c} = \left<1,1,1,1\right> \\
+      0 & \mbox{otherwise}
+    \end{array}
+  \right.
 \]
 Then,
 \[
  (A \mmult{2} B)[\bar{x}] = 
-	\left\{
-		\begin{array}{ll}
-			1 & \mbox{if } \bar{x} = \left<1,1,1\right> \\
-			0 & \mbox{otherwise}
-		\end{array}
-	\right.
+  \left\{
+    \begin{array}{ll}
+      1 & \mbox{if } \bar{x} = \left<1,1,1\right> \\
+      0 & \mbox{otherwise}
+    \end{array}
+  \right.
 \]
 So,
 \[
  ((A \mmult{2} B) \mmult{2} C)[\bar{x}] = 
-	\left\{
-		\begin{array}{ll}
-			1 & \mbox{if } \bar{x} = \left<1,1\right> \\
-			0 & \mbox{otherwise}
-		\end{array}
-	\right.
+  \left\{
+    \begin{array}{ll}
+      1 & \mbox{if } \bar{x} = \left<1,1\right> \\
+      0 & \mbox{otherwise}
+    \end{array}
+  \right.
 \]
 But, $(B \mmult{2} C)[\bar{x}] = 0$ so $(A \mmult{2} (B \mmult{2} C))[\bar{x}] = 0$
 Which goes to show that even though both $(A \mmult{2} B) \mmult{2} C$ and
@@ -433,7 +432,7 @@ $\bar{a} \oplus \bar{b} \oplus \bar{c} \in
  &= \sum_{\forall \bar{n}}
  \left(
   \sum_{\forall \bar{m} \in \Dim(\vec{m})}
-	A[\bar{a} \oplus \bar{m}]B[\bar{m} \oplus \bar{b} \oplus \bar{n}]
+  A[\bar{a} \oplus \bar{m}]B[\bar{m} \oplus \bar{b} \oplus \bar{n}]
  \right)
  C[\bar{n} \oplus \bar{c}] \\
  &= \sum_{\forall \bar{n}, \bar{m}}
@@ -468,7 +467,7 @@ However, the multiplicative identity also greatly depends on the size of
 the particular multiplication operation. 
 
 \begin{definition}[Multimatrix Identities]
-\label{mm_ident}
+\label{mm_mult_ident}
 Let us define $\Ident^n(\vec{v})$ as the $n^{\text{th}}$ order identity with base shape
 $\vec{v}$. This $\Ident^n(\vec{v})$ is a multimatrix with shape,
 \[ |\Ident^n(\vec{v})| = \bigoplus_{i \in [1, n]} \vec{v} \]
@@ -478,10 +477,10 @@ Let each element of $\Ident^n(\vec{v})$ is defined as,
 \[
  \Ident^n(\vec{v})[\bar{v_1}, \bar{v_2}, \ldots, \bar{v_n}]
  = \left\{
-	\begin{array}{ll}
-		1 & \mbox{if } \bar{v_1} = \bar{v_2} = \ldots = \bar{v_n} \\
-		0 & \mbox{otherwise}
-	\end{array}
+  \begin{array}{ll}
+    1 & \mbox{if } \bar{v_1} = \bar{v_2} = \ldots = \bar{v_n} \\
+    0 & \mbox{otherwise}
+  \end{array}
  \right.
 \]
 
@@ -494,6 +493,7 @@ pop up in derivatives down the line. For now, let's just look at how the
 square identity it relates to a multiplication operation.
 
 \begin{theorem}[Multimatrix Multiplicative Identity]
+\label{mm_ident}
 For all $\vec{m}$ and $\vec{n}$ on which the operations are valid,
 \[
  A \mmult{|\vec{m}|} \Ident^2(\vec{m}) = A
@@ -588,10 +588,10 @@ Since each element of $X$ is independent with respect to itself,
 \begin{align*}
  \frac{dX}{dX}[\bar{x_1} \oplus \bar{x_2}]
  &= \left\{
-	\begin{array}{ll}
-		1 & \mbox{if } \bar{x_1} = \bar{x_2} \\
-		0 & \mbox{otherwise}
-	\end{array}
+  \begin{array}{ll}
+    1 & \mbox{if } \bar{x_1} = \bar{x_2} \\
+    0 & \mbox{otherwise}
+  \end{array}
  \right. \\
  &= \Ident^2(\vec{x})[\bar{x_1} \oplus \bar{x_2}]
 \end{align*}
@@ -621,10 +621,10 @@ By the definition of a multimatrix derivative,
  &= \frac{\partial M[\bar{m}]}{\partial X[\bar{x}]} \\
  &= \frac{\partial m(X[\bar{m}])}{\partial X[\bar{x}]} \\
  &= \left\{
-	\begin{array}{ll}
-		m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
-		0 & \mbox{otherwise}
-	\end{array}
+  \begin{array}{ll}
+    m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
+    0 & \mbox{otherwise}
+  \end{array}
  \right. \\
  &= \delta_{\bar{m} \bar{x}} m'(X[\bar{m}])
 \end{align*}
@@ -639,31 +639,91 @@ say that,
  &= \sum_{\forall \bar{y} = \bar{m} = \bar{x}}
  \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
  &= \left\{
-	\begin{array}{ll}
-		m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
-		0 & \mbox{otherwise}
-	\end{array}
+  \begin{array}{ll}
+    m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
+    0 & \mbox{otherwise}
+  \end{array}
  \right. \\
  &= \delta_{\bar{m} \bar{x}} m'(X[\bar{m}])
 \end{align*}
 Therefore $dM/dX = \Ident^3(|X|) \mmult{||X||} M'(X)$
 \end{proof}
 
+Multimatrix identities also tend to cancel eachother out when multiplied by
+multiples of their base shape lengths.
+
+\begin{landscape}
 \begin{theorem}[Identity Contraction]
 For all $m, n, k \in \mathbb{Z}^+$ and $\vec{x}$ as a valid multimatrix shape,
 where $m > k$ and $n > k$,
 \[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{theorem}
 \begin{proof}
-TODO
-\end{proof}
+Consider that for some indicies
+$\{\bar{a_1}, \bar{a_2}, \ldots \bar{a}_{m-k}\}$
+and $\{\bar{b_1}, \bar{b_2}, \ldots \bar{b}_{n-k}\}$ where each
+$\bar{a_i} \in \Dim(\vec{x})$ and each $\bar{b_i} \in \Dim(\vec{x})$,
 
-\begin{theorem}[Communicative Identity Multiplication]
-\[ \Ident^n(\vec{x}) \mmult{k|\vec{x}|} A = A \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \]
-\end{theorem}
-\begin{proof}
-TODO
+\begin{align*}
+&\left( \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right)
+[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] = \\
+&\sum_{\forall \bar{c_1}, \bar{c_2}, \ldots \bar{c_k} \in \Dim(\vec{x})}
+\Ident^m(\vec{x})
+[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{c_1} \oplus \bar{c_2} \oplus \ldots]
+\Ident^n(\vec{x})
+[\bar{c_1} \oplus \bar{c_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots]
+\end{align*}
+
+Consider that $\Ident^m(\vec{x})
+[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{c_1} \oplus \bar{c_2} \oplus \ldots]$
+will be 0 whenever the any $\bar{c_i} \ne \bar{c_j}$ - we can simplify that to all
+the same $c$.
+
+\begin{align*}
+&\left( \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right)
+[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] = \\
+&\sum_{\forall \bar{c} \in \Dim(\vec{x})}
+\Ident^m(\vec{x})
+[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{c} \oplus \bar{c} \oplus \ldots]
+\Ident^n(\vec{x})
+[\bar{c} \oplus \bar{c} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots]
+\end{align*}
+
+Consider also that there can be at most one $\bar{c}$ for which
+$\bar{c} = \bar{a_1} = \bar{a_2} \ldots$. And since our right hand side is
+the sum of products of ones and zeros, we can therefore conclude it is either 1 or 0.
+
+We can futher reason that the right hand side can only be one when all of the
+$\bar{a_i}$ and all of the $\bar{b_i}$ equal $\bar{c}$. Furthermore, if all
+$\bar{a_i}$ and all $\bar{b_i}$ are equal then that $\bar{c}$ must exist since it can
+be any value in the range of all $\bar{a_i}$ and $\bar{b_i}$ and this is not a
+zero width multiplication ($k >= 1$). Therefore,
+
+\begin{align*}
+\left( \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right)
+[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] =
+\left\{
+  \begin{array}{ll}
+    1 & \mbox{if } \bar{a_1} = \bar{a_2} = \ldots = \bar{b_1} = \bar{b_2} = \ldots \\
+    0 & \mbox{otherwise}
+  \end{array}
+\right.
+\end{align*} 
+
+Which is an identity matrix! And since the dimensional rules of multimatrix 
+multiplication show that,
+
+\[
+ \left|\left| \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right|\right|
+ =
+ ||\Ident^m(\vec{x})|| + ||\Ident^n(\vec{x})|| - 2k|\vec{x}|
+\]
+
+We've shown that,
+
+\[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{proof}
+\end{landscape}
 
 \subsection*{Sample Problems}
 TODO
@@ -672,47 +732,138 @@ TODO
 Other operations include...
 
 \begin{definition}[Multimatrix Scalar Multiplication]
-\[ sA = ...\]
+Let $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$. If
+\[ sA = As = B \]
+Then
+\[ \forall \bar{x} \in \Dim(\vec{x}):
+   B[\bar{x}] = (s)(A[\bar{x}]) \]
+In other words, multiplying $A$ by a scalar $s$ simply multiplies each of
+it's elements by that scalar.
 \end{definition}
 
 \subsection{Addition}
 
 \begin{definition}[Multimatrix Addition]
-Bla
+Let $A, B, C \in \mathbb{R}^{\vec{x}}$. If
 \[ A + B = C \]
+Then
+\[ \forall \bar{x} \in \Dim(\vec{x}):
+   C[\bar{x}] = A[\bar{x}] + B[\bar{x}] \]
+In other words, adding two multimatricies (which must be of the same shape) results
+in a multimatrix of the same shape with elements which are the sum of the corresponding
+elements of the added multimatricies.
 \end{definition}
 
-\begin{definition}[Multimatrix Subtractin]
+\begin{definition}[Multimatrix Subtraction]
+Let $A, B \in \mathbb{R}^{\vec{x}}$. Then,
 \[ A - B = A + (-1)B \]
+It should be obvious that, as with scalars, multimatrix subtraction is the
+inverse of addition. In other words, $(A + B) - B = A$
 \end{definition}
 
+As with scalar, vector, or regular matrix addition, multimatrix addition is
+communicative. 
 \begin{theorem}[Communicative Property of Multimatrix Addition]
-Bla
+Let $A, B \in \mathbb{R}^{\vec{x}}$. Then,
 \[ A + B = B + A \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $C = A + B$ then,
+\[ \forall \bar{x} \in \Dim(\vec{x}) : C[\bar{x}] = A[\bar{x}] + B[\bar{x}] \]
+By standard scalar addition rules that also means that,
+$C[\bar{x}] = B[\bar{x}] + A[\bar{x}]$. So $C = B + A = A + B$.
 \end{proof}
 
+It's similarly trial to show that multimatrix addition is associative.
+
 \begin{theorem}[Associative Property of Multimatrix Addition]
+Let $A, B, C \in \mathbb{R}^{\vec{x}}$. Then,
 \[ (A + B) + C = A + (B + C) \]
 \end{theorem}
 \begin{proof}
-TODO
+For all $\bar{x} \in \Dim(\vec{x})$,
+\begin{align*}
+\left( (A+B)+C \right)[\bar{x}]
+&= (A[\bar{x}]+B[\bar{x}])+C[\bar{x}] \\
+&= A[\bar{x}]+(B[\bar{x}]+C[\bar{x}]) \\
+&= \left( A+(B+C) \right)[\bar{x}]
+\end{align*}
 \end{proof}
 
+A little less obvious is that multimatrix multiplication can be distributed over
+it's addition.
+
+\begin{landscape}
 \begin{theorem}[Multimatrix on Multimatrix Distributive Property]
+If $|A| = \vec{a} \oplus \vec{n}$ and $|B|=|C|=\vec{n} \oplus \vec{r}$ then,
 \[ A \mmult{n} (B + C) = A \mmult{n} B + A \mmult{n} C \]
+Similarly, if $|C| = \vec{n} \oplus \vec{c}$ and $|A|=|B|=\vec{l} \oplus \vec{n}$ then,
+\[ (A + B) \mmult{n} C = A \mmult{n} C + B \mmult{n} C \]
 \end{theorem}
 \begin{proof}
-TODO
+\begin{ppart}
+Let $|A| = \vec{a} \oplus \vec{n}$ and $|B|=|C|=\vec{n} \oplus \vec{r}$.
+So, $\forall \bar{a} \in \Dim(\vec{a}), \bar{r} \in \Dim(\vec{r}) :$
+\begin{align*}
+ \left( A \mmult{n} (B + C) \right)[\bar{a} \oplus \bar{r}]
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{a} \oplus \bar{n}] (B + C)[\bar{n} \oplus \bar{r}] \\
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{a} \oplus \bar{n}] (B[\bar{n} \oplus \bar{r}] + C[\bar{n} \oplus \bar{r}]) \\
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{a} \oplus \bar{n}] B[\bar{n} \oplus \bar{r}]
+  + A[\bar{a} \oplus \bar{n}]C[\bar{n} \oplus \bar{r}] \\
+ &= \left( \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{a} \oplus \bar{n}] B[\bar{n} \oplus \bar{r}] \right)
+    +
+    \left( \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{a} \oplus \bar{n}]C[\bar{n} \oplus \bar{r}] \right) \\
+ &= \left( A \mmult{n} B \right)[\bar{a} \oplus \bar{r}] +
+     \left( A \mmult{n} C \right)[\bar{a} \oplus \bar{r}]
+\end{align*}
+So $A \mmult{n} (B + C) = A \mmult{n} B + A \mmult{n} C$
+\end{ppart}
+\begin{ppart}
+Let $|C| = \vec{n} \oplus \vec{c}$ and $|A|=|B|=\vec{l} \oplus \vec{n}$.
+So, $\forall \bar{c} \in \Dim(\vec{c}), \bar{l} \in \Dim(\vec{l}) :$
+\begin{align*}
+ \left( (A + B) \mmult{n} C \right)[\bar{l} \oplus \bar{c}]
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    (A+B)[\bar{l} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    (A[\bar{l} \oplus \bar{n}]+B[\bar{l} \oplus \bar{n}])C[\bar{n} \oplus \bar{c}] \\
+ &= \sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{l} \oplus \bar{n}]C[\bar{n} \oplus \bar{c}]
+    +B[\bar{l} \oplus \bar{n}]C[\bar{n} \oplus \bar{c}] \\
+ &= \left(\sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    A[\bar{l} \oplus \bar{n}]C[\bar{n} \oplus \bar{c}]\right)
+    +
+    \left(\sum_{\forall \bar{n} \in \Dim(\vec{n})}
+    B[\bar{l} \oplus \bar{n}]C[\bar{n} \oplus \bar{c}]\right) \\
+ &= \left(A \mmult{n} C\right)[\bar{l} \oplus \bar{c}]
+    +\left(B \mmult{n} C\right)[\bar{l} \oplus \bar{c}]
+\end{align*}
+So $(A+B) \mmult{n} C = A \mmult{n} C + B \mmult{n} C$ 
+\end{ppart}
 \end{proof}
+\end{landscape}
 
+But it should be obvious that that the same applies to scalar 
+multiplication distributing over multimatrix addition..
 \begin{theorem}[Scalar on Multimatrix Distributive Property]
+If $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$ then,
 \[ s(A + B) = sA + sB \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$.
+Then for all $\bar{x} \in \Dim(\vec{x})$
+\begin{align*}
+(s(A+B))[\bar{x}]
+&= (s)((A+B)[\bar{x}]) \\
+&= (s)(A[\bar{x}] + B[\bar{x}]) \\
+&= (s)(A[\bar{x}]) + s(B[\bar{x}])
+\end{align*}
+Therefore $s(A+B) = sA + sB$
 \end{proof}
 
 \subsection{Transposition}
@@ -761,16 +912,16 @@ $|X| = \vec{l} \oplus \vec{r}$
   \Ident^2(|\vec{r}|)[\bar{r_2}\oplus\bar{r_1}]
   \Ident^2(|\vec{l}|)[\bar{l_1}\oplus\bar{l_2}] \\
  &=
- 	\left(
-		\Ident^2(|\vec{r}|)
-		\mmult{0}
-		\Ident^2(|\vec{l}|)
-	\right)
-	[\bar{r_2}\oplus\bar{r_1}\oplus\bar{l_1}\oplus\bar{l_2}] \\
+   \left(
+    \Ident^2(|\vec{r}|)
+    \mmult{0}
+    \Ident^2(|\vec{l}|)
+  \right)
+  [\bar{r_2}\oplus\bar{r_1}\oplus\bar{l_1}\oplus\bar{l_2}] \\
  &=
   \Tran(
     \Ident^2(|\vec{r}|)
-	  \mmult{0}
+    \mmult{0}
     \Ident^2(|\vec{l}|)
   , |\vec{r}|) 
  [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
@@ -800,8 +951,8 @@ and $|X| = \vec{x}$. Then,
  F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} +
  \Tran\left(
    \Tran(G(X), |\vec{c}|)
-	   \mmult{|\vec{c}|}
-	 \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right),
+     \mmult{|\vec{c}|}
+   \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right),
    |\vec{g} \oplus \vec{x}|
  \right)
 \end{align*}
@@ -810,128 +961,127 @@ and $|X| = \vec{x}$. Then,
 \[
  \forall
   \bar{f} \in \Dim(\vec{f}),
-	\bar{g} \in \Dim(\vec{g}),
-	\bar{x} \in \Dim(\vec{x})
+  \bar{g} \in \Dim(\vec{g}),
+  \bar{x} \in \Dim(\vec{x})
  :
 \]
 \begin{align*}
  \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
  &= \frac{
- 			\partial \left(F(X) \mmult{|\vec{c}|} G(X)\right)[\bar{f} \oplus \bar{g}]
-		}{
- 			\partial X[\bar{x}]
-		} \\
+       \partial \left(F(X) \mmult{|\vec{c}|} G(X)\right)[\bar{f} \oplus \bar{g}]
+    }{
+       \partial X[\bar{x}]
+    } \\
  &= \frac{
- 			\partial \left(
-				\sum_{\forall \bar{c} \in \Dim(\vec{c})}
-				 F(X)[\bar{f} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{g}]
-			\right)
-		}{
- 			\partial X[\bar{x}]
-		} \\
+       \partial \left(
+        \sum_{\forall \bar{c} \in \Dim(\vec{c})}
+         F(X)[\bar{f} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{g}]
+      \right)
+    }{
+       \partial X[\bar{x}]
+    } \\
  &= \sum_{\forall \bar{c} \in \Dim(\vec{c})}
     \frac{
-			\partial F(X)[\bar{f} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{g}]
-		}{
-		  \partial X[\bar{x}]
-	  }\\
+      \partial F(X)[\bar{f} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{g}]
+    }{
+      \partial X[\bar{x}]
+    }\\
  &= \sum_{\forall \bar{c} \in \Dim(\vec{c})}
-		F(X)[\bar{f} \oplus \bar{c}]
+    F(X)[\bar{f} \oplus \bar{c}]
     \frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]}
-		+
+    +
     \frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
-		G(X)[\bar{c} \oplus \bar{g}] \\
+    G(X)[\bar{c} \oplus \bar{g}] \\
  &=
-	 \left(
-		\sum_{\forall \bar{c}}
-			F(X)[\bar{f} \oplus \bar{c}]
-			\frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]}
-	 \right)
-	 +
-	 \left(
-		\sum_{\forall \bar{c}}
-			\frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
-			G(X)[\bar{c} \oplus \bar{g}]
-	 \right) \\
+   \left(
+    \sum_{\forall \bar{c}}
+      F(X)[\bar{f} \oplus \bar{c}]
+      \frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]}
+   \right)
+   +
+   \left(
+    \sum_{\forall \bar{c}}
+      \frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
+      G(X)[\bar{c} \oplus \bar{g}]
+   \right) \\
  &=
- 	 l + r
+    l + r
 \end{align*}
+Which each become,
 \begin{align*}
  l
  &=
-	\sum_{\forall \bar{c}}
-		F(X)[\bar{f} \oplus \bar{c}]
-		\frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]} \\
+  \sum_{\forall \bar{c}}
+    F(X)[\bar{f} \oplus \bar{c}]
+    \frac{\partial G(X)[\bar{c} \oplus \bar{g}]}{\partial X[\bar{x}]} \\
  &=
-	\sum_{\forall \bar{c}}
-		F(X)[\bar{f} \oplus \bar{c}]
-		\frac{dG(X)}{dX}[\bar{c} \oplus \bar{g} \oplus \bar{x}] \\
+  \sum_{\forall \bar{c}}
+    F(X)[\bar{f} \oplus \bar{c}]
+    \frac{dG(X)}{dX}[\bar{c} \oplus \bar{g} \oplus \bar{x}] \\
  &=
-	 \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
-	 [\bar{f} \oplus \bar{g} \oplus \bar{x}]
+   \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
 \end{align*}
 \begin{align*}
  r
  &=
-	\sum_{\forall \bar{c}}
-		\frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
-		G(X)[\bar{c} \oplus \bar{g}] \\
+  \sum_{\forall \bar{c}}
+    \frac{\partial F(X)[\bar{f} \oplus \bar{c}]}{\partial X[\bar{x}]}
+    G(X)[\bar{c} \oplus \bar{g}] \\
  &=
-	\sum_{\forall \bar{c}}
-		\frac{dF(X)}{dX}[\bar{f} \oplus \bar{c} \oplus \bar{x}]
-		G(X)[\bar{c} \oplus \bar{g}] \\
+  \sum_{\forall \bar{c}}
+    \frac{dF(X)}{dX}[\bar{f} \oplus \bar{c} \oplus \bar{x}]
+    G(X)[\bar{c} \oplus \bar{g}] \\
  &=
-	\sum_{\forall \bar{c}}
-		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-			[\bar{c} \oplus \bar{x} \oplus \bar{f}]
-		\Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}] \\
+  \sum_{\forall \bar{c}}
+    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+      [\bar{c} \oplus \bar{x} \oplus \bar{f}]
+    \Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}] \\
  &=
-	\sum_{\forall \bar{c}}
-		\Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}]
-		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-			[\bar{c} \oplus \bar{x} \oplus \bar{f}] \\
+  \sum_{\forall \bar{c}}
+    \Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}]
+    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+      [\bar{c} \oplus \bar{x} \oplus \bar{f}] \\
  &=
   \left(
-		\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-	\right)[\bar{g} \oplus \bar{x} \oplus \bar{f}] \\
+    \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+  \right)[\bar{g} \oplus \bar{x} \oplus \bar{f}] \\
  &= 
   \Tran\left(
-		\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-		, |\vec{g} \oplus \vec{x}|
-	\right)[\bar{f} \oplus \bar{g} \oplus \bar{x}]
+    \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+    , |\vec{g} \oplus \vec{x}|
+  \right)[\bar{f} \oplus \bar{g} \oplus \bar{x}]
 \end{align*}
 Therefore 
-\[
+\begin{alignat*}{3}
  \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
-\]
-\begin{align*}
-	=& 
-	\left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
-	[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
-	&+
+  &=&&
+  \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+  [\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
+  &&&+
   \Tran\left(
-		\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-		\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-		, |\vec{g} \oplus \vec{x}|
-	\right)[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
-\end{align*}
-\[
-	=
+    \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+    , |\vec{g} \oplus \vec{x}|
+  \right)[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
+  &=&&
   \left\{
-		\left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
-		+
-		\Tran\left(
-			\Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-			\Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-			, |\vec{g} \oplus \vec{x}|
-		\right)
-	\right\}
-	[\bar{f} \oplus \bar{g} \oplus \bar{x}]
-\]
+    \begin{array}{l}
+      \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right) \\
+      +
+      \Tran\left(
+        \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
+        \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+        , |\vec{g} \oplus \vec{x}|
+      \right)
+    \end{array}
+  \right\}
+  [\bar{f} \oplus \bar{g} \oplus \bar{x}]
+\end{alignat*}
 \end{proof}
 \end{landscape}
 
@@ -1137,91 +1287,91 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
 \end{theorem}
 \begin{proof}
 \begin{align*}
-	G(X)
-	&= \int_A^X F(Y) dY \\
-	&= 
-		\lim_{n \to \infty}
-	 	\sum_{i=1}^n
-		  F\left(A+\frac{i}{n}(X-A)\right)
-		  \mmult{||Y||}
-		  \left(\frac{X-A}{n}\right)
+  G(X)
+  &= \int_A^X F(Y) dY \\
+  &= 
+    \lim_{n \to \infty}
+     \sum_{i=1}^n
+      F\left(A+\frac{i}{n}(X-A)\right)
+      \mmult{||Y||}
+      \left(\frac{X-A}{n}\right)
 \end{align*}
 \begin{alignat*}{3}
-	\frac{dG(X)}{dX}
-	&=&&
-	  \frac{
-			d \left\{
-			\lim_{n \to \infty}
-			\sum_{i=1}^n
-				F\left(A+\frac{i}{n}(X-A)\right)
-				\mmult{||Y||}
-				\left(\frac{X-A}{n}\right)
-			\right\}
-		}{dX} \\
-	&=&&
-		\lim_{n \to \infty}
-		\frac{
-			d \left\{
-			\sum_{i=1}^n
-				F\left(A+\frac{i}{n}(X-A)\right)
-				\mmult{||Y||}
-				\left(\frac{X-A}{n}\right)
-			\right\}
-		}{dX} \\
-	&=&&
-		\lim_{n \to \infty}
-		\sum_{i=1}^n
-			\frac{
-				d \left\{
-					F\left(A+\frac{i}{n}(X-A)\right)
-					\mmult{||Y||}
-					\left(\frac{X-A}{n}\right)
-				\right\}
-			}{dX} \\
-	&=&&
-		\lim_{n \to \infty}
-			\sum_{i=1}^n
-				F\left(A+\frac{i}{n}(X-A)\right)
-					\mmult{||Y||}
-					\frac{d \left(\frac{X-A}{n}\right)}{dX}
-				\\&&&+
-				\Tran\left(
-					\Tran\left(\frac{X-A}{n}, ||Y||\right)
-					\mmult{||Y||}
-					\Tran\left(\frac{
-						d \left\{F\left(A+\frac{i}{n}(X-A)\right)\right\}
-					}{dX}, |\vec{f}|\right),
-					|\vec{x} \oplus \vec{x}|
-				\right) \\
-	&=&&
-		\lim_{n \to \infty}
-			\sum_{i=1}^n
-				F\left(A+\frac{i}{n}(X-A)\right)
-					\mmult{||Y||}
-					\frac{1}{n}\Ident^2(|X|)
-				\\&&&+
-				\Tran\left(
-					\frac{X-A}{n}
-					\mmult{||Y||}
-					\Tran\left(
-						\frac{dF(X)}{dX}
-						\mmult{|X|}
-						\frac{i}{n}\Ident^2(|X|), |\vec{f}|\right),
-					|\vec{x} \oplus \vec{x}|
-				\right) \\
-	&=&&
-		\lim_{n \to \infty}
-			\sum_{i=1}^n
-				\frac{1}{n}F\left(A+\frac{i}{n}(X-A)\right)
-				\\&&&+
-				\Tran\left(
-					\frac{X-A}{n}
-					\mmult{||Y||}
-					\Tran\left(
-						\frac{i}{n}\frac{dF(X)}{dX}
-						, |\vec{f}|\right),
-					|\vec{x} \oplus \vec{x}|
-				\right)
+  \frac{dG(X)}{dX}
+  &=&&
+    \frac{
+      d \left\{
+      \lim_{n \to \infty}
+      \sum_{i=1}^n
+        F\left(A+\frac{i}{n}(X-A)\right)
+        \mmult{||Y||}
+        \left(\frac{X-A}{n}\right)
+      \right\}
+    }{dX} \\
+  &=&&
+    \lim_{n \to \infty}
+    \frac{
+      d \left\{
+      \sum_{i=1}^n
+        F\left(A+\frac{i}{n}(X-A)\right)
+        \mmult{||Y||}
+        \left(\frac{X-A}{n}\right)
+      \right\}
+    }{dX} \\
+  &=&&
+    \lim_{n \to \infty}
+    \sum_{i=1}^n
+      \frac{
+        d \left\{
+          F\left(A+\frac{i}{n}(X-A)\right)
+          \mmult{||Y||}
+          \left(\frac{X-A}{n}\right)
+        \right\}
+      }{dX} \\
+  &=&&
+    \lim_{n \to \infty}
+      \sum_{i=1}^n
+        F\left(A+\frac{i}{n}(X-A)\right)
+          \mmult{||Y||}
+          \frac{d \left(\frac{X-A}{n}\right)}{dX}
+        \\&&&+
+        \Tran\left(
+          \Tran\left(\frac{X-A}{n}, ||Y||\right)
+          \mmult{||Y||}
+          \Tran\left(\frac{
+            d \left\{F\left(A+\frac{i}{n}(X-A)\right)\right\}
+          }{dX}, |\vec{f}|\right),
+          |\vec{x} \oplus \vec{x}|
+        \right) \\
+  &=&&
+    \lim_{n \to \infty}
+      \sum_{i=1}^n
+        F\left(A+\frac{i}{n}(X-A)\right)
+          \mmult{||Y||}
+          \frac{1}{n}\Ident^2(|X|)
+        \\&&&+
+        \Tran\left(
+          \frac{X-A}{n}
+          \mmult{||Y||}
+          \Tran\left(
+            \frac{dF(X)}{dX}
+            \mmult{|X|}
+            \frac{i}{n}\Ident^2(|X|), |\vec{f}|\right),
+          |\vec{x} \oplus \vec{x}|
+        \right) \\
+  &=&&
+    \lim_{n \to \infty}
+      \sum_{i=1}^n
+        \frac{1}{n}F\left(A+\frac{i}{n}(X-A)\right)
+        \\&&&+
+        \Tran\left(
+          \frac{X-A}{n}
+          \mmult{||Y||}
+          \Tran\left(
+            \frac{i}{n}\frac{dF(X)}{dX}
+            , |\vec{f}|\right),
+          |\vec{x} \oplus \vec{x}|
+        \right)
 \end{alignat*}
 At this point I'm fairly stuck.
 \end{proof}
