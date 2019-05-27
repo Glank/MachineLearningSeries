@@ -876,26 +876,102 @@ And,
 \[ \Tran(X, l)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
 \end{definition}
 
+\begin{theorem}[Inverse Transpose]
+If $|X| = \vec{l} \oplus \vec{r}$
+\[ \Tran(\Tran(X, |\vec{l}|), |\vec{r}|) = X \]
+\end{theorem}
+\begin{proof}
+Let $|X| = \vec{l} \oplus \vec{r}$ then
+$\forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : $
+\[ \Tran(X, |\vec{l}|)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
+And so,
+\begin{align*}
+	\Tran(\Tran(X, |\vec{l}|), |\vec{r}|)[\bar{l} \oplus \bar{r}]
+	&= \Tran(X, |\vec{l}|)[\bar{r} \oplus \bar{l}] \\
+	&= X[\bar{l} \oplus \bar{r}] \\
+\end{align*}
+Therefore, 
+\[ \Tran(\Tran(X, |\vec{l}|), |\vec{r}|) = X \]
+\end{proof}
+
+\begin{theorem}[Identity Transpose]
+\[ \Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x}) \]
+\end{theorem}
+\begin{proof}
+Consider that for some ordered set of indicies
+$\{\bar{x}_1, \bar{x}_2, \ldots \bar{x}_n\} = X$ such that each
+$\bar{x}_i \in X \implies \bar{x}_i \in \Dim(\vec{x})$.
+Let $X'$ be some ordered permutation of $X$, then we can reason that,
+\begin{align*}
+ \Ident^n(\vec{x})\left[\bigoplus X'\right]
+ &= 
+	\left\{
+  \begin{array}{ll}
+    1 & \mbox{if all } \bar{x}_i \in X' \mbox{ are equal.}\\
+    0 & \mbox{otherwise}
+  \end{array}
+	\right.\\
+ &= 
+	\left\{
+  \begin{array}{ll}
+    1 & \mbox{if all } \bar{x}_i \in X \mbox{ are equal.}\\
+    0 & \mbox{otherwise}
+  \end{array}
+	\right.\\
+ &=\Ident^n(\vec{n})\left[\bigoplus X\right]
+\end{align*}
+Since for
+$X' = \left\{\bar{x}_{k+1}, \bar{x}_{k+2} \ldots \bar{x}_{n},
+\bar{x}_1, \bar{x}_2 \ldots \bar{x}_k\right\}$
+\begin{align*}
+  \Tran(\Ident^n(\vec{x}), k|\vec{x}|)\left[\bigoplus X'\right]
+	&=
+  \Ident^n(\vec{x})\left[\bigoplus X\right]\\
+	&=
+  \Ident^n(\vec{x})\left[\bigoplus X'\right]
+\end{align*}
+Therefore
+$\Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x})$
+\end{proof}
+
+\begin{theorem}[Transposition of Multimatrix Multiplication]
+\label{mm_tran_mult}
+Let $|A| = \vec{a} \oplus \vec{c}$ and $|B| = \vec{c} \oplus \vec{b}$ then
+\[
+ \Tran(A \mmult{|\vec{c}|} B, |\vec{a}|)
+ =  \Tran(B, |\vec{c}|) \mmult{|\vec{c}|} \Tran(A, |\vec{a}|)
+\]
+\end{theorem}
+\begin{proof}
+Let $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$.
+Then,
+\begin{align*}
+	\Tran(A \mmult{|\vec{c}|} B, |\vec{a}|)[\bar{b} \oplus \bar{a}]
+	&=
+	\left(A \mmult{|\vec{c}|} B \right)[\bar{a} \oplus \bar{b}] \\
+	&=
+	\sum_{\forall \bar{c} \in \Dim(\vec{c})}
+	A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}] \\
+	&=
+	\sum_{\forall \bar{c} \in \Dim(\vec{c})}
+	B[\bar{c} \oplus \bar{b}] A[\bar{a} \oplus \bar{c}] \\
+	&=
+	\sum_{\forall \bar{c} \in \Dim(\vec{c})}
+	\Tran(B, |\vec{c}|)[\bar{b} \oplus \bar{c}]
+	\Tran(A, |\vec{a}|)[\bar{c} \oplus \bar{a}] \\
+	&=
+	\left(\Tran(B, |\vec{c}|) \mmult{|\vec{c}|} \Tran(A, |\vec{a}|) \right)
+	[\bar{b} \oplus \bar{a}]
+\end{align*}
+\end{proof}
+
 \subsection*{Sample Problems}
 TODO
 
 \section{Derivative Rules}
 
-\begin{theorem}[Right Multiplicative Derivative]
-\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
-\end{theorem}
-\begin{proof}
-TODO
-\end{proof}
-
-\begin{theorem}[Left Multiplicative Derivative]
-\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n) \]
-\end{theorem}
-\begin{proof}
-TODO
-\end{proof}
-
 \begin{theorem}[Transpose Derivative]
+\label{tran_derivative}
 $|X| = \vec{l} \oplus \vec{r}$
 \[
  \frac{d\Tran(X, |\vec{l}|)}{dX} =
@@ -927,6 +1003,92 @@ $|X| = \vec{l} \oplus \vec{r}$
  [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
 \end{align*}
 \end{proof}
+
+\begin{theorem}[Right Multiplicative Derivative]
+\label{right_mult_derivative}
+\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{landscape}
+\begin{theorem}[Left Multiplicative Derivative]
+\label{left_mult_derivative}
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n) \]
+\end{theorem}
+\begin{proof}
+Let $|X| = \vec{x} \oplus \vec{n}$ and $|A| = \vec{n} \oplus \vec{a}$. Then,
+for all
+$\bar{x}_1, \bar{x}_2 \in \Dim(\vec{x}), \bar{a}_1 \in \Dim(\vec{a}),
+\bar{n}_1 \in \Dim(\vec{n}):$
+\begin{align*}
+	\frac{d(X \mmult{n} A)}{dX}
+	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
+	&= 
+	\frac{
+		\partial (X \mmult{n} A) [\bar{x}_1 \oplus \bar{a}_1]
+	}{\partial X[\bar{x}_2 \oplus \bar{n}_1]} \\
+	&= 
+	\frac{
+		\partial \left(
+			\sum_{\forall \bar{n}_2 \in \Dim(\vec{n})}
+			X[\bar{x}_1 \oplus \bar{n}_2] A[\bar{n}_2 \oplus \bar{a}_1]
+		\right)
+	}{\partial X[\bar{x}_2 \oplus \bar{n}_1]} \\
+	&= 
+	\sum_{\forall \bar{n}_2 \in \Dim(\vec{n})}
+	\frac{
+		\partial \left(
+			X[\bar{x}_1 \oplus \bar{n}_2] A[\bar{n}_2 \oplus \bar{a}_1]
+		\right)
+	}{\partial X[\bar{x}_2 \oplus \bar{n}_1]} \\
+	&= 
+	\sum_{\forall \bar{n}_2 \in \Dim(\vec{n})}
+	\delta_{\bar{x}_1\bar{x}_2}
+	\delta_{\bar{n}_1\bar{n}_2}
+	A[\bar{n}_2 \oplus \bar{a}_1] \\
+	&= 
+	\delta_{\bar{x}_1\bar{x}_2}
+	A[\bar{n}_1 \oplus \bar{a}_1]
+\end{align*}
+We can also show that,
+\begin{align*}
+	\left(\Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n)\right)
+	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
+	&=
+	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a}_1)}
+	\Ident^2(|X \mmult{n} A|)[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{a}_2]
+	\Tran(A, n)[\bar{a}_2 \oplus \bar{n}_1] \\
+	&=
+	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a})}
+	\delta_{\bar{x}_1 \bar{x}_2} \delta_{\bar{a}_1 \bar{a}_2}
+	\Tran(A, n)[\bar{a}_2 \oplus \bar{n}_1] \\
+	&=
+	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a})}
+	\delta_{\bar{x}_1 \bar{x}_2} \delta_{\bar{a}_1 \bar{a}_2}
+	A[\bar{n}_1 \oplus \bar{a}_2] \\
+	&=
+	\delta_{\bar{x}_1 \bar{x}_2}
+	A[\bar{n}_1 \oplus \bar{a}_1]
+\end{align*}
+Then since,
+\[
+	\frac{d(X \mmult{n} A)}{dX}
+	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
+	=
+	\left(\Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n)\right)
+	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
+\]
+we have shown that,
+\[
+	\frac{d(X \mmult{n} A)}{dX}
+	=
+	\Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n)
+\]
+\end{proof}
+\end{landscape}
+
 
 \begin{theorem}[Addition Rule]
 \[ \frac{d(F(X) + G(X))}{dX} = \frac{dF(X)}{dX} + \frac{dG(X)}{dX} \]
@@ -1374,6 +1536,35 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
         \right)
 \end{alignat*}
 At this point I'm fairly stuck.
+
+Ok, lets think of this in another way. Is this true?
+\[
+	\lim_{\epsilon \to 0}
+	\frac{
+		G(X+\epsilon H) - G(X)
+	}{\epsilon}
+	=
+	F(X) \mmult{||X||} H
+\]
+Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
+
+\begin{align*}
+\lim_{\epsilon \to 0}
+\frac{
+	G(X+\epsilon H) - G(X)
+}{\epsilon}
+&= 
+\lim_{\epsilon \to 0}
+\frac{
+	\left( \int_A^{X+\epsilon H} F(Y) dY \right) - \left( \int_A^X F(Y) dY \right)
+}{\epsilon} \\
+&= 
+\lim_{\epsilon \to 0}
+\frac{
+	\int_X^{X+\epsilon H} F(Y) dY
+}{\epsilon}
+\end{align*}
 \end{proof}
+
 \end{landscape}
 \end{document}
