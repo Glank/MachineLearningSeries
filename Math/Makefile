@@ -10,3 +10,4 @@ clean:
 	-rm paper.pdf
 	-rm paper.bbl
 	-rm paper.blg
+	-rm paper.toc

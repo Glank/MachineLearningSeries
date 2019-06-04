@@ -1,5 +1,5 @@
-genetic
 test_mmatrix
-weights.js
+test_jpeg_decoder
 *.o
 *.dSYM/*
+bin/

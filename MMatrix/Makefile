@@ -1,11 +1,20 @@
-CFLAGS = -std=c++11 -Wall
+CMP = g++
+CFLAGS = -std=c++11 -Wall -Isrc
 
-test_mmatrix: mmatrix.o test_mmatrix.cc
-	g++ -g -o test_mmatrix test_mmatrix.cc mmatrix.o ${CFLAGS}
+test_mmatrix: bin/mmatrix.o test/test_mmatrix.cc
+	${CMP} -o test_mmatrix test/test_mmatrix.cc bin/mmatrix.o ${CFLAGS}
 
-mmatrix.o: mmatrix.cc mmatrix.h
-	g++ -g -c mmatrix.cc ${CFLAGS}
+test_jpeg_decoder: test/test_jpeg_decoder.cc
+	${CMP} -o test_jpeg_decoder test/test_jpeg_decoder.cc ${CFLAGS}
+
+bin/:
+	mkdir bin
+
+bin/mmatrix.o: bin/ src/mmatrix.cc src/mmatrix.h
+	${CMP} -c src/mmatrix.cc -o bin/mmatrix.o ${CFLAGS}
 
 clean:
 	-rm test_mmatrix
-	-rm *.o
+	-rm test_jpeg_decoder
+	-rm -r test_mmatrix.dSYM
+	-rm -r bin
