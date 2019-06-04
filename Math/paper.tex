@@ -22,10 +22,15 @@
 \theoremstyle{ppart}
 \newtheorem{ppart}{Part}
 \AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
+\AtBeginEnvironment{align}{\setcounter{equation}{0}}
+\AtBeginEnvironment{alignat}{\setcounter{equation}{0}}
 
 \DeclareMathOperator{\Dim}{Dim}
 \DeclareMathOperator{\Ident}{I}
 \DeclareMathOperator{\Tran}{Tran}
+\DeclareMathOperator{\SoS}{\mathbb{S}}
+\DeclareMathOperator{\Softmax}{Softmax}
+\DeclareMathOperator{\Sum}{\Sigma}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
@@ -50,6 +55,12 @@ that's more consise than anything I've found in other works.
 This book is about my exploration into multidimensional matricies - multimatricies -
 and how they can simplify derivatives of matrix equations.
 \end{abstract}
+
+\newpage
+
+\tableofcontents
+
+\newpage
 
 \section{Defining the Derivative}
 
@@ -725,11 +736,29 @@ We've shown that,
 \end{proof}
 \end{landscape}
 
+A final useful theorem happens to involve 0 overlap multiplication, which seams at first
+nonsensical given our definition of multiplication,
+but if you notice that the each element of a
+multiplication result is the sum over every index in the dimensionality of the
+portion of the shape vector of that overlapping length, and you consider that every
+vector could be said to 'start' and 'end' with an empty vector (as the concatenation of
+an empty vector does not change the vector), then it makes sense that this zero-length
+overlap always exists and is one and only one vector. That is, $\{\}$.
+
+\begin{theorem}[Zero Overlap Multiplication]
+So if $|A| = \vec{a}$ and $|B| = \vec{b}$, for every $\bar{a} \in \Dim(\vec{a})$
+and $\bar{b} \in \Dim(\vec{b}):$
+
+\[ (A \mmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] \]
+\end{theorem}
+
 \subsection*{Sample Problems}
 TODO
 
 \section{Other Operations With Multimatricies}
 Other operations include...
+
+\subsection{Scalars}
 
 \begin{definition}[Multimatrix Scalar Multiplication]
 Let $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$. If
@@ -740,6 +769,84 @@ Then
 In other words, multiplying $A$ by a scalar $s$ simply multiplies each of
 it's elements by that scalar.
 \end{definition}
+
+Note that by our definitions of scalar and multimatrix derivatives and multiplication,
+we can model scalars in either case as multimatricies with shape $\{\}$.
+
+\begin{theorem}[Empty Shape Multimatrix and Scalar Multiplication Equivalence]
+\label{s_mm_mult_equiv}
+For any multiplication operation defined between multimatricies and scalars,
+the scalar may be replaced by an equivalent empty-shaped multimatrix who's
+single value is that of the scalar.
+
+In other words, let $s \in \mathbb{R}$ and $S \in \mathbb{R}^{\{\}}$ such that
+$S[\{\}] = s$. Then, for any multimatrix $A$, 
+\[ sA = As = S \mmult{0} A = A \mmult{0} S \]
+\end{theorem}
+\begin{proof}
+Let $|A| = \vec{a}$. Then for all $\bar{a} \in \Dim(\vec{a})$,
+\begin{align*}
+	(sA)[\bar{a}]
+	&= (s)A[\bar{a}] \\
+	&= A[\bar{a}](s) \\
+	&= (As)[\bar{a}]
+\end{align*}
+So $sA = As$. Also,
+\begin{align}
+	(sA)[\bar{a}]
+	&= (s)A[\bar{a}] \\
+	&= S[\{\}]A[\bar{a}] \\
+	&= \sum_{\forall \bar{c} \in \Dim(\{\})}
+		S[\{\} \oplus \bar{c}]A[\bar{c} \oplus \bar{a}] \\
+	&= (S \mmult{0} A)[\{\} \oplus \bar{a}] \\
+	&= (S \mmult{0} A)[\bar{a}] \\
+\end{align}
+Note that step 3 is valid because $\bar{c}$ can only be $\{\}$ and
+$\{\} \oplus \bar{a} = \bar{a}$. So, $sA = S \mmult{0} A$.
+Finally, by similiar reasoning,
+\begin{align*}
+	(sA)[\bar{a}]
+	&= (s)A[\bar{a}] \\
+	&= A[\bar{a}](s) \\
+	&= A[\bar{a}]S[\{\}] \\
+	&= \sum_{\forall \bar{c} \in \Dim(\{\})}
+		A[\bar{a} \oplus \bar{c}] S[\bar{c} \oplus \{\}] \\
+	&= (A \mmult{0} S)[\bar{a} \oplus \{\}] \\
+	&= (A \mmult{0} S)[\bar{a}]
+\end{align*}
+So $sA = A \mmult{0} S$. Therefore we've shown that
+$sA = As = S \mmult{0} A = A \mmult{0} S$
+\end{proof}
+
+Noticing this lead me to suspect that the same might be true of my definitions
+of the derivative rules. A quick check confirmed that the dimensionality
+worked out, and it seems intuitive that we would always be able to treat scalars
+as empty-shape multimatricies if multiplication workes, but let's formalize that
+assertion.
+
+\begin{theorem}[Empty Shape Multimatrix and Scalar Domain Derivative Equivalence]
+\label{s_mm_domain_equiv}
+Let $F(x)$ be a function $F : \mathbb{R} \to \mathbb{R}^{\vec{f}}$. And let
+$G(X)$ be an equivalent function, $G : \mathbb{R}^{\{\}} \to \mathbb{R}^{\vec{f}}$
+such that for all $X \in \mathbb{R}^{\{\}}$ it is true that $G(X) = F(X[\{\}])$
+Then,
+\[ \frac{dF(x)}{dx} = \frac{dG(X)}{dX} \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Empty Shape Multimatrix and Scalar Range Derivative Equivalence]
+\label{s_mm_range_equiv}
+Let $f(X)$ be a function $f : \mathbb{R}^{\vec{x}} \to \mathbb{R}$. And let
+$F(X)$ be an equivalent function, $F : \mathbb{R}^{\vec{x}} \to \mathbb{R}^{\{\}}$
+such that for all $X \in \mathbb{R}^{\vec{x}}$ it is true that $F(X)[\{\}] = f(X)$
+Then,
+\[ \frac{df(X)}{dX} = \frac{dF(X)}{dX} \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
 
 \subsection{Addition}
 
@@ -965,10 +1072,24 @@ Then,
 \end{align*}
 \end{proof}
 
+\begin{theorem}[Communicativity of scalar Multiplication and Transposition]
+\[ s\Tran(A, x) = \Tran(sA, x) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{theorem}[Stacked Transposition]
+\[ \Tran(\Tran(A, x), y) = \Tran(A, x+y) \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
 \subsection*{Sample Problems}
 TODO
 
-\section{Derivative Rules}
+\section{Generic Derivative Rules}
 
 \begin{theorem}[Transpose Derivative]
 \label{tran_derivative}
@@ -1094,14 +1215,46 @@ we have shown that,
 \[ \frac{d(F(X) + G(X))}{dX} = \frac{dF(X)}{dX} + \frac{dG(X)}{dX} \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $|F(X)| = |G(X)| = \vec{f}$ and $|X| = \vec{x}$. Then,
+$\forall \bar{f} \in \Dim(\vec{f}), \bar{x} \in \Dim(\vec{x}):$
+\begin{align*}
+	\frac{d(F(X) + G(X))}{dX}[\bar{f} \oplus \bar{x}]
+	&=
+	\frac{\partial (F(X) + G(X))[\bar{f}]}{\partial X[\bar{x}]} \\
+	&=
+	\frac{\partial (F(X)[\bar{f}] + G(X)[\bar{f}])}{\partial X[\bar{x}]} \\
+	&=
+	\frac{\partial F(X)[\bar{f}]}{\partial X[\bar{x}]} +
+	\frac{\partial G(X)[\bar{f}]}{\partial X[\bar{x}]} \\
+	&=
+	\frac{dF(X)}{dX}[\bar{f} \oplus \bar{x}]+
+	\frac{dG(X)}{dX}[\bar{f} \oplus \bar{x}]
+\end{align*}
+So $d(F(X) + G(X))/dX = dF(X)/dX + dG(X)/dX$
 \end{proof}
 
+A rule for derivatives involving scalar multiplication also seems generally
+useful. Of course, by the Theorem \ref{s_mm_mult_equiv}, this is just a very specific
+case of Theorem \ref{right_mult_derivative} but the proof is simple and worth
+the additional ink, I think,
 \begin{theorem}[Scalar Multiplication Rule]
 \[ \frac{d(sF(X))}{dX} = s\frac{dF(X)}{dX} \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $|F(X)| = \vec{f}$ and $|X| = \vec{x}$. Then
+$\forall \bar{f} \in \Dim(\vec{f}), \bar{x} \in \Dim(\vec{x}):$
+\begin{align*}
+	\frac{d(sF(X))}{dX}[\bar{f} \oplus \bar{x}]
+	&=
+	\frac{\partial (sF(X))[\bar{f}]}{\partial X[\bar{x}]} \\
+	&=
+	\frac{\partial (s)(F(X)[\bar{f}])}{\partial X[\bar{x}]} \\
+	&=
+	s\frac{\partial F(X)[\bar{f}]}{\partial X[\bar{x}]} \\
+	&=
+	s\frac{dF(X)}{dX}[\bar{f} \oplus \bar{x}]
+\end{align*}
+Therefore $d(sF(X))/dX = s(dF(X)/dX)$
 \end{proof}
 
 \begin{landscape}
@@ -1247,12 +1400,11 @@ Therefore
 \end{proof}
 \end{landscape}
 
-\subsection{Chain Rules}
-
-\begin{theorem}[M.M.M. Chain Rule]
+\begin{theorem}[Chain Rule]
 \label{mmm_chain_rule}
 Let $F(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}^{\vec{f}}$
 and $G(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}^{\vec{g}}$.
+Then,
 \[
 \frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
 \]
@@ -1269,7 +1421,7 @@ By the definition of a derivative (\ref{mm_derivative}),
 \frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
 = \frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
 \]
-By the scalar total derivative rule,
+By the scalar total derivative rule \cite{wiki:totalderiv},
 \[
 \frac{\partial F(G(X))[\bar{f}]}{\partial X[\bar{x}]}
 = \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
@@ -1303,118 +1455,255 @@ Which, taking a look at the definition of multidimensional matrix multiplication
 \]
 \end{proof}
 
-\begin{theorem}[S.M.M. Chain Rule]
-\label{smm_chain_rule}
-Let $f(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}$
-and $G(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}^{\vec{g}}$.
-\[
-\frac{df(G(X))}{dX} = \frac{df}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
-\]
-\end{theorem}
-\begin{proof}
-By the definitions of a derivative
-(\ref{sm_derivative} and \ref{mm_derivative} respectively),
-\[
-\forall \bar{g} \in \Dim(\vec{g}):
-\frac{df(G)}{dG}[\bar{g}]
-= \frac{\partial f(G)}{\partial G[\bar{g}]}
-\]
-\[
-\forall \bar{g} \in \Dim(\vec{g}), \bar{x} \in \Dim(\vec{x}):
-\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
-= \frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
-\]
-By the scalar total derivative rule,
-\[
-\frac{\partial f(G(X))}{\partial X[\bar{x}]}
-= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
-\frac{\partial f(G)}{\partial G[\bar{g}]}
-\frac{\partial G(X)[\bar{g}]}{\partial X[\bar{x}]}
-\]
-Substituting in our above definitions this yields,
-\[
-\frac{\partial f(G(X))}{\partial X[\bar{x}]}
-= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
-\frac{df(G)}{dG}[\bar{g}]
-\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
-\]
-Again, by the definition of a derivative (\ref{sm_derivative}),
-\[
-\frac{df(G(X))}{dX}[\bar{x}] =
-\frac{\partial f(G(X))}{\partial X[\bar{x}]}
-\]
-Therefore,
-\[
-\frac{df(G(X))}{dX}[\bar{x}]
-= \sum_{\forall \bar{g} \in \Dim(\vec{g})} 
-\frac{df(G)}{dG}[\bar{g}]
-\frac{dG(X)}{dX}[\bar{g} \oplus \bar{x}]
-\]
-Which, by the definition of multidimensional multipliction (\ref{mm_mult}),
-implies that,
-\[
-\frac{df(G(X))}{dX} = \frac{df(G)}{dG} \mmult{|\vec{g}|} \frac{dG(X)}{dX}
-\]
-\end{proof}
+\section{Machine Learning Specific Derivatives}
+TODO
 
-\begin{theorem}[M.S.M. Chain Rule]
-\label{msm_chain_rule}
-Let $F(g)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{f}}$
-and $g(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}$.
-\[
-\frac{dF(g(X))}{dX} = \frac{dF}{dg} \mmult{0} \frac{dg}{dX}
-\]
+\begin{definition}[Sum]
+Let $\Sum(X)$ be the function $\Sum : \mathbb{R}^{\vec{x}} \to \mathbb{R}$
+such that \[ \Sum(X) = \sum_{\forall \bar{x} \in \Dim(\vec{x})} X[\bar{x}] \]
+\end{definition}
+
+\begin{theorem}[Derivative of Sum]
+\[\frac{d\Sum(X)}{dX} = 1^{|X|}\]
 \end{theorem}
 \begin{proof}
 TODO
 \end{proof}
 
-\begin{theorem}[M.M.S. Chain Rule]
-\label{mms_chain_rule}
-Let $F(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}^{\vec{f}}$
-and $G(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{g}}$.
-\[
-\frac{dF(G(x))}{dx} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dx}
-\]
+\begin{definition}[Sum of Squares]
+Let $\SoS(X)$ be the function $\SoS : \mathbb{R}^{\vec{x}} \to \mathbb{R}$
+such that 
+\[ \SoS(X) = \sum_{\forall \bar{x} \in \Dim(\vec{x})} X[\bar{x}]^2 \]
+\end{definition}
+
+\begin{theorem}[Derivative of Sum of Squares]
+\[ \frac{d \SoS(X)}{dX} = 2X \]
 \end{theorem}
 \begin{proof}
+Notice that $\SoS(X) = X \mmult{|\vec{x}|} X$...
+
 TODO
 \end{proof}
 
-\begin{theorem}[S.S.M. Chain Rule]
-\label{ssm_chain_rule}
-Let $f(g)$ be a function $\mathbb{R} \rightarrow \mathbb{R}$
-and $g(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}$.
+\begin{definition}[Softmax]
+Let $\Softmax(X)$ be the function
+$\Softmax : \mathbb{R}^{\vec{X}} \to \mathbb{R}^{\vec{X}}$
+such that $\forall \bar{x} \in \Dim(\vec{x}):$
 \[
-\frac{df(g(X))}{dX} = \frac{df}{dg} \frac{dg}{dX}
+  \Softmax(X)[\bar{x}] = \frac{
+		\exp(X[\bar{x}])
+	}{
+		\sum_{\forall \bar{c} \in \Dim(\vec{x})} \exp(X[\bar{c}])
+	}
 \]
-\end{theorem}
-\begin{proof}
-TODO
-\end{proof}
+\end{definition}
 
-\begin{theorem}[S.M.S. Chain Rule]
-\label{sms_chain_rule}
-Let $f(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}$
-and $G(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{g}}$.
-\[
-\frac{df(G(X))}{dx} = \frac{df}{dG} \mmult{|\vec{g}|} \frac{dG}{dx}
-\]
+\begin{landscape}
+\begin{theorem}[Derivative of Softmax]
+TODO
+\begin{align*}
+	\frac{d\Softmax(X)}{dX}
+	&=
+	\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+  -\Softmax(X) \mmult{0} \Softmax(X) \\
+	&=
+	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
+	\mmult{||X||} \Softmax(X)
+\end{align*}
 \end{theorem}
 \begin{proof}
-TODO
+Notice that 
+\[
+	\Softmax(X) = \exp(X) \mmult{0} \left( \Sum(\exp(X)) \right)^{-1}
+\]
+So,
+\begin{alignat}{3}
+	\frac{d\Softmax(X)}{dX}
+	&=&&
+	\frac{d \left( \exp(X) \mmult{0} \left( \Sum(\exp(X)) \right)^{-1} \right)}{dX} \\
+	&=&&
+	\exp(X) \mmult{0} \frac{d \left( \Sum(\exp(X)) \right)^{-1}}{dX}
+	\nonumber\\&&&+
+	\Tran\left(
+		\Tran\left(
+			\left( \Sum(\exp(X)) \right)^{-1}
+			,0
+		\right)
+		\mmult{0}
+		\Tran\left(
+			\frac{d \exp(X)}{dX}
+			,|\vec{x}|
+		\right)
+		,|\{\} \oplus \vec{x}|
+	\right) \\
+	&=&&
+	\exp(X) \mmult{0} \frac{d \left( \Sum(\exp(X)) \right)^{-1}}{dX}
+	\nonumber\\&&&+
+	\Tran\left(
+		\left( \Sum(\exp(X)) \right)^{-1}
+		\mmult{0}
+		\Tran\left(
+			\frac{d \exp(X)}{dX}
+			,|\vec{x}|
+		\right)
+		,|\vec{x}|
+	\right) \\
+	&=&&
+	\exp(X) \mmult{0} \left(
+		-\left( \Sum(\exp(X)) \right)^{-2}
+		\mmult{0}
+		\frac{d\Sum(\exp(X))}{dX}
+	\right)
+	\nonumber\\&&&+
+	\Tran\left(
+		\left( \Sum(\exp(X)) \right)^{-1}
+		\mmult{0}
+		\Tran\left(
+			\Ident^3(|X|) \mmult{||X||} \exp(X)
+			,|\vec{x}|
+		\right)
+		,|\vec{x}|
+	\right) \\
+	&=&&
+	\exp(X) \mmult{0} \left(
+		-\left( \Sum(\exp(X)) \right)^{-2}
+		\mmult{0}
+		1^{|X|}
+		\mmult{||X||}
+		\Ident^3(|X|)
+		\mmult{||X||}
+		\exp(X)
+	\right)
+	\nonumber\\&&&+
+	\Tran\left(
+		\Tran\left(
+			\left( \Sum(\exp(X)) \right)^{-1}
+			\mmult{0}
+			\Ident^3(|X|) \mmult{||X||} \exp(X)
+		,|\vec{x}|
+		\right)
+		,|\vec{x}|
+	\right) \\
+	&=&&
+	-\Softmax(X) \mmult{0} \left(
+		\left( \Sum(\exp(X)) \right)^{-1}
+		\mmult{0}
+		\Ident^2(|X|)
+		\mmult{||X||}
+		\exp(X)
+	\right)
+	\nonumber\\&&&+
+	\Tran\left(
+		\Tran\left(
+			\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+		,|\vec{x}|
+		\right)
+	,|\vec{x}|
+	\right) \\
+	&=&&
+	-\Softmax(X) \mmult{0} \Softmax(X)
+	+
+	\Tran\left(
+		\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+		,2|\vec{x}|
+	\right) \\
+	&=&&
+	\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+  -\Softmax(X) \mmult{0} \Softmax(X) \\
+	&=&&
+	\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+	-\Softmax(X) \mmult{0} \Ident^2(|X|) \mmult{||X||} \Softmax(X) \\
+	&=&&
+	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
+	\mmult{||X||} \Softmax(X)
+\end{alignat}
+Let's just verify that against the Wikipedia \cite{wiki:softmax} result:
+\begin{align*}
+	\frac{\partial \Softmax(X)[\bar{x}_1]}{\partial X[\bar{x}_2]}
+	&=
+	\left\{
+		\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
+		\mmult{||X||} \Softmax(X)
+	\right\}
+	[\bar{x}_1 \oplus \bar{x}_2] \\
+	&=
+	\sum_{\forall \bar{x}_3}
+	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
+	[\bar{x}_1 \oplus \bar{x}_2 \oplus \bar{x}_3]
+	\Softmax(X)[\bar{x}_3] \\
+	&=
+	\sum_{\forall \bar{x}_3}
+	\left(
+		\delta_{\bar{x}_1 \bar{x}_2 \bar{x}_3}
+		- \Softmax(X)[\bar{x}_1] \delta_{\bar{x}_2 \bar{x}_3}
+	\right)
+	\Softmax(X)[\bar{x}_3] \\
+	&=
+	(\delta_{\bar{x}_1 \bar{x}_2} - \Softmax(X)[\bar{x}_1])
+	\Softmax(X)[\bar{x}_2] \\
+	&= \left\{
+  \begin{array}{ll}
+    (1-\Softmax(X)[\bar{x}_1])\Softmax(X)[\bar{x}_2]
+			& \mbox{if } \bar{x}_1 = \bar{x}_2 \\
+    (0-\Softmax(X)[\bar{x}_1])\Softmax(X)[\bar{x}_2]
+			& \mbox{otherwise}
+  \end{array}
+	\right. \\
+	&= \left\{
+  \begin{array}{ll}
+    \Softmax(X)[\bar{x}_1]-\Softmax(X)[\bar{x}_1]^2
+			& \mbox{if } \bar{x}_1 = \bar{x}_2 \\
+    -\Softmax(X)[\bar{x}_1])\Softmax(X)[\bar{x}_2]
+			& \mbox{otherwise}
+  \end{array}
+	\right. \\
+	&= \left\{
+  \begin{array}{ll}
+    (1-\Softmax(X)[\bar{x}_2])\Softmax(X)[\bar{x}_2]
+			& \mbox{if } \bar{x}_1 = \bar{x}_2 \\
+    (0-\Softmax(X)[\bar{x}_2])\Softmax(X)[\bar{x}_1]
+			& \mbox{otherwise}
+  \end{array}
+	\right. \\
+	&= (\delta_{\bar{x}_1 \bar{x}_2} - \Softmax(X)[\bar{x}_2])
+	\Softmax(X)[\bar{x}_1]
+\end{align*}
+And it looks like we're good. I wrote this proof before backreferencing the wiki
+page, so that's a good sign.
 \end{proof}
+\end{landscape}
 
-\begin{theorem}[M.S.S. Chain Rule]
-\label{mss_chain_rule}
-Let $F(g)$ be a function $\mathbb{R} \rightarrow \mathbb{R}^{\vec{f}}$
-and $g(x)$ be a function $\mathbb{R} \rightarrow \mathbb{R}$.
-\[
-\frac{dF(g(x))}{dx} = \frac{dF}{dg} \frac{dg}{dx}
-\]
+\begin{definition}[Feed Forward Neural Net Layer]
+Feed forward neural nets are described all over the place so I won't go into too
+much detail here. In short, for every layer except the input layer there is some
+previous layer which feeds into current layer via a fully-connected network of
+weights.
+
+Let $L_{i-1}$ be the activations of the the previous layer and $L_i$ the activations
+of the current layer. Each of these can be modeled as a multimatrix. As an the weighted
+connections between them, $W_i$. Finally, there is an activation function
+$a(X) : \mathbb{R}^{|X|} \to \mathbb{R}^{|X|}$ which is an elementwise function,
+often the sigmoid function, or ReLU, or some variant thereof. It's unimportant for this
+definition.
+
+\[ L_i = a(L_{i-1} \mmult{||L_{i-1}||} W_i) \]
+\end{definition}
+
+\begin{theorem}[Derivative of FFNN Layer]
+\[ \frac{dL_i}{dW_j} = ? \]
 \end{theorem}
 \begin{proof}
+\begin{ppart} When $i < j$,
+$L_i$ does not depend on $W_j$, so 
+$\forall \bar{x} \in \Dim(|L_i|), \bar{y} \in \Dim(|W_j|)$
+$\frac{dL_i}{dW_j} = 0$
+\end{ppart}
+\begin{ppart} $i = j$
 TODO
+\end{ppart}
+\begin{ppart} $i > j$
+TODO
+\end{ppart}
 \end{proof}
 
 \section{Integration}
@@ -1565,6 +1854,9 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 }{\epsilon}
 \end{align*}
 \end{proof}
-
 \end{landscape}
+
+\bibliography{paper}
+\bibliographystyle{ieeetr}
+
 \end{document}

@@ -1,0 +1,9 @@
+\contentsline {section}{\numberline {1}Defining the Derivative}{3}
+\contentsline {section}{\numberline {2}Multimatrix Multiplication}{7}
+\contentsline {section}{\numberline {3}Other Operations With Multimatricies}{17}
+\contentsline {subsection}{\numberline {3.1}Scalars}{17}
+\contentsline {subsection}{\numberline {3.2}Addition}{19}
+\contentsline {subsection}{\numberline {3.3}Transposition}{23}
+\contentsline {section}{\numberline {4}Generic Derivative Rules}{25}
+\contentsline {section}{\numberline {5}Machine Learning Specific Derivatives}{33}
+\contentsline {section}{\numberline {6}Integration}{37}
