@@ -14,9 +14,11 @@
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
 
+\theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
 \newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{example}{Example}[section]
 
 \newtheoremstyle{ppart}{}{}{}{}{}{:}{ }{}
 \theoremstyle{ppart}
@@ -48,12 +50,18 @@ either requires users to pull apart the matricies they're working with or otherw
 bypass the issue of taking derivatives of matrix equations.
 
 So, I came up with a system of my own. And, much to my surprise, some of the
-results I came up with were surprisingly elegant. For example, I proved a
+results I came up with were kind of elegant. For example, I proved a
 multidimensional version of the derivative chain rule (Thm. \ref{mmm_chain_rule})
-that's more consise than anything I've found in other works.
+that's more consise than anything I've seen in my (admitedly limited) experience.
 
-This book is about my exploration into multidimensional matricies - multimatricies -
-and how they can simplify derivatives of matrix equations.
+The ultimate goal of this notation system was to provide a way to take derivatives
+of matrix equations without having to break apart matricies into their constituent
+parts. I knew I succeeded when I was able to derive the derivative of the softmax
+function completely in my own notation (Thm. \ref{softmax_derivative}).
+
+Not knowing what else to do with the results, I've written this paper (short book?)
+about my amature exploration into multidimensional matricies -
+multimatricies - and how they can simplify derivatives of matrix equations.
 \end{abstract}
 
 \newpage
@@ -123,7 +131,7 @@ The ordering here is arbitrary, there is no reason why the dimensionality of
 of the independent variable \textit{needs} to be concatenated with to the right of the
 dimensionality of the output. What's important is that the dimensionality of
 both output and indepenedent variable are preserved - but let us declare this to
-be our convention for the remainder of this article.
+be our convention for the remainder of this work.
 
 We have, therefore, a multidimensional object with four indicies. Suppose we try to
 pull a single partial derivative from this complete derivative, what could our
@@ -145,9 +153,9 @@ a row and column, but each uniquely indexed cell in this object may have a
 unique value, just like a standard two dimensional matrix.
 
 \begin{definition}[Multimatrix]
-Let's define a bit of notation. A multimatrix $M$ is a multidimensional matrix
-that has some shape, $|M| \in \mathbb{N}^n$, where $n$ is the number of
-dimensions of $M$.
+Let's define this bit of notation formally. A multimatrix $M$ is a multidimensional
+matrix that has some shape, $|M| \in \mathbb{N}^n$, where $n \in \mathbb{Z}^+ \cup \{0\}$
+is the number of dimensions of $M$.
 
 We'll say that if $\vec{v} = |M|$, then any $\bar{v} \in \mathbb{N}^n$ is a valid
 index of $M$ if and only if value of $\bar{v}$ is less than or equal to the value
@@ -246,8 +254,8 @@ like this:
 \frac{dM}{dX} = \Ident^3(|X|) \mmult{||X||} \cos(X)
 \]
 
-But that single line will require defining something I'm going to call a cubic
-identity, $\Ident^3(|X|)$, as well as multimatrix multiplication.
+But that single line will require defining multimatrix multiplication and
+something I'll call a cubic identity, $\Ident^3(|X|)$.
 
 \subsection*{Sample Problems}
 TODO
@@ -255,9 +263,10 @@ TODO
 \section{Multimatrix Multiplication}
 
 Multiplication of traditional matricies is one of those things that, when you
-first learn about it, you wonder "Who the hell defined it this way?" And then
-when you see it used in practice, you slowly come to understand they why behind
-it.
+first learn about it, makes you wonder ``What crosseyed weirdo defined it this way?''
+And then, after seeing it used in practice, you slowly come to understand the
+reason behind the madness. Let me warn you now - multimatrix multiplication will
+feel the same way.
 
 Just to review, for two matricies $A$ and $B$, multipication is only defined
 for $A \times B = C$ if $A$ has the same number of columns as $B$ has rows.
@@ -284,11 +293,13 @@ $\left<7, 7\ldots\right>$ so maybe our multiplication operation should work on t
 additional dimension, leaving us with $\left<5, 2, 4\right> = |A \times B|$.
 But the first definition looks like it could still be useful! It could let us cover 
 two dimensional matrix multiplication completely within our definition. This second
-definition seems more... multidimensional but it also seems to arbitrarily depend
-on the shape of the two matricies.
+definition seems more... er... multidimensional... but it also seems to
+arbitrarily depend on the shape of the two matricies.
 
-So - a compromize. Maybe multimatrix isn't a binary operation. Maybe it's a trinary
-operation. There's some component of, ``How many dimensions are you combining?'' inherent
+What we really need is an operation which covers both lines of reasoning but that
+seems impossible with a binary operaiton. So maybe multimatrix isn't a binary operation.
+Maybe it's a trinary operation. There's some component of, 
+``How many dimensions are you combining?'' inherent
 in the operation. So we can distinguish our two types of multiplication, and indeed
 an infinite number of types of multiplication, with a new operator, $\mmult{n}$ where
 $|A \mmult{1} B| = \left<5, 7, 7, 2, 4\right>$ and 
@@ -301,7 +312,7 @@ just jump into the formal definition and I'll explain with an example:
 \label{mm_mult}
 Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$,
 $|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$ with
-$n \in \left\{ 0 \right\} \cup \mathbb{Z}^{+}$. We shall call $n$ the 'size'
+$n \in \{0\} \cup \mathbb{Z}^{+}$. We shall call $n$ the 'size' or the 'width'
 of the multiplication operation.
 The shape of the result is defined, $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$
 and the value of the result is defined,
@@ -312,6 +323,83 @@ and the value of the result is defined,
   A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}]
 \]
 \end{definition}
+
+\newpage
+\begin{example}
+Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{c c c | c}
+$\bar{a}_1$ & $\bar{a}_2$ & $\bar{a}_3$ & $A[\bar{a}]$ \\
+\hline
+1           & 1           & 1           & -0.5         \\
+1           & 1           & 2           & 1            \\
+1           & 2           & 1           & 2            \\
+1           & 2           & 2           & -1           \\
+1           & 3           & 1           & 5            \\
+1           & 3           & 2           & 1            \\
+2           & 1           & 1           & 3            \\
+2           & 1           & 2           & -7           \\
+2           & 2           & 1           & 5            \\
+2           & 2           & 2           & 2            \\
+2           & 3           & 1           & -3           \\
+2           & 3           & 2           & -1
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{c c c | c}
+$\bar{b}_1$ & $\bar{b}_2$ & $\bar{b}_3$ & $B[\bar{b}]$ \\
+\hline
+1           & 1           & 1           & 1            \\
+1           & 1           & 2           & 0            \\
+1           & 2           & 1           & 1            \\
+1           & 2           & 2           & 0            \\
+2           & 1           & 1           & 1            \\
+2           & 1           & 2           & 0            \\
+2           & 2           & 1           & 1            \\
+2           & 2           & 2           & 0            \\
+3           & 1           & 1           & 1            \\
+3           & 1           & 2           & 0            \\
+3           & 2           & 1           & 1            \\
+3           & 2           & 2           & 0
+\end{tabular}
+\end{center}
+\end{table}
+
+You given $|A|$ and $|B|$, and by our definition of multimatrix multiplication,
+you can see that $|A \mmult{2} B| = \left<2, 2\right>$. And the values of the
+resulting multimatrix are defined:
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{c c | c | c | c}
+$\bar{x}_1$ & $\bar{x}_2$ & $(A \mmult{2} B)[\bar{x}]$ & = & = \\
+\hline
+1 & 1 &
+  $A[1,1,1]B[1,1,1] + A[1,1,2]B[1,2,1] +$ & $(-0.5)(1) + (1)(1) +$ & 7.5 \\
+&&$A[1,2,1]B[2,1,1] + A[1,2,2]B[2,2,1] +$ & $(2)(1) + (-1)(1) +$ & \\
+&&$A[1,3,1]B[3,1,1] + A[1,3,2]B[3,2,1]$   & $(5)(1) + (1)(1)$ & \\
+1 & 2 &
+  $A[1,1,1]B[1,1,2] + A[1,1,2]B[1,2,2] +$ & $(-0.5)(0) + (1)(0) +$ & 0 \\
+&&$A[1,2,1]B[2,1,2] + A[1,2,2]B[2,2,2] +$ & $(2)(0) + (-1)(0) +$ & \\
+&&$A[1,3,1]B[3,1,2] + A[1,3,2]B[3,2,2]$   & $(5)(0) + (1)(0)$ & \\
+2 & 1 &
+  $A[2,1,1]B[1,1,1] + A[2,1,2]B[1,2,1] +$ & $(3)(1) + (-7)(1) +$ & 1 \\
+&&$A[2,2,1]B[2,1,1] + A[2,2,2]B[2,2,1] +$ & $(5)(1) + (2)(1) +$ & \\
+&&$A[2,3,1]B[3,1,1] + A[2,3,2]B[3,2,1]$   & $(-3)(1) + (1)(1)$ & \\
+2 & 2 &
+  $A[2,1,1]B[1,1,2] + A[2,1,2]B[1,2,2] +$ & $(3)(0) + (-7)(0) +$ & 0 \\
+&&$A[2,2,1]B[2,1,2] + A[2,2,2]B[2,2,2] +$ & $(5)(0) + (2)(0) +$ & \\
+&&$A[2,3,1]B[3,1,2] + A[2,3,2]B[3,2,2]$   & $(-3)(0) + (1)(0)$ &
+\end{tabular}
+\end{center}
+\end{table}
+
+\end{example}
+\newpage
 
 Like two dimensional matrix multiplication, multimatrix multiplication is
 \textit{not} communicative. And it is only weakly associative. That sounds like
@@ -324,7 +412,7 @@ $|B| = \left<2,7\right>$, and
 $|C| = \left<3,7,2\right>$ where you should be able to see that
 $(A \mmult{1} B) \mmult{2} C$ is a valid operation since
 $|A \mmult{1} B| = \left<5,3,7\right>$ and
-$|(A \mmult{1} B) \mmult{2} C| = \left<5,7\right>$. But
+$|(A \mmult{1} B) \mmult{2} C| = \left<5,2\right>$. But
 $A \mmult{1} (B \mmult{2} C)$ isn't a valid set of operations since even
 $B \mmult{2} C$ is an invalid operation.
 
@@ -403,21 +491,24 @@ and $m + n \le ||B||$.
 Then the following must be true by the definiton of multimatrix multiplication
 (Def. \ref{mm_mult}).
 
-\noindent
-Since $A \mmult{m} B$ is defined,
-\[
- \exists \vec{a}, \vec{m}, \vec{b_1} :
- |\vec{m}| = m \land |A| = \vec{a} \oplus \vec{m} \land |B| = \vec{m} \oplus \vec{b_1} 
-\]
-Since $B \mmult{n} C$ is defined,
-\[
- \exists \vec{b_2}, \vec{n}, \vec{c} :
- |\vec{n}| = n \land |B| = \vec{b_2} \oplus \vec{n} \land |C| = \vec{n} \oplus \vec{c}
-\]
+Since $A \mmult{m} B$ is defined, there exist vectors $\vec{a}, \vec{m},$ and
+$\vec{b_1}$ such that 
+$|\vec{m}| = m$,
+$|A| = \vec{a} \oplus \vec{m}$,
+and
+$|B| = \vec{m} \oplus \vec{b_1}$
+
+Since $B \mmult{n} C$ is defined, there exist vectors $\vec{b_2}, \vec{n},$ and
+$\vec{c}$ such that
+$|\vec{n}| = n$,
+$|B| = \vec{b_2} \oplus \vec{n}$
+and
+$|C| = \vec{n} \oplus \vec{c}$
+
 Since $|B| = \vec{m} \oplus \vec{b_1} = \vec{b_2} \oplus \vec{n}$ and
-$||B|| \ge |\vec{m}| + |\vec{n}|$, it must follow that,
+$||B|| \ge |\vec{m}| + |\vec{n}|$, it must follow that, there is some vector $\vec{b}$
+such that,
 \[
- \exists \vec{b} :
  |B| = \vec{m} \oplus \vec{b} \oplus \vec{n}
 \]
 Even if $\vec{b}$ is an empty vector. Then,
@@ -1500,7 +1591,7 @@ such that $\forall \bar{x} \in \Dim(\vec{x}):$
 
 \begin{landscape}
 \begin{theorem}[Derivative of Softmax]
-TODO
+\label{softmax_derivative}
 \begin{align*}
 	\frac{d\Softmax(X)}{dX}
 	&=
