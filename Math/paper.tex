@@ -6,6 +6,8 @@
 \usepackage{mathtools}
 \usepackage{pdflscape}
 \usepackage{etoolbox}
+\usepackage{csquotes}
+\usepackage[normalem]{ulem}
 
 \title{Multimatrices and Their Derivatives}
 \author{Ernest Kirstein}
@@ -13,6 +15,7 @@
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
+\newtheorem{exercise}{Exercise}[section]
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
@@ -23,6 +26,12 @@
 \newtheoremstyle{ppart}{}{}{}{}{}{:}{ }{}
 \theoremstyle{ppart}
 \newtheorem{ppart}{Part}
+
+\newtheoremstyle{solution}{}{}{}{}{}{:}{\newline}{Exercise \thmnumber{#2} Solution}
+\theoremstyle{solution}
+\newtheorem{solution}{Solution}
+
+\AtBeginEnvironment{subsection}{\setcounter{solution}{0}}
 \AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
 \AtBeginEnvironment{align}{\setcounter{equation}{0}}
 \AtBeginEnvironment{alignat}{\setcounter{equation}{0}}
@@ -43,24 +52,26 @@
 \maketitle
 
 \begin{abstract}
-I was working my way through the implementation of a machine learning system as
-a hobby project and I was having a hell of a time wrapping my head around the
-existing notation for derivatives of matrix equations. Every notation system
-either requires users to pull apart the matricies they're working with or otherwise
-bypass the issue of taking derivatives of matrix equations.
+I was working my way through a hobby programming project, trying to manifest Skynet
+as more than the apocalyptic fever dream James Cameron, and ran into a problem.
+The existing notation for taking derivatives of matrix equations is so
+deliberately obtuse as to suggest that some hidden cabal of mathematicians is
+actively working to sabotage our glorious yet-to-be-built robot overlords.
+That sort of justice cannot stand! 
 
-So, I came up with a system of my own. And, much to my surprise, some of the
-results I came up with were kind of elegant. For example, I proved a
+I thus set out to invent a system of my own. Much to my surprise, some of the
+results with were rather elegant. For example, I stumbled upon a
 multidimensional version of the derivative chain rule (Thm. \ref{mmm_chain_rule})
-that's more consise than anything I've seen in my (admitedly limited) experience.
+that's nearly as consise as the same rule for scalars.
 
-The ultimate goal of this notation system was to provide a way to take derivatives
+The ultimate goal of this notation system was to \sout{bring about the downfall
+of humanity} figure out a way to take derivatives
 of matrix equations without having to break apart matricies into their constituent
-parts. I knew I succeeded when I was able to derive the derivative of the softmax
+parts. I knew I had succeeded when I was able to derive the derivative of the softmax
 function completely in my own notation (Thm. \ref{softmax_derivative}).
 
-Not knowing what else to do with the results, I've written this paper (short book?)
-about my amature exploration into multidimensional matricies -
+Now, not knowing what else to do with the results, I've written this paper
+(short book?) about my amature exploration into multidimensional matricies -
 multimatricies - and how they can simplify derivatives of matrix equations.
 \end{abstract}
 
@@ -72,17 +83,33 @@ multimatricies - and how they can simplify derivatives of matrix equations.
 
 \section{Defining the Derivative}
 
-Let's consider a traditional matrix equation.
-We'll define some matricies $M$ and $X$ such that
-$|M| = |X| = \left< 3,5 \right>$
-and \[M_{r,c} = \sin(X_{r,c})\]
-Or more simply, \[M = \sin(X)\]
+\begin{displayquote}
+``If you're a bit touched, like I am, you may want to make a dedicated tool.'' -
+This Old Tony, `Making Springs At Home'
+\end{displayquote}
 
-\noindent
-The partial derivatives of this equation are simple enough. Assuming that all elements
-of $X$ are independent,
+Let's consider a traditional matrix equation. As is traditional, one matrix
+$X$ shall represent the scientific education level of undergraduates, who happen
+to work in a densely packed 3 by 5 grid - which is also traditional. Then let
+$B$ represent the belief each of those undergradutes has in a higher power,
+which, as we all know, fluctuates with respect to their scientific education in
+a sinusoidal pattern (Weinersmith, 2010 \cite{weinersmith:education}).
+
+Formally, the shape of these two matricies are defined,
+$|B| = |X| = \left< 3,5 \right>$.
+And each element of $B$ will be the sine of the corresponding element of
+$X$. That is, \[B_{r,c} = \sin(X_{r,c})\]
+Which I'll write more simply as, \[B = \sin(X)\]
+
+Now, I would call the derivative of any element of $B$ with respect to any element
+of $X$ a partial derivative of that function. Since
+$\partial B_{r_1, c_1}/\partial X_{r_2, c_2}$ is defined by the rate of change of
+\textit{one} undergraduate's belief in a higher power with respect to \textit{one}
+undergraduate's education level - it only represents a change to part of the whole
+system. 
+We can calculate this partial derivative easily enough,
 \[
-\frac{\partial M_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
+\frac{\partial B_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
 \left\{
   \begin{array}{ll}
     \cos(X_{r_2,c_2})  & \mbox{if } r_1 = r_2 \mbox{ and } c_1 = c_2 \\
@@ -90,17 +117,28 @@ of $X$ are independent,
   \end{array}
 \right.
 \]
-Which can also be writen more simply using Kronecker deltas,
+Every student's belief in a higher power changes with respect to their own
+scientific education level, but does not change with respect to other students'
+scientific education. No mater how much I teach Jane about photosynthesis, I'm
+not going to change Joe's mind about divine mysteries.
+
+This can also be writen more simply using Kronecker deltas \cite{wiki:kronecker},
+which should make one feel particularly intellegent as Kronecker deltas were used
+by Einstein (and presumably someone named Kronecker) \cite{wiki:einstein}.
 \[
-\frac{\partial M_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
+\frac{\partial B_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
 \cos (X_{r_2, c_2}) \delta_{r_1 r_2} \delta_{c_1 c_2}
 \]
 
-\noindent
-But what about the complete deriative? What would that even mean? What sort of
-mathmatical object would represent the entire derivative of $M$ with respect to $X$.
+But what about the complete deriative?
+What sort of mathmatical object would represent the entire derivative
+of $B$ with respect to $X$?
+I need a mathematical object which perfectly
+encapsulates the rate of change of \textit{all} the undergraduates' beliefs in a
+higher power with respect to \textit{every} undergraduates' scientific education
+and my current toolkit does not serve that need!
 
-\[\frac{dM}{dX} = \mbox{ ? }\]
+\[\frac{dB}{dX} = \mbox{ ? }\]
 
 If this were a function that mapped a vector to a scalar, you might say that the
 complete derivate was the gradient. But in this case, our function's output is more
@@ -109,19 +147,19 @@ than a simple scalar and even our dependent variable is more complex than a vect
 By looking at the partial derivatives, we can come to some understanding of the
 dimensionality of the complete derivative. Each combination of input and output
 element has its own partial derivative, so it makes sense that the total size
-of the complete derivative should be the product of the size of $M$ and the size
+of the complete derivative should be the product of the size of $B$ and the size
 of $X$.
 
 And so, the size of the complete derivate would be,
 \[
-\mbox{size}\left(\frac{dM}{dX}\right) = \mbox{size}(M) \mbox{size}(X)
+\mbox{size}\left(\frac{dB}{dX}\right) = \mbox{size}(B) \mbox{size}(X)
 \]
 And perhaps we could even let this help us define the 'shape' of the complete
 derivative. This complete derivative would need to be composed of partial
 derivatives, so it would make sense to just smush the shapes of the input
 matrix and the output matrix together,
 \begin{align*}
-\left|\frac{dM}{dX}\right| &= |M| \oplus |X| \\
+\left|\frac{dB}{dX}\right| &= |B| \oplus |X| \\
  &= \left< 3, 5 \right> \oplus \left< 3, 5 \right> \\
  &= \left< 3, 5, 3, 5 \right>
 \end{align*}
@@ -138,13 +176,13 @@ pull a single partial derivative from this complete derivative, what could our
 notation look like? Four underscript indicies would be unwieldy, so maybe something
 like this:
 \[
-\frac{dM}{dX}[1,2,3,4] = \frac{\partial M_{1,2}}{\partial X_{3,4}}
+\frac{dB}{dX}[1,2,3,4] = \frac{\partial B_{1,2}}{\partial X_{3,4}}
 \]
 
 And since we're defining our own notation, let's go ahead and define our original
 matricies in a similar manner:
 \[
-\frac{dM}{dX}[1,2,3,4] = \frac{\partial M[1,2]}{\partial X[3,4]}
+\frac{dB}{dX}[1,2,3,4] = \frac{\partial B[1,2]}{\partial X[3,4]}
 \]
 
 So what is this object we've defined? In all ways that matter, it seams to be
@@ -157,12 +195,14 @@ Let's define this bit of notation formally. A multimatrix $M$ is a multidimensio
 matrix that has some shape, $|M| \in \mathbb{N}^n$, where $n \in \mathbb{Z}^+ \cup \{0\}$
 is the number of dimensions of $M$.
 
-We'll say that if $\vec{v} = |M|$, then any $\bar{v} \in \mathbb{N}^n$ is a valid
-index of $M$ if and only if value of $\bar{v}$ is less than or equal to the value
-of it's parallel index in $\vec{v}$. That is, $\forall i: 1 \le \bar{v}_i \le \vec{v}_i$.
+We'll say that for the whole number vector $\vec{v}$ which describes the shape of
+$M$, then $\vec{v} = |M|$. And for any other $\bar{v} \in \mathbb{N}^n$, $\bar{v}$
+is a valid index of $M$ if and only if each value of $\bar{v}$ is less than or equal
+to the value of it's corresponding index in $\vec{v}$.
+That is, $\forall i: 1 \le \bar{v}_i \le \vec{v}_i$.
 
 We can further simplify that notation for our set of valid indicies. Let's say we have
-some $\vec{v} \in \mathbb{N}^n$ that defines the shape of some matrix. Then well
+some $\vec{v} \in \mathbb{N}^n$ that defines the shape of some matrix. Then we'll
 define the set of valid indicies of that matrix to be $\Dim(\vec{v})$. 
 
 Each value of $M$ is a real value, so we'll define the set of all real valued
@@ -236,14 +276,16 @@ x &\in \mathbb{R} \\
 
 Ok, that's neat and all but what does that actually mean? Can we answer our motivating 
 question?
-\[\frac{dM}{dX} = ? \]
-Well... sort of. We can say that the total derivative of $M$ with respect to $X$ is
-a matrix with shape $|M| \oplus |X|$, who's elements we can define as,
-\[\forall \bar{m} \in \Dim(|M|), \bar{x} \in \Dim(|X|):\]
+\[\frac{dB}{dX} = ? \]
+Well... sort of. We have to abuse the notation a little and say that $B$ and $X$ are
+just multimatricies with 2 dimensions. Then we can say that the total derivative
+of $B$ with respect to $X$ is a multimatrix with shape $|B| \oplus |X|$,
+who's elements we can define as,
+\[\forall \bar{b} \in \Dim(|B|), \bar{x} \in \Dim(|X|):\]
 \begin{align*}
-\left( \frac{dM}{dX} \right)[\bar{m} \oplus \bar{x}]
-&= \frac{\partial M[\bar{m}]}{\partial X[\bar{x}]} \\
-&= \delta_{\bar{m}\bar{x}}\cos(\bar{x})
+\left( \frac{dB}{dX} \right)[\bar{b} \oplus \bar{x}]
+&= \frac{\partial B[\bar{b}]}{\partial X[\bar{x}]} \\
+&= \delta_{\bar{b}\bar{x}}\cos(\bar{x})
 \end{align*}
 
 Which isn't a huge improvement over our original notation. What would be great is
@@ -251,22 +293,44 @@ if we could define the total derivative without going down into the partial deri
 at all, which we'll be able to do in later sections. As a sneak peak, that'll look
 like this:
 \[
-\frac{dM}{dX} = \Ident^3(|X|) \mmult{||X||} \cos(X)
+\frac{dB}{dX} = \Ident^3(|X|) \mmult{||X||} \cos(X)
 \]
 
 But that single line will require defining multimatrix multiplication and
 something I'll call a cubic identity, $\Ident^3(|X|)$.
 
-\subsection*{Sample Problems}
-TODO
+\subsection*{Exercises}
+
+\begin{exercise}
+Let $A$, $B$, and $C$ be multimatricies such that $|A| = \left<1,2,3\right>$,
+$|B| = \left<3,1,2\right>$ and $|C| = \left<3,2,1\right>$. For each of these
+multiplications determine if it is valid, and if so, what the resulting
+shape would be:
+\begin{enumerate}
+\item $A \mmult{2} B$
+\item $B \mmult{2} A$
+\item $A \mmult{2} C$
+\item $A \mmult{1} C$
+\end{enumerate}
+\end{exercise}
 
 \section{Multimatrix Multiplication}
 
-Multiplication of traditional matricies is one of those things that, when you
-first learn about it, makes you wonder ``What crosseyed weirdo defined it this way?''
-And then, after seeing it used in practice, you slowly come to understand the
-reason behind the madness. Let me warn you now - multimatrix multiplication will
-feel the same way.
+\begin{displayquote}
+``The universe is a cruel, uncaring void. The key to being happy isn't a search
+for meaning. It's to just keep yourself busy with unimportant nonsense, and eventually,
+you'll be dead.'' - Mr. Peanutbutter, BoJack Horseman
+\end{displayquote}
+
+Multiplication of traditional matricies is one of those things that, when one first
+learn about it, causes one to wonder ``By which satanic cult was this process
+proscribed?''
+And then, after seeing it used in practice, one slowly comes to understand the
+reason behind the madness. That is, that madness is the natural state of things
+and matrix multiplication is used to punish those few kind souls who dare to
+fight against the darkness.
+
+Multimatrix multiplication is much the same.
 
 Just to review, for two matricies $A$ and $B$, multipication is only defined
 for $A \times B = C$ if $A$ has the same number of columns as $B$ has rows.
@@ -326,7 +390,8 @@ and the value of the result is defined,
 
 \newpage
 \begin{example}
-Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$
+Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$ where
+the elements of $A$ and $B$ are defined in the tables below.
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{c c c | c}
@@ -369,7 +434,7 @@ $\bar{b}_1$ & $\bar{b}_2$ & $\bar{b}_3$ & $B[\bar{b}]$ \\
 \end{center}
 \end{table}
 
-You given $|A|$ and $|B|$, and by our definition of multimatrix multiplication,
+Given $|A|$ and $|B|$, and by our definition of multimatrix multiplication,
 you can see that $|A \mmult{2} B| = \left<2, 2\right>$. And the values of the
 resulting multimatrix are defined:
 
@@ -843,10 +908,17 @@ and $\bar{b} \in \Dim(\vec{b}):$
 \[ (A \mmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] \]
 \end{theorem}
 
-\subsection*{Sample Problems}
+\subsection*{Exercises}
 TODO
 
 \section{Other Operations With Multimatricies}
+
+\begin{displayquote}
+``When the light turns green, you go. When the light turns red, you stop.
+But what do you do when the light turns blue with orange and lavender spots?''
+- Shel Silverstein, 'A Light in the Attic'
+\end{displayquote}
+
 Other operations include...
 
 \subsection{Scalars}
@@ -1177,10 +1249,16 @@ TODO
 TODO
 \end{proof}
 
-\subsection*{Sample Problems}
+\subsection*{Exercises}
 TODO
 
 \section{Generic Derivative Rules}
+
+\begin{displayquote}
+``It goes without saying that all writers owe a debt to their teachers... who
+naturally bear all responsibility for any errors contained herein...''
+- Paul Rentel, 'Manifolds, Tensors, and Forms'
+\end{displayquote}
 
 \begin{theorem}[Transpose Derivative]
 \label{tran_derivative}
@@ -1547,7 +1625,11 @@ Which, taking a look at the definition of multidimensional matrix multiplication
 \end{proof}
 
 \section{Machine Learning Specific Derivatives}
-TODO
+
+\begin{displayquote}
+``I'm not saying Machine Learning is a portal to a demon universe, I'm just saying
+that some doors are best left unopened.'' - James Mickens, AKA `Galactic Viceroy of Research Excellence', USENIX Security '18-Q
+\end{displayquote}
 
 \begin{definition}[Sum]
 Let $\Sum(X)$ be the function $\Sum : \mathbb{R}^{\vec{x}} \to \mathbb{R}$
@@ -1946,6 +2028,21 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 \end{align*}
 \end{proof}
 \end{landscape}
+
+\section{Solutions to the Exercises}
+
+\subsection*{Section 1 Solutions}
+
+\begin{solution}
+\begin{enumerate}
+\item[]
+\item Invalid
+\item $\left<3, 3\right>$
+\item Invalid
+\item $\left<1, 2, 2, 1\right>$
+\end{enumerate}
+\end{solution}
+
 
 \bibliography{paper}
 \bibliographystyle{ieeetr}
