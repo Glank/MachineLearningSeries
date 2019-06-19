@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[12pt]{book}
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amsthm}
@@ -14,14 +14,14 @@
 \date{\today}
 
 \theoremstyle{definition}
-\newtheorem{definition}{Definition}[section]
-\newtheorem{exercise}{Exercise}[section]
+\newtheorem{definition}{Definition}[chapter]
+\newtheorem{exercise}{Exercise}[chapter]
 
 \theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[section]
+\newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{corollary}{Corollary}[theorem]
 \newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{example}{Example}[section]
+\newtheorem{example}{Example}[chapter]
 
 \newtheoremstyle{ppart}{}{}{}{}{}{:}{ }{}
 \theoremstyle{ppart}
@@ -31,7 +31,7 @@
 \theoremstyle{solution}
 \newtheorem{solution}{Solution}
 
-\AtBeginEnvironment{subsection}{\setcounter{solution}{0}}
+\AtBeginEnvironment{section}{\setcounter{solution}{0}}
 \AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
 \AtBeginEnvironment{align}{\setcounter{equation}{0}}
 \AtBeginEnvironment{alignat}{\setcounter{equation}{0}}
@@ -46,42 +46,38 @@
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
 
-
 \begin{document}
 
 \maketitle
 
-\begin{abstract}
+\chapter*{Preface}
 I was working my way through a hobby programming project, trying to manifest Skynet
-as more than the apocalyptic fever dream James Cameron, and ran into a problem.
-The existing notation for taking derivatives of matrix equations is so
-deliberately obtuse as to suggest that some hidden cabal of mathematicians is
-actively working to sabotage our glorious yet-to-be-built robot overlords.
+as more than the apocalyptic fever dream of James Cameron, and ran into a problem.
+The existing notation for taking derivatives of matrix equations is terrible.
+It's so deliberately obtuse that I could only conclude that some hidden cabal of
+mathematicians is actively working to sabotage our glorious yet-to-be-built
+robot overlords.
+
 That sort of justice cannot stand! 
 
-I thus set out to invent a system of my own. Much to my surprise, some of the
-results with were rather elegant. For example, I stumbled upon a
+So, I set out to invent a system of my own. Much to my surprise, some of the
+results with were rather elegant. For example, I stumbled onto a
 multidimensional version of the derivative chain rule (Thm. \ref{mmm_chain_rule})
 that's nearly as consise as the same rule for scalars.
 
 The ultimate goal of this notation system was to \sout{bring about the downfall
 of humanity} figure out a way to take derivatives
 of matrix equations without having to break apart matricies into their constituent
-parts. I knew I had succeeded when I was able to derive the derivative of the softmax
-function completely in my own notation (Thm. \ref{softmax_derivative}).
+parts. I knew that I had succeeded when I was able to derive the derivative of the
+softmax function completely in my own notation (Thm. \ref{softmax_derivative}).
 
-Now, not knowing what else to do with the results, I've written this paper
-(short book?) about my amature exploration into multidimensional matricies -
+Now, not knowing what else to do with the results, I've written this book
+about my amature exploration into multidimensional matricies -
 multimatricies - and how they can simplify derivatives of matrix equations.
-\end{abstract}
-
-\newpage
 
 \tableofcontents
 
-\newpage
-
-\section{Defining the Derivative}
+\chapter{Defining the Derivative}
 
 \begin{displayquote}
 ``If you're a bit touched, like I am, you may want to make a dedicated tool.'' -
@@ -103,7 +99,7 @@ Which I'll write more simply as, \[B = \sin(X)\]
 
 Now, I would call the derivative of any element of $B$ with respect to any element
 of $X$ a partial derivative of that function. Since
-$\partial B_{r_1, c_1}/\partial X_{r_2, c_2}$ is defined by the rate of change of
+$\partial B_{r_1, c_1}/\partial X_{r_2, c_2}$ is defined as the rate of change of
 \textit{one} undergraduate's belief in a higher power with respect to \textit{one}
 undergraduate's education level - it only represents a change to part of the whole
 system. 
@@ -136,7 +132,7 @@ of $B$ with respect to $X$?
 I need a mathematical object which perfectly
 encapsulates the rate of change of \textit{all} the undergraduates' beliefs in a
 higher power with respect to \textit{every} undergraduates' scientific education
-and my current toolkit does not serve that need!
+and my current toolkit doesn't work!
 
 \[\frac{dB}{dX} = \mbox{ ? }\]
 
@@ -154,7 +150,7 @@ And so, the size of the complete derivate would be,
 \[
 \mbox{size}\left(\frac{dB}{dX}\right) = \mbox{size}(B) \mbox{size}(X)
 \]
-And perhaps we could even let this help us define the 'shape' of the complete
+And perhaps we could even let this help us define the `shape' of the complete
 derivative. This complete derivative would need to be composed of partial
 derivatives, so it would make sense to just smush the shapes of the input
 matrix and the output matrix together,
@@ -166,36 +162,39 @@ matrix and the output matrix together,
 Where $\oplus$ is the concatenate operator.
 
 The ordering here is arbitrary, there is no reason why the dimensionality of
-of the independent variable \textit{needs} to be concatenated with to the right of the
+of the independent variable \textit{needs} to be concatenated to the right of the
 dimensionality of the output. What's important is that the dimensionality of
-both output and indepenedent variable are preserved - but let us declare this to
-be our convention for the remainder of this work.
+both output and indepenedent variable are preserved. Let us declare this to
+be our convention since, for the purpose of this work, mine is the divinely revealed
+word of god, passed down to you lowly mortals who have yet to commit your
+own mad ramblings to \LaTeX.
 
-We have, therefore, a multidimensional object with four indicies. Suppose we try to
-pull a single partial derivative from this complete derivative, what could our
-notation look like? Four underscript indicies would be unwieldy, so maybe something
-like this:
+Our total derivate is therefore a multidimensional object with four indicies.
+Suppose we try to pull a single partial derivative from this complete derivative,
+what could our notation look like? Four underscript indicies would be unwieldy,
+so maybe something like this:
 \[
 \frac{dB}{dX}[1,2,3,4] = \frac{\partial B_{1,2}}{\partial X_{3,4}}
 \]
 
-And since we're defining our own notation, let's go ahead and define our original
+And since we're defining our own notation, let's splurge and reference our original
 matricies in a similar manner:
 \[
 \frac{dB}{dX}[1,2,3,4] = \frac{\partial B[1,2]}{\partial X[3,4]}
 \]
 
-So what is this object we've defined? In all ways that matter, it seams to be
+So what is this object we've defined? In all ways that matter, it seems to be
 a multidimensional matrix. It has four dimensions of indices, rather than just
 a row and column, but each uniquely indexed cell in this object may have a
-unique value, just like a standard two dimensional matrix.
+unique value, just like a standard two dimensional matrix. Let's define this
+bit of notation formaly.
 
 \begin{definition}[Multimatrix]
-Let's define this bit of notation formally. A multimatrix $M$ is a multidimensional
-matrix that has some shape, $|M| \in \mathbb{N}^n$, where $n \in \mathbb{Z}^+ \cup \{0\}$
+A multimatrix $M$ is a multidimensional object that has some shape,
+$\vec{v} \in \mathbb{N}^n$, where $n \in \mathbb{Z}^+ \cup \{0\}$
 is the number of dimensions of $M$.
 
-We'll say that for the whole number vector $\vec{v}$ which describes the shape of
+Let $\vec{v}$ be the natural number vector which describes the shape of
 $M$, then $\vec{v} = |M|$. And for any other $\bar{v} \in \mathbb{N}^n$, $\bar{v}$
 is a valid index of $M$ if and only if each value of $\bar{v}$ is less than or equal
 to the value of it's corresponding index in $\vec{v}$.
@@ -212,8 +211,9 @@ We'll use the notation $M[\bar{v}]$ to reference any individual scalar value of 
 at indicies $\bar{v} \in \Dim(|M|)$. 
 \end{definition}
 
-Going back to our original motivating problem, we can express our derivative
-notation thusly,
+Going back to our original motivating problem, we (that is to say, myself and my
+split personalities whom I reference as to give my writing the percieved authority
+of more than one author) can express our derivative notation thusly,
 
 \begin{definition}[Multimatrix on Multimatrix Derivative]
 \label{mm_derivative}
@@ -290,31 +290,43 @@ who's elements we can define as,
 
 Which isn't a huge improvement over our original notation. What would be great is
 if we could define the total derivative without going down into the partial derivatives
-at all, which we'll be able to do in later sections. As a sneak peak, that'll look
-like this:
+at all, which we'll be able to do in later chapters. As a sneak peak (a whole
+chapter ahead), that'll look like this:
 \[
 \frac{dB}{dX} = \Ident^3(|X|) \mmult{||X||} \cos(X)
 \]
 
 But that single line will require defining multimatrix multiplication and
-something I'll call a cubic identity, $\Ident^3(|X|)$.
+a mysterious, and possibly dangerious, entity call a cubic identity, $\Ident^3(|X|)$.
 
-\subsection*{Exercises}
+\section*{Exercises}
 
 \begin{exercise}
-Let $A$, $B$, and $C$ be multimatricies such that $|A| = \left<1,2,3\right>$,
-$|B| = \left<3,1,2\right>$ and $|C| = \left<3,2,1\right>$. For each of these
-multiplications determine if it is valid, and if so, what the resulting
-shape would be:
+Are the following assertions are true or false?
 \begin{enumerate}
-\item $A \mmult{2} B$
-\item $B \mmult{2} A$
-\item $A \mmult{2} C$
-\item $A \mmult{1} C$
+\item $\left<1,1,1\right> \in \Dim(\left<5,5,5\right>)$
+\item $\left<1,1\right> \in \Dim(\left<5,5,5\right>)$
+\item $\left<1,2,3\right> \in \Dim(\left<3,2,1\right>)$
+\item $\left<3,7\right> \in \Dim(\left<3,7\right>)$
 \end{enumerate}
 \end{exercise}
 
-\section{Multimatrix Multiplication}
+\begin{exercise}
+Let $F(X)$ be a function from $\mathbb{R}^{\left<3,7,2\right>}$ to
+$\mathbb{R}^{\left<6, 7\right>}$. That is, $|F(X)| = \left<6,7\right>$
+and for any valid input to $F(X)$, $|X| = \left<3,7,2\right>$.
+Then what is the shape of $dF/dX$?
+\end{exercise}
+
+\begin{exercise}
+Let $f(X)$ be the sum of all values of $X$, where
+$X \in \mathbb{R}^{\left<2,3,2\right>}$. That is,
+\[ f(X) = \sum_{\forall \bar{x} \in \Dim(\left<2,3,2\right>)} X[\bar{x}] \]
+What is the shape of $df/dX$? If $\bar{v} \in \Dim(|df/dX|)$ then what is
+\[ \frac{df}{dX}[\bar{v}] = ? \]
+\end{exercise}
+
+\chapter{Multimatrix Multiplication}
 
 \begin{displayquote}
 ``The universe is a cruel, uncaring void. The key to being happy isn't a search
@@ -322,12 +334,13 @@ for meaning. It's to just keep yourself busy with unimportant nonsense, and even
 you'll be dead.'' - Mr. Peanutbutter, BoJack Horseman
 \end{displayquote}
 
-Multiplication of traditional matricies is one of those things that, when one first
-learn about it, causes one to wonder ``By which satanic cult was this process
+The multiplication of traditional matricies is a calculation that, when one first
+encouters it, inspires thoughts such as ``By which satanic cult was this process
 proscribed?''
-And then, after seeing it used in practice, one slowly comes to understand the
+
+After seeing the method used in practice, one slowly comes to understand the
 reason behind the madness. That is, that madness is the natural state of things
-and matrix multiplication is used to punish those few kind souls who dare to
+and matrix multiplication is used to punish those few brave souls who dare to
 fight against the darkness.
 
 Multimatrix multiplication is much the same.
@@ -342,6 +355,10 @@ every combination of the corresponding row of $A$ and the corresponding column o
 $B$,
 
 \[ C[r_a, c_b] = \sum_{\forall i} A[r_a, i] B[i, c_b] \]
+
+Easily done. The hard part isn't doing the calculation. The hard part is
+parlaying with Sheogorath, Daedric Prince of Madness for the intellectual
+property rights.
 
 So now consider how we would multiply two matricies $A$ and $B$ if they had more
 than two dimensions. Let's use a concrete example to make the problems more apparent.
@@ -360,9 +377,11 @@ two dimensional matrix multiplication completely within our definition. This sec
 definition seems more... er... multidimensional... but it also seems to
 arbitrarily depend on the shape of the two matricies.
 
-What we really need is an operation which covers both lines of reasoning but that
-seems impossible with a binary operaiton. So maybe multimatrix isn't a binary operation.
-Maybe it's a trinary operation. There's some component of, 
+What we really need is an operation which covers both lines of reasoning. To do
+so, we need to compleately abandon conventional algebras, and indeed any hope of
+returning to sanity. That's right, we're introducing a trinary operator.
+
+I would argue that there shall always be some component of, 
 ``How many dimensions are you combining?'' inherent
 in the operation. So we can distinguish our two types of multiplication, and indeed
 an infinite number of types of multiplication, with a new operator, $\mmult{n}$ where
@@ -377,7 +396,7 @@ just jump into the formal definition and I'll explain with an example:
 Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$,
 $|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$ with
 $n \in \{0\} \cup \mathbb{Z}^{+}$. We shall call $n$ the 'size' or the 'width'
-of the multiplication operation.
+or the 'overlap' of the multiplication operation.
 The shape of the result is defined, $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$
 and the value of the result is defined,
 \[
@@ -390,8 +409,11 @@ and the value of the result is defined,
 
 \newpage
 \begin{example}
-Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$ where
-the elements of $A$ and $B$ are defined in the tables below.
+Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$. I would
+define their values in a three dimensional grid but I fear that my three dimensional
+\LaTeX skills aren't up to the task (and three dimensional monitors are quite hard to
+come by). So here is where we leave behind nice graphical representations of
+things, and I'll just define the elements of $A$ and $B$ in the tables below.
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{c c c | c}
@@ -468,7 +490,7 @@ $\bar{x}_1$ & $\bar{x}_2$ & $(A \mmult{2} B)[\bar{x}]$ & = & = \\
 
 Like two dimensional matrix multiplication, multimatrix multiplication is
 \textit{not} communicative. And it is only weakly associative. That sounds like
-nonsense, but here's what I mean.
+nonsense, and ideed it is, but I shall prove it to you.
 
 Multimatrix multiplication may not even make sense dimensionally when you move
 around parentheses. Take for example multimatricies $A$, $B$, and $C$ such that,
@@ -482,7 +504,8 @@ $A \mmult{1} (B \mmult{2} C)$ isn't a valid set of operations since even
 $B \mmult{2} C$ is an invalid operation.
 
 But even when the dimensional analysis makes sense, multimatrix multiplication
-may not be associative. Take, for example, multimatricies $A$, $B$, and $C$ such
+may not be associative (Honestly, how could you be so naive?). 
+Take, for example, multimatricies $A$, $B$, and $C$ such
 that $|A| = \left<2,2,2,2\right>$, $|B| = \left<2,2,2\right>$, and
 $|C| = \left<2,2,2,2\right>$. Let,
 \[
@@ -537,7 +560,7 @@ But, $(B \mmult{2} C)[\bar{x}] = 0$ so $(A \mmult{2} (B \mmult{2} C))[\bar{x}] =
 Which goes to show that even though both $(A \mmult{2} B) \mmult{2} C$ and
 $A \mmult{2} (B \mmult{2} C)$ are valid calculations which result in multimatrixes
 of the same dimensionality, they are not equal so multiplicative associativity
-doesn't hold.
+doesn't hold. It also goes to show that your intuition is bad and you should feel bad.
 
 However, there are a broad catagory of cases where associativity \textit{does} hold:
 
@@ -631,7 +654,8 @@ values must be equal.
 Multiplicative identities for multimatricies depend on the shape of the
 multimatrix they are being multiplied against, just as for regular matricies.
 However, the multiplicative identity also greatly depends on the size of
-the particular multiplication operation. 
+the particular multiplication operation. Making a confusing and frightening
+situation even more so, like loosing a troup of clowns in children's cancer ward.
 
 \begin{definition}[Multimatrix Identities]
 \label{mm_mult_ident}
@@ -737,11 +761,11 @@ The square identity also pops up in the derivative of a multimatrix
 with respect to itself.
 
 \begin{theorem}[Self Derivative]
-Let $X$ be a multimatrix with independent elements. Then,
+Let $X$ be some multimatrix. Then,
 \[ \frac{dX}{dX} = \Ident^2(|X|) \]
 \end{theorem}
 \begin{proof}
-Let $X$ be a multimatrix of shape $|X|=\vec{x}$ with independent elements.
+Let $X$ be a multimatrix of shape $|X|=\vec{x}$.
 By the derivative definition (Def. \ref{mm_derivative}),
 \[
  \forall \bar{x_1} \in \Dim(\vec{x}),
@@ -765,8 +789,9 @@ Since each element of $X$ is independent with respect to itself,
 Therefore $dX/dX = \Ident^2(|X|)$
 \end{proof}
 
-The cubic identity, strangely enough, pops up in the derivative of elementwise
-functions.
+The cubic identity, strangely enough, appear in the derivative of elementwise
+functions. Which is one of the reaspons I needed to expand my definition of
+identities beyond $\Ident^2(\vec{v})$, beyond my crushing identity crisis.
 
 \begin{theorem}[Elementwise Derivative]
 Let $M$ be an element wise function on $X$. That is, Let $M(X)$ be a function
@@ -892,26 +917,111 @@ We've shown that,
 \end{proof}
 \end{landscape}
 
-A final useful theorem happens to involve 0 overlap multiplication, which seams at first
-nonsensical given our definition of multiplication,
-but if you notice that the each element of a
-multiplication result is the sum over every index in the dimensionality of the
-portion of the shape vector of that overlapping length, and you consider that every
-vector could be said to 'start' and 'end' with an empty vector (as the concatenation of
-an empty vector does not change the vector), then it makes sense that this zero-length
-overlap always exists and is one and only one vector. That is, $\{\}$.
+A final useful theorem (definition?) happens to involve 0 overlap multiplication.
+You'll notice that I very carefully constructed my definition to allow for this
+definition (theorem?). Does it still count as a theorem if it's only true because
+I worked over the definition of multimatrix multiplication to make it true? I feel
+a bit like Tommy Wiseau writing my own sex scene into the script... twice... God,
+what a tool.
 
 \begin{theorem}[Zero Overlap Multiplication]
-So if $|A| = \vec{a}$ and $|B| = \vec{b}$, for every $\bar{a} \in \Dim(\vec{a})$
+Anyways, if $|A| = \vec{a}$ and $|B| = \vec{b}$, for every $\bar{a} \in \Dim(\vec{a})$
 and $\bar{b} \in \Dim(\vec{b}):$
 
 \[ (A \mmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] \]
+
 \end{theorem}
+\begin{proof}
+\begin{align*}
+	(A \mmult{0} B)[\bar{a} \oplus \bar{b}]
+	&=
+	\sum_{\forall \bar{v} \in \Dim(\left<\right>)}
+	A[\bar{a} \oplus \bar{v}] B[\bar{v} \oplus \bar{b}] \\
+	&=
+	\sum_{\forall \bar{v} \in \left\{\left<\right>\right\}}
+	A[\bar{a} \oplus \bar{v}] B[\bar{v} \oplus \bar{b}] \\
+	&=
+	A[\bar{a} \oplus \left<\right>] B[\left<\right> \oplus \bar{b}] \\
+	&=
+	A[\bar{a}] B[\bar{b}] \\
+\end{align*}
+\end{proof}
 
-\subsection*{Exercises}
-TODO
+\section*{Exercises}
 
-\section{Other Operations With Multimatricies}
+\begin{exercise}
+Let $A$, $B$, and $C$ be multimatricies such that $|A| = \left<1,2,3\right>$,
+$|B| = \left<3,1,2\right>$ and $|C| = \left<3,2,1\right>$. For each of these
+multiplications determine if it is valid, and if so, what the resulting
+shape would be:
+\begin{enumerate}
+\item $A \mmult{2} B$
+\item $B \mmult{2} A$
+\item $A \mmult{2} C$
+\item $A \mmult{1} C$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+In which of these cases does $A \mmult{m} (B \mmult{n} C) = (A \mmult{m} B) \mmult{n} C$?
+\begin{enumerate}
+\item When,
+	\begin{itemize}
+		\item $|A| = \left<3, 7, 9\right>$
+		\item $|B| = \left<9, 5\right>$
+		\item $|C| = \left<5, 7, 3\right>$
+		\item and $m = n = 1$
+	\end{itemize}
+\item When,
+	\begin{itemize}
+		\item $|A| = \left<6, 6, 6\right>$
+		\item $|B| = \left<6, 6, 6\right>$
+		\item $|C| = \left<6, 6, 6\right>$
+		\item and $m = n = 2$
+	\end{itemize}
+\item When,
+	\begin{itemize}
+		\item $|A| = \left<3, 5, 3\right>$
+		\item $|B| = \left<5, 3, 11\right>$
+		\item $|C| = \left<11, 2, 7\right>$
+		\item $m = 2$
+		\item and $n = 1$
+	\end{itemize}
+\item When,
+	\begin{itemize}
+		\item $|A| = \left<3, 5, 3\right>$
+		\item $|B| = \left<5, 3, 3, 5\right>$
+		\item $|C| = \left<3, 3, 5, 2\right>$
+		\item $m = 2$
+		\item and $n = 3$
+	\end{itemize}
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Let $|X| = \vec{x}$. Simplify the following where possible:
+\begin{enumerate}
+\item $\Ident^5(\vec{x}) \mmult{3 |\vec{x}|} \Ident^3(\vec{x})$
+\item $\Ident^2(\vec{x}) \mmult{|\vec{x}|} X$
+\item $\Ident^3(\vec{x}) \mmult{2|\vec{x}|} X$
+\item $\Ident^2(\vec{x}) \mmult{|\vec{x}|} \left(X \mmult{|\vec{x}|} \Ident^3(|\vec{x}|)
+				\right) \mmult{2|\vec{x}|} \Ident^3(|\vec{x}|)$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Let $M$ be some multimatrix such that $|M| = \left<5,2,3\right>$. Then what is
+$dM/dM$?
+\end{exercise}
+
+\begin{exercise}
+Let $Y = \tan(X)$ be the elementwise application of the scalar tangent function to
+the elements of $X$, that is, for all $\bar{v} \in \Dim(|X|)$
+\[ Y[\bar{v}] = \tan(X[\bar{v}]) \]
+What is $dY/dX$?
+\end{exercise}
+
+\chapter{Other Operations With Multimatricies}
 
 \begin{displayquote}
 ``When the light turns green, you go. When the light turns red, you stop.
@@ -921,7 +1031,7 @@ But what do you do when the light turns blue with orange and lavender spots?''
 
 Other operations include...
 
-\subsection{Scalars}
+\section{Scalars}
 
 \begin{definition}[Multimatrix Scalar Multiplication]
 Let $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$. If
@@ -1011,7 +1121,7 @@ Then,
 TODO
 \end{proof}
 
-\subsection{Addition}
+\section{Addition}
 
 \begin{definition}[Multimatrix Addition]
 Let $A, B, C \in \mathbb{R}^{\vec{x}}$. If
@@ -1136,7 +1246,7 @@ Then for all $\bar{x} \in \Dim(\vec{x})$
 Therefore $s(A+B) = sA + sB$
 \end{proof}
 
-\subsection{Transposition}
+\section{Transposition}
 
 \begin{definition}[Multimatrix Transposition]
 Let $|X| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = l$ and $|\vec{r}| = r$
@@ -1249,10 +1359,10 @@ TODO
 TODO
 \end{proof}
 
-\subsection*{Exercises}
+\section*{Exercises}
 TODO
 
-\section{Generic Derivative Rules}
+\chapter{Generic Derivative Rules}
 
 \begin{displayquote}
 ``It goes without saying that all writers owe a debt to their teachers... who
@@ -1624,7 +1734,7 @@ Which, taking a look at the definition of multidimensional matrix multiplication
 \]
 \end{proof}
 
-\section{Machine Learning Specific Derivatives}
+\chapter{Machine Learning Specific Derivatives}
 
 \begin{displayquote}
 ``I'm not saying Machine Learning is a portal to a demon universe, I'm just saying
@@ -1879,7 +1989,7 @@ TODO
 \end{ppart}
 \end{proof}
 
-\section{Integration}
+\chapter{Integration}
 
 I think, I'm not sure, but I think that the integral of a multimatrix function should
 be defined,
@@ -2029,9 +2139,36 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 \end{proof}
 \end{landscape}
 
-\section{Solutions to the Exercises}
+\chapter{Solutions to the Exercises}
 
-\subsection*{Section 1 Solutions}
+\section*{Chapter 1 Solutions}
+
+\begin{solution}
+\begin{enumerate}
+\item[]
+\item True
+\item False, $\Dim(\left<5,5,5\right>)$ contains only vectors in $\mathbb{N}^3$ 
+\item False, the last value of $\left<1,2,3\right>$, $3$, is greater than it's
+						 corresponding value in $\left<3,2,1\right>$, which is $1$.
+\item True
+\end{enumerate}
+\end{solution}
+
+\begin{solution}
+\[ \left|\frac{dF}{dX}\right| = \left<6,7,3,7,2\right> \]
+\end{solution}
+
+\begin{solution}
+\[ \left|\frac{df}{dX}\right| = |X| = \left<2,3,2\right> \]
+\[ \frac{df}{dX}[\bar{v}] = 1 \]
+\end{solution}
+
+\begin{solution}
+\[ \left|\frac{df}{dX}\right| = |X| = \left<2,3,2\right> \]
+\[ \frac{df}{dX}[\bar{v}] = 1 \]
+\end{solution}
+
+\section*{Chapter 2 Solutions}
 
 \begin{solution}
 \begin{enumerate}
