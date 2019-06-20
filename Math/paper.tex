@@ -679,8 +679,10 @@ In particular, let us call $\Ident^2(\vec{v})$ the square identity of $\vec{v}$ 
 $\Ident^3(\vec{v})$ the cubic identity of $\vec{v}$.
 \end{definition}
 
-That definition seems rather arbitrary, but you'll see various orders of identity
-pop up in derivatives down the line. For now, let's just look at how the
+That definition seems rather arbitrary but stick with me, I know what I'm
+talking about. I've got a \sout{doctorate}
+masters degree in \sout{mathematics} \sout{a real engineering field}, fine, software
+engineering. Whatever. Just look at how the
 square identity it relates to a multiplication operation.
 
 \begin{theorem}[Multimatrix Multiplicative Identity]
@@ -791,7 +793,7 @@ Therefore $dX/dX = \Ident^2(|X|)$
 
 The cubic identity, strangely enough, appear in the derivative of elementwise
 functions. Which is one of the reaspons I needed to expand my definition of
-identities beyond $\Ident^2(\vec{v})$, beyond my crushing identity crisis.
+identities beyond $\Ident^2(\vec{v})$.
 
 \begin{theorem}[Elementwise Derivative]
 Let $M$ be an element wise function on $X$. That is, Let $M(X)$ be a function
@@ -919,8 +921,8 @@ We've shown that,
 
 A final useful theorem (definition?) happens to involve 0 overlap multiplication.
 You'll notice that I very carefully constructed my definition to allow for this
-definition (theorem?). Does it still count as a theorem if it's only true because
-I worked over the definition of multimatrix multiplication to make it true? I feel
+definition (theorem?). Does it still count as a theorem if it only works because
+I tweeked the definition of multimatrix multiplication to make it fit? I feel
 a bit like Tommy Wiseau writing my own sex scene into the script... twice... God,
 what a tool.
 
@@ -1024,14 +1026,14 @@ What is $dY/dX$?
 \chapter{Other Operations With Multimatricies}
 
 \begin{displayquote}
-``When the light turns green, you go. When the light turns red, you stop.
-But what do you do when the light turns blue with orange and lavender spots?''
-- Shel Silverstein, 'A Light in the Attic'
+``You can't just start a section with a subsection heading. At least put a quote
+in there or something,'' - Dr. William Tepfenhart 
 \end{displayquote}
 
-Other operations include...
-
 \section{Scalars}
+
+One of those obvious operations we'll need to do is multiply
+a multimatrix by a constant. I guess that means we need another definition,
 
 \begin{definition}[Multimatrix Scalar Multiplication]
 Let $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$. If
@@ -1043,8 +1045,8 @@ In other words, multiplying $A$ by a scalar $s$ simply multiplies each of
 it's elements by that scalar.
 \end{definition}
 
-Note that by our definitions of scalar and multimatrix derivatives and multiplication,
-we can model scalars in either case as multimatricies with shape $\{\}$.
+But actually, you'll find that scalars can be modeled equally well by multricies
+with the shpe $\left<\right>$. It works with multiplication and derivatives. Look:
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Multiplication Equivalence]
 \label{s_mm_mult_equiv}
@@ -1052,8 +1054,8 @@ For any multiplication operation defined between multimatricies and scalars,
 the scalar may be replaced by an equivalent empty-shaped multimatrix who's
 single value is that of the scalar.
 
-In other words, let $s \in \mathbb{R}$ and $S \in \mathbb{R}^{\{\}}$ such that
-$S[\{\}] = s$. Then, for any multimatrix $A$, 
+In other words, let $s \in \mathbb{R}$ and $S \in \mathbb{R}^{\left<\right>}$ such that
+$S[\left<\right>] = s$. Then, for any multimatrix $A$, 
 \[ sA = As = S \mmult{0} A = A \mmult{0} S \]
 \end{theorem}
 \begin{proof}
@@ -1068,52 +1070,75 @@ So $sA = As$. Also,
 \begin{align}
 	(sA)[\bar{a}]
 	&= (s)A[\bar{a}] \\
-	&= S[\{\}]A[\bar{a}] \\
-	&= \sum_{\forall \bar{c} \in \Dim(\{\})}
-		S[\{\} \oplus \bar{c}]A[\bar{c} \oplus \bar{a}] \\
-	&= (S \mmult{0} A)[\{\} \oplus \bar{a}] \\
+	&= S[\left<\right>]A[\bar{a}] \\
+	&= \sum_{\forall \bar{c} \in \Dim(\left<\right>)}
+		S[\left<\right> \oplus \bar{c}]A[\bar{c} \oplus \bar{a}] \\
+	&= (S \mmult{0} A)[\left<\right> \oplus \bar{a}] \\
 	&= (S \mmult{0} A)[\bar{a}] \\
 \end{align}
-Note that step 3 is valid because $\bar{c}$ can only be $\{\}$ and
-$\{\} \oplus \bar{a} = \bar{a}$. So, $sA = S \mmult{0} A$.
+Note that step 3 is valid because $\bar{c}$ can only be $\left<\right>$ and
+$\left<\right> \oplus \bar{a} = \bar{a}$. So, $sA = S \mmult{0} A$.
 Finally, by similiar reasoning,
 \begin{align*}
 	(sA)[\bar{a}]
 	&= (s)A[\bar{a}] \\
 	&= A[\bar{a}](s) \\
-	&= A[\bar{a}]S[\{\}] \\
-	&= \sum_{\forall \bar{c} \in \Dim(\{\})}
-		A[\bar{a} \oplus \bar{c}] S[\bar{c} \oplus \{\}] \\
-	&= (A \mmult{0} S)[\bar{a} \oplus \{\}] \\
+	&= A[\bar{a}]S[\left<\right>] \\
+	&= \sum_{\forall \bar{c} \in \Dim(\left<\right>)}
+		A[\bar{a} \oplus \bar{c}] S[\bar{c} \oplus \left<\right>] \\
+	&= (A \mmult{0} S)[\bar{a} \oplus \left<\right>] \\
 	&= (A \mmult{0} S)[\bar{a}]
 \end{align*}
 So $sA = A \mmult{0} S$. Therefore we've shown that
 $sA = As = S \mmult{0} A = A \mmult{0} S$
 \end{proof}
 
-Noticing this lead me to suspect that the same might be true of my definitions
-of the derivative rules. A quick check confirmed that the dimensionality
-worked out, and it seems intuitive that we would always be able to treat scalars
-as empty-shape multimatricies if multiplication workes, but let's formalize that
-assertion.
+It wasn't until I noticed this that I began to suspect that the same might be true
+of the derivative rules.
+A quick check confirmed that the dimensionality worked out and it seems intuitive
+that we would always be able to treat scalars
+as empty-shape multimatricies, but let's canonize it.
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Domain Derivative Equivalence]
 \label{s_mm_domain_equiv}
+That really rolls off the tongue.
+
 Let $F(x)$ be a function $F : \mathbb{R} \to \mathbb{R}^{\vec{f}}$. And let
-$G(X)$ be an equivalent function, $G : \mathbb{R}^{\{\}} \to \mathbb{R}^{\vec{f}}$
-such that for all $X \in \mathbb{R}^{\{\}}$ it is true that $G(X) = F(X[\{\}])$
+$G(X)$ be an equivalent function,
+$G : \mathbb{R}^{\left<\right>} \to \mathbb{R}^{\vec{f}}$
+such that for all $X \in \mathbb{R}^{\left<\right>}$ it is true that
+$G(X) = F(X[\left<\right>])$
 Then,
 \[ \frac{dF(x)}{dx} = \frac{dG(X)}{dX} \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $\bar{f} \in \Dim(\vec{f})$ then for $F(x)[\vec{f}] = G(X)[\vec{f}]$.
+Since $\partial F(x)[\vec{f}] / \partial x$ is defined as the rate of
+change of $F(x)[\vec{f}]$ with respect to $x$, it stands to reason that,
+$\partial F(X[\left<\right>])[\vec{f}] / \partial X[\left<\right>]$ is
+equivalent by definition. By are given $G(X) = F(X[\left<\right>])$ we
+can then also say that,
+\[
+\frac{ \partial F(X[\left<\right>])[\vec{f}] }{ \partial X[\left<\right>] }
+=
+\frac{ \partial G(X)[\vec{f}] }{ \partial X[\left<\right>] }
+\]
+Therefore, by our definitions of derivatives,
+\[
+\frac{ d F(x) }{ d x }
+=
+\frac{ d G(X) }{ d X }
+\]
 \end{proof}
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Range Derivative Equivalence]
-\label{s_mm_range_equiv}
+\label{s_mm_range_equiv} Or `E.S.M.a.S.R.D.E', for short.
+
 Let $f(X)$ be a function $f : \mathbb{R}^{\vec{x}} \to \mathbb{R}$. And let
-$F(X)$ be an equivalent function, $F : \mathbb{R}^{\vec{x}} \to \mathbb{R}^{\{\}}$
-such that for all $X \in \mathbb{R}^{\vec{x}}$ it is true that $F(X)[\{\}] = f(X)$
+$F(X)$ be an equivalent function,
+$F : \mathbb{R}^{\vec{x}} \to \mathbb{R}^{\left<\right>}$
+such that for all $X \in \mathbb{R}^{\vec{x}}$ it is true that
+$F(X)[\left<\right>] = f(X)$
 Then,
 \[ \frac{df(X)}{dX} = \frac{dF(X)}{dX} \]
 \end{theorem}
@@ -1817,7 +1842,7 @@ So,
 			\frac{d \exp(X)}{dX}
 			,|\vec{x}|
 		\right)
-		,|\{\} \oplus \vec{x}|
+		,|\left<\right> \oplus \vec{x}|
 	\right) \\
 	&=&&
 	\exp(X) \mmult{0} \frac{d \left( \Sum(\exp(X)) \right)^{-1}}{dX}
