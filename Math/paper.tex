@@ -31,6 +31,8 @@
 \theoremstyle{solution}
 \newtheorem{solution}{Solution}
 
+\newenvironment{argument}{\noindent\textit{Argument.}}{\hfill$\square$}
+
 \AtBeginEnvironment{section}{\setcounter{solution}{0}}
 \AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
 \AtBeginEnvironment{align}{\setcounter{equation}{0}}
@@ -1027,7 +1029,7 @@ What is $dY/dX$?
 
 \begin{displayquote}
 ``You can't just start a section with a subsection heading. At least put a quote
-in there or something,'' - Dr. William Tepfenhart 
+in there or something,'' - Dr. William Tepfenhart, my software architecture professor.
 \end{displayquote}
 
 \section{Scalars}
@@ -1067,17 +1069,20 @@ Let $|A| = \vec{a}$. Then for all $\bar{a} \in \Dim(\vec{a})$,
 	&= (As)[\bar{a}]
 \end{align*}
 So $sA = As$. Also,
-\begin{align}
+\begin{align*}
 	(sA)[\bar{a}]
 	&= (s)A[\bar{a}] \\
 	&= S[\left<\right>]A[\bar{a}] \\
 	&= \sum_{\forall \bar{c} \in \Dim(\left<\right>)}
 		S[\left<\right> \oplus \bar{c}]A[\bar{c} \oplus \bar{a}] \\
+	&= \sum_{\forall \bar{c} \in \{\left<\right>\}}
+		S[\left<\right> \oplus \bar{c}]A[\bar{c} \oplus \bar{a}] \\
+	&= S[\left<\right> \oplus \left<\right>]A[\left<\right> \oplus \bar{a}] \\
+	&= S[\left<\right>]A[\bar{a}] \\
 	&= (S \mmult{0} A)[\left<\right> \oplus \bar{a}] \\
 	&= (S \mmult{0} A)[\bar{a}] \\
-\end{align}
-Note that step 3 is valid because $\bar{c}$ can only be $\left<\right>$ and
-$\left<\right> \oplus \bar{a} = \bar{a}$. So, $sA = S \mmult{0} A$.
+\end{align*}
+So, $sA = S \mmult{0} A$.
 Finally, by similiar reasoning,
 \begin{align*}
 	(sA)[\bar{a}]
@@ -1086,6 +1091,10 @@ Finally, by similiar reasoning,
 	&= A[\bar{a}]S[\left<\right>] \\
 	&= \sum_{\forall \bar{c} \in \Dim(\left<\right>)}
 		A[\bar{a} \oplus \bar{c}] S[\bar{c} \oplus \left<\right>] \\
+	&= \sum_{\forall \bar{c} \in \{\left<\right>\}}
+		A[\bar{a} \oplus \bar{c}] S[\bar{c} \oplus \left<\right>] \\
+	&= A[\bar{a} \oplus \left<\right>] S[\left<\right> \oplus \left<\right>] \\
+	&= A[\bar{a}]S[\left<\right>] \\
 	&= (A \mmult{0} S)[\bar{a} \oplus \left<\right>] \\
 	&= (A \mmult{0} S)[\bar{a}]
 \end{align*}
@@ -1111,7 +1120,7 @@ $G(X) = F(X[\left<\right>])$
 Then,
 \[ \frac{dF(x)}{dx} = \frac{dG(X)}{dX} \]
 \end{theorem}
-\begin{proof}
+\begin{argument}
 Let $\bar{f} \in \Dim(\vec{f})$ then for $F(x)[\vec{f}] = G(X)[\vec{f}]$.
 Since $\partial F(x)[\vec{f}] / \partial x$ is defined as the rate of
 change of $F(x)[\vec{f}]$ with respect to $x$, it stands to reason that,
@@ -1129,7 +1138,7 @@ Therefore, by our definitions of derivatives,
 =
 \frac{ d G(X) }{ d X }
 \]
-\end{proof}
+\end{argument}
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Range Derivative Equivalence]
 \label{s_mm_range_equiv} Or `E.S.M.a.S.R.D.E', for short.
@@ -1142,11 +1151,27 @@ $F(X)[\left<\right>] = f(X)$
 Then,
 \[ \frac{df(X)}{dX} = \frac{dF(X)}{dX} \]
 \end{theorem}
-\begin{proof}
-TODO
-\end{proof}
+\begin{argument}
+Let $\bar{x} \in \Dim(\vec{x})$. We note that as $\partial f(X) / \partial X[\bar{x}]$
+is defined as the rate of change of $f(X)$ as $X[\bar{x}]$ changes, and each value of
+$f(X)$ is equal to $F(X)[\left<\right>]$, we can reason that the rate of change of
+$F(X)[\left<\right>]$ as $X[\bar{x}]$ changes is equal to the rate of change of $f(X)$
+as $X[\bar{x}]$ changes. That is,
+\[
+	\frac{\partial f(X)}{\partial X[\bar{x}]}
+		=
+	\frac{\partial F(X)[\left<\right>]}{\partial X[\bar{x}]}
+\]
+And so by our definition of derivatives,
+\[ \frac{df(X)}{dX} = \frac{dF(X)}{dX} \]
+\end{argument}
 
 \section{Addition}
+
+Ah addition. What can I say about multimatrix addition that hasn't been
+said so many times before. Well... anything, actually. I don't think anyone's
+written about multimatrix addition before. Probably should define it first
+though.
 
 \begin{definition}[Multimatrix Addition]
 Let $A, B, C \in \mathbb{R}^{\vec{x}}$. If
@@ -1159,12 +1184,23 @@ in a multimatrix of the same shape with elements which are the sum of the corres
 elements of the added multimatricies.
 \end{definition}
 
+Multimatrix subtraction is defined as the inverse of multimatrix addition.
+
 \begin{definition}[Multimatrix Subtraction]
 Let $A, B \in \mathbb{R}^{\vec{x}}$. Then,
-\[ A - B = A + (-1)B \]
-It should be obvious that, as with scalars, multimatrix subtraction is the
-inverse of addition. In other words, $(A + B) - B = A$
+\[ (A + B) - B = A \]
 \end{definition}
+
+The following should be obvious,
+
+\begin{theorem}[Equivalent Addition for Subtraction]
+\label{eq_add_sub_thm}
+For any multimatricies $A$ and $B$ where $|A| = |B|$,
+\[ A - B = A + (-1)B \]
+\end{theorem}
+\begin{proof}
+Left as an exercise for the reader (Exercise \ref{eq_add_sub_ex}).
+\end{proof}
 
 As with scalar, vector, or regular matrix addition, multimatrix addition is
 communicative. 
@@ -1371,20 +1407,54 @@ Then,
 \end{proof}
 
 \begin{theorem}[Communicativity of scalar Multiplication and Transposition]
+Let $s$ be a scalar, $x$ be in $\mathbb{Z}^{+} \cup \{0\}$, and $A$ be
+a multimatrix on which $\Tran(A, x)$ is defined. Then,
 \[ s\Tran(A, x) = \Tran(sA, x) \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $|A| = \vec{x} \oplus \vec{a}$ where $|\vec{x}| = x$. Then
+let $\bar{x} \in \Dim(\vec{x})$ and $\bar{a} \in \Dim(\vec{a})$. So,
+\begin{align*}
+  (s\Tran(A, x))[\bar{a} \oplus \bar{x}]
+  &= s \Tran(A, x)[\bar{a} \oplus \bar{x}] \\
+  &= s A[\bar{x} \oplus \bar{a}] \\
+  &= (s A)[\bar{x} \oplus \bar{a}] \\
+  &= \Tran(sA, x)[\bar{a} \oplus \bar{x}]
+\end{align*}
+Therefore $s\Tran(A, x) = \Tran(sA, x)$.
 \end{proof}
 
 \begin{theorem}[Stacked Transposition]
 \[ \Tran(\Tran(A, x), y) = \Tran(A, x+y) \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $|A| = \vec{x} \oplus \vec{y} \oplus \vec{a}$ where $|\vec{x}| = x$ and
+$|\vec{y}| = y$. Note that,
+\[ |\Tran(A, x)| = \vec{y} \oplus \vec{a} \oplus \vec{x} \]
+And,
+\[ |\Tran(\Tran(A, x), y)| = \vec{a} \oplus \vec{x} \oplus \vec{y} \]
+Also that,
+\[ |\Tran(A, x+y)| = \vec{a} \oplus \vec{x} \oplus \vec{y} \]
+So $|\Tran(\Tran(A, x), y)| = \Tran(A, x+y)$ which is necessary but not
+sufficient for this proof.
+
+To show the elementwise equivalence, let $\bar{x} \in \Dim(\vec{x})$,
+$\bar{y} \in \Dim(\vec{y})$, and $\bar{a} \in \Dim(\vec{a})$. Then,
+\begin{align*}
+  \Tran(\Tran(A, x), y)[\bar{a} \oplus \bar{x} \oplus \bar{y}]
+  &= A[\bar{x} \oplus \bar{y} \oplus \bar{a}] \\
+  &= \Tran(A, x+y)[\bar{a} \oplus \bar{x} \oplus \bar{y}]
+\end{align*}
+Which shows that $\Tran(\Tran(A, x), y) = \Tran(A, x+y)$
 \end{proof}
 
 \section*{Exercises}
+
+\begin{exercise}
+\label{eq_add_sub_ex}
+Prove Theorem \ref{eq_add_sub_thm}.
+\end{exercise}
+
 TODO
 
 \chapter{Generic Derivative Rules}
