@@ -1191,7 +1191,7 @@ Let $A, B \in \mathbb{R}^{\vec{x}}$. Then,
 \[ (A + B) - B = A \]
 \end{definition}
 
-The following should be obvious,
+The following should be obvious, condesendingly so,
 
 \begin{theorem}[Equivalent Addition for Subtraction]
 \label{eq_add_sub_thm}
@@ -1231,8 +1231,9 @@ For all $\bar{x} \in \Dim(\vec{x})$,
 \end{align*}
 \end{proof}
 
-A little less obvious is that multimatrix multiplication can be distributed over
-it's addition.
+A little less obvious, in that a coffee-deprived undergraduate might
+struggle with it for a second, is that multimatrix multiplication can be
+distributed over it's addition.
 
 \begin{landscape}
 \begin{theorem}[Multimatrix on Multimatrix Distributive Property]
@@ -1289,8 +1290,9 @@ So $(A+B) \mmult{n} C = A \mmult{n} C + B \mmult{n} C$
 \end{proof}
 \end{landscape}
 
-But it should be obvious that that the same applies to scalar 
-multiplication distributing over multimatrix addition..
+But it should be obvious - seriously, how have you not figured this out yet -
+that that the same applies to scalar  multiplication distributing over multimatrix
+addition..
 \begin{theorem}[Scalar on Multimatrix Distributive Property]
 If $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$ then,
 \[ s(A + B) = sA + sB \]
@@ -1309,6 +1311,9 @@ Therefore $s(A+B) = sA + sB$
 
 \section{Transposition}
 
+Multimatrix transposition clearly requires an additional parameter defining where
+the cut happens in the shape vector.
+
 \begin{definition}[Multimatrix Transposition]
 Let $|X| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = l$ and $|\vec{r}| = r$
 \[ |\Tran(X, l)| = \vec{r} \oplus \vec{l} \]
@@ -1316,6 +1321,23 @@ And,
 \[ \forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : \]
 \[ \Tran(X, l)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
 \end{definition}
+
+Here's an example - get out your crayons and follow along.
+
+\begin{example}
+Let's construct some multimatrix, $M$, with a shape:
+\[ |M| = \left<3,2,7,5,9\right> \]
+Then lets take the first transpose of that
+multimatrix:
+\[ |\Tran(M, 1)| = \left<2,7,5,9,3\right> \]
+And... how about the third:
+\[ |\Tran(M, 3)| = \left<5,9,3,2,7\right> \]
+You can see, it's as though I cut off the front of the shape vector and transfered
+it to the end of the vector.
+
+You do the same thing with indicies. So,
+\[ M[1,2,3,4,5] = \Tran(M, 3)[4,5,1,2,3] \]
+\end{example}
 
 \begin{theorem}[Inverse Transpose]
 If $|X| = \vec{l} \oplus \vec{r}$
@@ -1406,7 +1428,7 @@ Then,
 \end{align*}
 \end{proof}
 
-\begin{theorem}[Communicativity of scalar Multiplication and Transposition]
+\begin{theorem}[Communicativity of Scalar Multiplication and Transposition]
 Let $s$ be a scalar, $x$ be in $\mathbb{Z}^{+} \cup \{0\}$, and $A$ be
 a multimatrix on which $\Tran(A, x)$ is defined. Then,
 \[ s\Tran(A, x) = \Tran(sA, x) \]
@@ -1422,6 +1444,17 @@ let $\bar{x} \in \Dim(\vec{x})$ and $\bar{a} \in \Dim(\vec{a})$. So,
   &= \Tran(sA, x)[\bar{a} \oplus \bar{x}]
 \end{align*}
 Therefore $s\Tran(A, x) = \Tran(sA, x)$.
+\end{proof}
+
+\begin{theorem}[Communicativity of Addition and Transposition]
+\label{com_add_tran_thm}
+Let $x$ be in $\mathbb{Z}^{+} \cup \{0\}$ and let $A$ and $B$ be
+multimatricies such that $|A| = |B|$ and $\Tran(A, x)$ is defined.
+Then,
+\[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
+\end{theorem}
+\begin{proof}
+Left as an exercise for the reader (Exercise \ref{com_add_tran_ex}).
 \end{proof}
 
 \begin{theorem}[Stacked Transposition]
@@ -1452,10 +1485,37 @@ Which shows that $\Tran(\Tran(A, x), y) = \Tran(A, x+y)$
 
 \begin{exercise}
 \label{eq_add_sub_ex}
-Prove Theorem \ref{eq_add_sub_thm}.
+Prove Theorem \ref{eq_add_sub_thm} which is that,
+\[ A - B = A + (-1)B \]
 \end{exercise}
 
-TODO
+\begin{exercise}
+\label{com_add_tran_ex}
+Prove Theorem \ref{com_add_tran_thm} which is that,
+\[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
+\end{exercise}
+
+\begin{exercise}
+Let $A$ be a multimatrix such that $|A| = <1,2,3,4,5>$,
+Find the shape of the following trasnposes:
+\begin{enumerate}
+\item $|\Tran(A, 3)| = ?$
+\item $|\Tran(A, 4)| = ?$
+\item $|\Tran(A, 5)| = ?$
+\item $|\Tran(A, 0)| = ?$
+\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+Let $M$ be any multimatrix.
+Find the value, in terms of $M$, of the following equations.
+For example $\Tran(M, 1)[2,3,4,5,1] = M[1,2,3,4,5]$
+\begin{enumerate}
+\item $\Tran(M, 3)[1,2,3,4] = ?$
+\item $\Tran(M, 0)[6,5,3] = ?$
+\item $\Tran(M, 2)[1,1,1] = ?$
+\end{enumerate}
+\end{exercise}
 
 \chapter{Generic Derivative Rules}
 
