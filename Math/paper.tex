@@ -213,6 +213,16 @@ We'll use the notation $M[\bar{v}]$ to reference any individual scalar value of 
 at indicies $\bar{v} \in \Dim(|M|)$. 
 \end{definition}
 
+I'll give you a theorem here and make you prove it yourself because I'm a jerk.
+\begin{theorem}[Dimensional Set and Index Concatenation]
+\label{dim_set_ind_concat_thm}
+If $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$ then,
+\[ \bar{a} \oplus \bar{b} \in \Dim(\vec{a} \oplus \vec{b}) \]
+\end{theorem}
+\begin{proof}
+Left as an exercise for the reader (Exercise \ref{dim_set_ind_concat_ex}).
+\end{proof}
+
 Going back to our original motivating problem, we (that is to say, myself and my
 split personalities whom I reference as to give my writing the percieved authority
 of more than one author) can express our derivative notation thusly,
@@ -302,6 +312,12 @@ But that single line will require defining multimatrix multiplication and
 a mysterious, and possibly dangerious, entity call a cubic identity, $\Ident^3(|X|)$.
 
 \section*{Exercises}
+
+\begin{exercise}
+\label{dim_set_ind_concat_ex}
+Prove Theorem \ref{dim_set_ind_concat_thm}. Which is that,
+\[ \bar{a} \oplus \bar{b} \in \Dim(\vec{a} \oplus \vec{b}) \]
+\end{exercise}
 
 \begin{exercise}
 Are the following assertions are true or false?
@@ -1561,10 +1577,111 @@ $|X| = \vec{l} \oplus \vec{r}$
 
 \begin{theorem}[Right Multiplicative Derivative]
 \label{right_mult_derivative}
+Let $A$ and $X$ be multimatricies such that $A \mmult{n} X$ is
+defined. Then,
 \[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $|A| = \vec{a} \oplus \vec{n}$ and $|X| = \vec{n} \oplus \vec{x}$
+where $|\vec{n}| = n$ which is equivalent to saying $A \mmult{n} X$ is defined.
+Also let $\bar{a} \in \Dim(\vec{a})$, $\bar{n} \in \Dim(\vec{n})$,
+$\bar{x}_1 \in \Dim(\vec{x})$ and $\bar{x}_2 \in \Dim(\vec{x})$.
+Then, starting with the definition of the derivative,
+\begin{align*}
+  \frac{d(A\mmult{n}X)}{dX}[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
+  &=
+  \frac{
+    \partial (A \mmult{n} X)[\bar{a} \oplus \bar{x}_1]
+  }{
+    \partial X[\bar{n} \oplus \bar{x}_2]
+  } \\
+  &=
+  \frac{
+    \partial \left(
+      \sum_{\forall \bar{m} \in \Dim(\vec{n})}
+        A[\bar{a} \oplus \bar{m}]
+        X[\bar{m} \oplus \bar{x}_1]
+    \right)
+  }{
+    \partial X[\bar{n} \oplus \bar{x}_2]
+  } \\
+  &=
+  \sum_{\forall \bar{m} \in \Dim(\vec{n})}
+    \frac{
+      \partial 
+      A[\bar{a} \oplus \bar{m}]
+      X[\bar{m} \oplus \bar{x}_1]
+    }{
+      \partial X[\bar{n} \oplus \bar{x}_2]
+    } \\
+  &=
+  \left(
+    \sum_{\forall \bar{m} \ne \bar{n}} 0
+  \right)
+  +
+  \left(
+    \sum_{\forall \bar{m} = \bar{n}}
+    \frac{
+      \partial 
+      A[\bar{a} \oplus \bar{m}]
+      X[\bar{m} \oplus \bar{x}_1]
+    }{
+      \partial X[\bar{n} \oplus \bar{x}_2]
+    }
+  \right) \\
+  &=
+  \frac{
+    \partial 
+    A[\bar{a} \oplus \bar{n}]
+    X[\bar{n} \oplus \bar{x}_1]
+  }{
+    \partial X[\bar{n} \oplus \bar{x}_2]
+  } \\
+  &= A[\bar{a} \oplus \bar{n}] \delta_{\bar{x}_1 \bar{x}_2}
+\end{align*}
+Then, note that,
+\begin{align*}
+  A \mmult{n} \Ident^2(|X|)[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
+  &=
+  \sum_{\forall \bar{m} \in \Dim(\vec{n})}
+  A[\bar{a} \oplus \bar{m}]
+  \Ident^2(|X|)[\bar{m} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2] \\
+  &=
+  \sum_{\forall \bar{m} \in \Dim(\vec{n})}
+  A[\bar{a} \oplus \bar{m}]
+  \delta_{\bar{m} \bar{n}}
+  \delta_{\bar{x}_1 \bar{x}_2} \\
+  &=
+  \left(
+    \sum_{\forall \bar{m} \ne \bar{n}} 0
+  \right)
+  +
+  \left(
+    \sum_{\forall \bar{m} = \bar{n}}
+    A[\bar{a} \oplus \bar{m}]
+    \delta_{\bar{m} \bar{n}}
+    \delta_{\bar{x}_1 \bar{x}_2}
+  \right) \\
+  &=
+  A[\bar{a} \oplus \bar{n}]
+  \delta_{\bar{n} \bar{n}}
+  \delta_{\bar{x}_1 \bar{x}_2} \\
+  &=
+  A[\bar{a} \oplus \bar{n}]
+  \delta_{\bar{x}_1 \bar{x}_2}
+\end{align*}
+So, 
+\[
+  \frac{d(A\mmult{n}X)}{dX}[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
+  =
+  A \mmult{n} \Ident^2(|X|)[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
+\]
+For all $\bar{a}$, $\bar{x}_1$, $\bar{n}$ and $\bar{x}_2$. Therefore,
+\[
+  \frac{d(A\mmult{n}X)}{dX}
+  =
+  A \mmult{n} \Ident^2(|X|)
+\]
 \end{proof}
 
 \begin{landscape}
