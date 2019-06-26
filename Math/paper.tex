@@ -4,7 +4,10 @@
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{mathtools}
+% Use pdflscape for pdf viewers
 \usepackage{pdflscape}
+% Use lscape for printing as a book
+%\usepackage{lscape}
 \usepackage{etoolbox}
 \usepackage{csquotes}
 \usepackage[normalem]{ulem}
@@ -27,13 +30,16 @@
 \theoremstyle{ppart}
 \newtheorem{ppart}{Part}
 
-\newtheoremstyle{solution}{}{}{}{}{}{:}{\newline}{Exercise \thmnumber{#2} Solution}
+\newcounter{solutionctr}
+\newtheoremstyle{solution}{}{}{}{}{}{:}{\newline}{
+  Exercise \refstepcounter{solutionctr}\thesolutionctr~Solution}
 \theoremstyle{solution}
 \newtheorem{solution}{Solution}
+\newcommand{\solutionsection}[1]{
+  \section{Chapter~#1 Solutions}\setcounter{solutionctr}{0}}
 
 \newenvironment{argument}{\noindent\textit{Argument.}}{\hfill$\square$}
 
-\AtBeginEnvironment{section}{\setcounter{solution}{0}}
 \AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
 \AtBeginEnvironment{align}{\setcounter{equation}{0}}
 \AtBeginEnvironment{alignat}{\setcounter{equation}{0}}
@@ -53,14 +59,12 @@
 \maketitle
 
 \chapter*{Preface}
-I was working my way through a hobby programming project, trying to manifest Skynet
-as more than the apocalyptic fever dream of James Cameron, and ran into a problem.
+I was working my way through a hobby programming project, trying to get my
+machine to do some learning, and ran into a problem.
 The existing notation for taking derivatives of matrix equations is terrible.
 It's so deliberately obtuse that I could only conclude that some hidden cabal of
 mathematicians is actively working to sabotage our glorious yet-to-be-built
-robot overlords.
-
-That sort of justice cannot stand! 
+AI overlords. I, for one, will not stand for such blasphemy.
 
 So, I set out to invent a system of my own. Much to my surprise, some of the
 results with were rather elegant. For example, I stumbled onto a
@@ -79,12 +83,14 @@ multimatricies - and how they can simplify derivatives of matrix equations.
 
 \tableofcontents
 
-\chapter{Defining the Derivative}
+\chapter{The Multimatrix and Its Derivative}
 
 \begin{displayquote}
 ``If you're a bit touched, like I am, you may want to make a dedicated tool.'' -
 This Old Tony, `Making Springs At Home'
 \end{displayquote}
+
+\section{Motivating the Multimatrix}
 
 Let's consider a traditional matrix equation. As is traditional, one matrix
 $X$ shall represent the scientific education level of undergraduates, who happen
@@ -116,7 +122,7 @@ We can calculate this partial derivative easily enough,
 \right.
 \]
 Every student's belief in a higher power changes with respect to their own
-scientific education level, but does not change with respect to other students'
+scientific education level but does not change with respect to other students'
 scientific education. No mater how much I teach Jane about photosynthesis, I'm
 not going to change Joe's mind about divine mysteries.
 
@@ -187,13 +193,13 @@ matricies in a similar manner:
 
 So what is this object we've defined? In all ways that matter, it seems to be
 a multidimensional matrix. It has four dimensions of indices, rather than just
-a row and column, but each uniquely indexed cell in this object may have a
+a row and column but each uniquely indexed cell in this object may have a
 unique value, just like a standard two dimensional matrix. Let's define this
 bit of notation formaly.
 
 \begin{definition}[Multimatrix]
 A multimatrix $M$ is a multidimensional object that has some shape,
-$\vec{v} \in \mathbb{N}^n$, where $n \in \mathbb{Z}^+ \cup \{0\}$
+$\vec{v} \in \mathbb{N}^n$, where $n \in \mathbb{N} \cup \{0\}$
 is the number of dimensions of $M$.
 
 Let $\vec{v}$ be the natural number vector which describes the shape of
@@ -222,6 +228,8 @@ If $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$ then,
 \begin{proof}
 Left as an exercise for the reader (Exercise \ref{dim_set_ind_concat_ex}).
 \end{proof}
+
+\section{Defining the Derivative}
 
 Going back to our original motivating problem, we (that is to say, myself and my
 split personalities whom I reference as to give my writing the percieved authority
@@ -311,7 +319,7 @@ chapter ahead), that'll look like this:
 But that single line will require defining multimatrix multiplication and
 a mysterious, and possibly dangerious, entity call a cubic identity, $\Ident^3(|X|)$.
 
-\section*{Exercises}
+\section{Exercises}
 
 \begin{exercise}
 \label{dim_set_ind_concat_ex}
@@ -352,9 +360,11 @@ for meaning. It's to just keep yourself busy with unimportant nonsense, and even
 you'll be dead.'' - Mr. Peanutbutter, BoJack Horseman
 \end{displayquote}
 
+\section{Defining Multiplication}
+
 The multiplication of traditional matricies is a calculation that, when one first
-encouters it, inspires thoughts such as ``By which satanic cult was this process
-proscribed?''
+encouters it, inspires thoughts such as, ``What the shit?'' or, ``Get me a knife,
+I gotta to stab someone.''
 
 After seeing the method used in practice, one slowly comes to understand the
 reason behind the madness. That is, that madness is the natural state of things
@@ -413,7 +423,7 @@ just jump into the formal definition and I'll explain with an example:
 \label{mm_mult}
 Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$,
 $|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$ with
-$n \in \{0\} \cup \mathbb{Z}^{+}$. We shall call $n$ the 'size' or the 'width'
+$n \in \{0\} \cup \mathbb{N}$. We shall call $n$ the 'size' or the 'width'
 or the 'overlap' of the multiplication operation.
 The shape of the result is defined, $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$
 and the value of the result is defined,
@@ -506,6 +516,8 @@ $\bar{x}_1$ & $\bar{x}_2$ & $(A \mmult{2} B)[\bar{x}]$ & = & = \\
 \end{example}
 \newpage
 
+\section{Rules of Multimatrix Multiplication}
+
 Like two dimensional matrix multiplication, multimatrix multiplication is
 \textit{not} communicative. And it is only weakly associative. That sounds like
 nonsense, and ideed it is, but I shall prove it to you.
@@ -585,7 +597,7 @@ However, there are a broad catagory of cases where associativity \textit{does} h
 \begin{theorem}[Associativity of Multimatrix Multiplication]
 \label{mm_associativity}
 Let $A$, $B$, and $C$ be multimatricies and $m$ and $n$ in
-$\left\{ 0 \right\} \cup \mathbb{Z}^{+}$.
+$\{0\} \cup \mathbb{N}$.
 If both operations $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$
 are valid dimensionally and $m+n \le ||B||$, then,
 \[ (A \mmult{m} B) \mmult{n} C = A \mmult{m} (B \mmult{n} C) \]
@@ -668,6 +680,8 @@ Since $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$ are both
 the same shape and every cell with the same index in each is equal, the two
 values must be equal.
 \end{proof}
+
+\section{Multiplicative Identities}
 
 Multiplicative identities for multimatricies depend on the shape of the
 multimatrix they are being multiplied against, just as for regular matricies.
@@ -866,7 +880,7 @@ multiples of their base shape lengths.
 
 \begin{landscape}
 \begin{theorem}[Identity Contraction]
-For all $m, n, k \in \mathbb{Z}^+$ and $\vec{x}$ as a valid multimatrix shape,
+For all $m, n, k \in \mathbb{N}$ and $\vec{x}$ as a valid multimatrix shape,
 where $m > k$ and $n > k$,
 \[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{theorem}
@@ -967,7 +981,7 @@ and $\bar{b} \in \Dim(\vec{b}):$
 \end{align*}
 \end{proof}
 
-\section*{Exercises}
+\section{Exercises}
 
 \begin{exercise}
 Let $A$, $B$, and $C$ be multimatricies such that $|A| = \left<1,2,3\right>$,
@@ -1122,7 +1136,7 @@ It wasn't until I noticed this that I began to suspect that the same might be tr
 of the derivative rules.
 A quick check confirmed that the dimensionality worked out and it seems intuitive
 that we would always be able to treat scalars
-as empty-shape multimatricies, but let's canonize it.
+as empty-shape multimatricies but let's canonize it.
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Domain Derivative Equivalence]
 \label{s_mm_domain_equiv}
@@ -1445,7 +1459,7 @@ Then,
 \end{proof}
 
 \begin{theorem}[Communicativity of Scalar Multiplication and Transposition]
-Let $s$ be a scalar, $x$ be in $\mathbb{Z}^{+} \cup \{0\}$, and $A$ be
+Let $s$ be a scalar, $x$ be in $\mathbb{N} \cup \{0\}$, and $A$ be
 a multimatrix on which $\Tran(A, x)$ is defined. Then,
 \[ s\Tran(A, x) = \Tran(sA, x) \]
 \end{theorem}
@@ -1464,7 +1478,7 @@ Therefore $s\Tran(A, x) = \Tran(sA, x)$.
 
 \begin{theorem}[Communicativity of Addition and Transposition]
 \label{com_add_tran_thm}
-Let $x$ be in $\mathbb{Z}^{+} \cup \{0\}$ and let $A$ and $B$ be
+Let $x$ be in $\mathbb{N} \cup \{0\}$ and let $A$ and $B$ be
 multimatricies such that $|A| = |B|$ and $\Tran(A, x)$ is defined.
 Then,
 \[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
@@ -1497,7 +1511,7 @@ $\bar{y} \in \Dim(\vec{y})$, and $\bar{a} \in \Dim(\vec{a})$. Then,
 Which shows that $\Tran(\Tran(A, x), y) = \Tran(A, x+y)$
 \end{proof}
 
-\section*{Exercises}
+\section{Exercises}
 
 \begin{exercise}
 \label{eq_add_sub_ex}
@@ -2019,10 +2033,41 @@ such that \[ \Sum(X) = \sum_{\forall \bar{x} \in \Dim(\vec{x})} X[\bar{x}] \]
 \end{definition}
 
 \begin{theorem}[Derivative of Sum]
+Let $X$ be any multimatrix, then,
 \[\frac{d\Sum(X)}{dX} = 1^{|X|}\]
 \end{theorem}
 \begin{proof}
-TODO
+Let $|X| = \vec{x}$ and $\bar{x} = \Dim(\vec{x})$. Then,
+\begin{align*}
+  \frac{d\Sum(X)}{dX}[\bar{x}]
+  &= \frac{\partial \Sum(X)}{\partial X[\bar{x}]} \\
+  &= \frac{
+    \partial \left(
+      \sum_{\forall \bar{y} \in \Dim(\vec{x})} X[\bar{y}]
+    \right)
+  }{
+    \partial X[\bar{x}]
+  } \\
+  &= \sum_{\forall \bar{y} \in \Dim(\vec{x})}
+  \frac{
+    \partial X[\bar{y}]
+  }{
+    \partial X[\bar{x}]
+  } \\
+  &= \left(
+    \sum_{\forall \bar{y} \ne \bar{x}} 0
+  \right)
+  +
+  \left(
+    \sum_{\forall \bar{y} = \bar{x}}
+    \frac{\partial X[\bar{y}]}{\partial X[\bar{x}]}
+  \right) \\
+  &= \frac{\partial X[\bar{x}]}{\partial X[\bar{x}]} \\
+  &= 1 \\
+  &= 1^{\vec{x}}[\bar{x}]
+\end{align*}
+So,
+\[\frac{d\Sum(X)}{dX} = 1^{|X|}\]
 \end{proof}
 
 \begin{definition}[Sum of Squares]
@@ -2263,7 +2308,7 @@ TODO
 
 \chapter{Integration}
 
-I think, I'm not sure, but I think that the integral of a multimatrix function should
+I think, I'm not sure but I think, that the integral of a multimatrix function should
 be defined,
 
 \[
@@ -2274,7 +2319,7 @@ be defined,
   \left(\frac{B-A}{n}\right)
 \]
 
-Which, I have very little idea what that means geometriclly, but
+Which, I have very little idea what that means geometriclly but
 if you let $G(X) = \int_A^X F(Y) dY$ you seem to end up with $dG/dX = F(X)$.
 
 Maybe... well look at it this way. $F(X)$ is a function which produces some,
@@ -2413,7 +2458,7 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 
 \chapter{Solutions to the Exercises}
 
-\section*{Chapter 1 Solutions}
+\solutionsection{1}
 
 \begin{solution}
 \begin{enumerate}
@@ -2440,7 +2485,7 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 \[ \frac{df}{dX}[\bar{v}] = 1 \]
 \end{solution}
 
-\section*{Chapter 2 Solutions}
+\solutionsection{2}
 
 \begin{solution}
 \begin{enumerate}
