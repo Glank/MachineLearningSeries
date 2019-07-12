@@ -30,6 +30,10 @@
 \theoremstyle{ppart}
 \newtheorem{ppart}{Part}
 
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
+
 \newcounter{solutionctr}
 \newtheoremstyle{solution}{}{}{}{}{}{:}{\newline}{
   Exercise \refstepcounter{solutionctr}\thesolutionctr~Solution}
@@ -41,6 +45,7 @@
 \newenvironment{argument}{\noindent\textit{Argument.}}{\hfill$\square$}
 
 \AtBeginEnvironment{proof}{\setcounter{ppart}{0}}
+\AtBeginEnvironment{proof}{\setcounter{case}{0}}
 \AtBeginEnvironment{align}{\setcounter{equation}{0}}
 \AtBeginEnvironment{alignat}{\setcounter{equation}{0}}
 
@@ -50,6 +55,7 @@
 \DeclareMathOperator{\SoS}{\mathbb{S}}
 \DeclareMathOperator{\Softmax}{Softmax}
 \DeclareMathOperator{\Sum}{\Sigma}
+\DeclareMathOperator{\remainder}{mod}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
@@ -92,12 +98,16 @@ This Old Tony, `Making Springs At Home'
 
 \section{Motivating the Multimatrix}
 
-Let's consider a traditional matrix equation. As is traditional, one matrix
-$X$ shall represent the scientific education level of undergraduates, who happen
-to work in a densely packed 3 by 5 grid - which is also traditional. Then let
-$B$ represent the belief each of those undergradutes has in a higher power,
-which, as we all know, fluctuates with respect to their scientific education in
-a sinusoidal pattern (Weinersmith, 2010 \cite{weinersmith:education}).
+Let us consider a traditional matrix equation - one contrived on the spot for the
+purposes of adding an additional layer of confusion to the situation.
+
+As is tradition, let one matrix $X$ represent the scientific education level of
+undergraduates, who work in a densely packed 3 by 5 grid (which is also traditional).
+Then let $B$ represent the belief each of those undergradutes has in a higher power.
+
+It has been shown that an undergraduate's belief in a higher power fluctuates with
+respect to their scientific education in a sinusoidal pattern
+(Weinersmith, 2010 \cite{weinersmith:education}).
 
 Formally, the shape of these two matricies are defined,
 $|B| = |X| = \left< 3,5 \right>$.
@@ -169,13 +179,13 @@ matrix and the output matrix together,
 \end{align*}
 Where $\oplus$ is the concatenate operator.
 
-The ordering here is arbitrary, there is no reason why the dimensionality of
+The ordering here is arbitrary. There is no reason why the dimensionality of
 of the independent variable \textit{needs} to be concatenated to the right of the
 dimensionality of the output. What's important is that the dimensionality of
 both output and indepenedent variable are preserved. Let us declare this to
 be our convention since, for the purpose of this work, mine is the divinely revealed
-word of god, passed down to you lowly mortals who have yet to commit your
-own mad ramblings to \LaTeX.
+word of god, graciously passed down to you lowly mortals (I've typeset
+my mad ranblings with \LaTeX ~therefore they must be reasonably coherent. QED).
 
 Our total derivate is therefore a multidimensional object with four indicies.
 Suppose we try to pull a single partial derivative from this complete derivative,
@@ -300,7 +310,7 @@ question?
 Well... sort of. We have to abuse the notation a little and say that $B$ and $X$ are
 just multimatricies with 2 dimensions. Then we can say that the total derivative
 of $B$ with respect to $X$ is a multimatrix with shape $|B| \oplus |X|$,
-who's elements we can define as,
+whose elements we can define as,
 \[\forall \bar{b} \in \Dim(|B|), \bar{x} \in \Dim(|X|):\]
 \begin{align*}
 \left( \frac{dB}{dX} \right)[\bar{b} \oplus \bar{x}]
@@ -328,7 +338,7 @@ Prove Theorem \ref{dim_set_ind_concat_thm}. Which is that,
 \end{exercise}
 
 \begin{exercise}
-Are the following assertions are true or false?
+True or false?
 \begin{enumerate}
 \item $\left<1,1,1\right> \in \Dim(\left<5,5,5\right>)$
 \item $\left<1,1\right> \in \Dim(\left<5,5,5\right>)$
@@ -384,12 +394,14 @@ $B$,
 
 \[ C[r_a, c_b] = \sum_{\forall i} A[r_a, i] B[i, c_b] \]
 
-Easily done. The hard part isn't doing the calculation. The hard part is
-parlaying with Sheogorath, Daedric Prince of Madness for the intellectual
-property rights.
+Easily done. The hard part isn't doing the calculation. The hard part getting over
+your naive belief that mathematical operations should be rooted in some concrete
+concept rather than ``this is the way it's done because it makes the equations
+you'll see later work.''
 
 So now consider how we would multiply two matricies $A$ and $B$ if they had more
-than two dimensions. Let's use a concrete example to make the problems more apparent.
+than two dimensions. Let's use a concrete example to make the problems more
+structurally sound.
 Let $|A| = \left<5,7,7\right>$ and $|B| = \left<7,7,2,4\right>$.
 First of all, can we even multiply the two together? Hm... maybe? $|A|$ ends with
 $\left<\ldots, 7\right>$ and $|B|$ starts with $\left<7,\ldots\right>$ so it would
@@ -407,7 +419,7 @@ arbitrarily depend on the shape of the two matricies.
 
 What we really need is an operation which covers both lines of reasoning. To do
 so, we need to compleately abandon conventional algebras, and indeed any hope of
-returning to sanity. That's right, we're introducing a trinary operator.
+returning to sanity. That's right, we're introducing a ternary operator.
 
 I would argue that there shall always be some component of, 
 ``How many dimensions are you combining?'' inherent
@@ -1083,7 +1095,7 @@ with the shpe $\left<\right>$. It works with multiplication and derivatives. Loo
 \begin{theorem}[Empty Shape Multimatrix and Scalar Multiplication Equivalence]
 \label{s_mm_mult_equiv}
 For any multiplication operation defined between multimatricies and scalars,
-the scalar may be replaced by an equivalent empty-shaped multimatrix who's
+the scalar may be replaced by an equivalent empty-shaped multimatrix whose
 single value is that of the scalar.
 
 In other words, let $s \in \mathbb{R}$ and $S \in \mathbb{R}^{\left<\right>}$ such that
@@ -1345,11 +1357,13 @@ Multimatrix transposition clearly requires an additional parameter defining wher
 the cut happens in the shape vector.
 
 \begin{definition}[Multimatrix Transposition]
+\label{tran_def}
 Let $|X| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = l$ and $|\vec{r}| = r$
 \[ |\Tran(X, l)| = \vec{r} \oplus \vec{l} \]
 And,
 \[ \forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : \]
 \[ \Tran(X, l)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
+We call $l$ the index of transpose.
 \end{definition}
 
 Here's an example - get out your crayons and follow along.
@@ -1369,25 +1383,346 @@ You do the same thing with indicies. So,
 \[ M[1,2,3,4,5] = \Tran(M, 3)[4,5,1,2,3] \]
 \end{example}
 
-\begin{theorem}[Inverse Transpose]
-If $|X| = \vec{l} \oplus \vec{r}$
-\[ \Tran(\Tran(X, |\vec{l}|), |\vec{r}|) = X \]
+However, you'll see cases in later chapters of multimatrix transposes where
+the index of transpose is larger than the size of the shape matrix. So we need
+to make sense of that operation as well. Fortunately, there is a logical way
+to extend the definition. Consider that this transposition can be reasonably
+shown to be equivalent to moving the first index of the shape matrix
+to the end of the shape matrix over and over again, this can be done any number
+of times, therefore doing so for more than the size of the shape matrix still works,
+it just requires a bit of modular arithmetic.
+
+\begin{definition}[Multimatrix Transpose Extension]
+\label{tran_ext}
+For any multimatrix, the following transposes are equivalent,
+\[ \Tran(X, n) = \Tran(X, \remainder(n, ||X||)) \]
+Where $\remainder(n, ||X||)$ is the remainder of $n$ divided by $||X||$.
+That is, a value $0 \le \remainder(n, ||X||) < ||X||$ such that there exists an
+integer $k$ where, $n = k||X|| + \remainder(n, ||X||)$.
+\end{definition}
+
+This extension is consisent with the prevous definition because, for any
+index of transpose, $l$, that would be covered by the original definition,
+$0 \le l \le ||X||$, you can see that, in all but one case $\remainder(l, ||X||) = l$.
+The exception, $l = ||X||$ is covered by showing that
+$\remainder(||X||, ||X||) = 0$ and $\Tran(X, 0) = \Tran(X, ||X||)$. 
+
+Thus, we (by which I mean \textit{me} since \textit{you} certainly haven't done any
+of the work) have shown a natural equivalent class \cite{book:abstract} of transpose
+operations. On multimatricies with a shape of some length $n$ there are $n$ unique
+transpose; $\Tran(X, i)$ for all $0 \le i < n$. All other transposes are equivalent
+to one of these base transposes by our extended definition.
+
+To make use of this equivalence, we need to first show how these classes are
+isomorphic \cite{book:abstract} to a more manageable group.
+
+\begin{theorem}[Isomorphism of Transpostion and Modular Integers]
+\label{tran_int_iso}
+Let $\mathbb{T}_n$ be the set of possible transpositions on multimatricies with
+shapes of length $n$. Let $\circ$ be the operation of composition. Then
+$(\mathbb{T}_n, \circ)$ is a group which is isomorphic to the group of
+integers mod $n$ under addition. That is,
+\[ (\mathbb{T}_n, \circ) \cong (\mathbb{Z}_n, +) \]
 \end{theorem}
 \begin{proof}
-Let $|X| = \vec{l} \oplus \vec{r}$ then
-$\forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : $
-\[ \Tran(X, |\vec{l}|)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
-And so,
+I'll need to tackle this proof in two parts. First I'll need to show that
+that set of transpositions is a group under composition, then I'll need to
+provide a one-to-one and onto map that preseves the respective group operations
+between transpositions and integers mod $n$.
+
+\begin{ppart}
+To begin, I'll show that the set of all transpositions on multimatricies 
+with shapes of length $n$ form a group under composition.
+
+Let's look at the composition of some two transposes on a multimatrix.
+So, let $A$ be a multimatrix with shape of length $n$. Now let $x$ and $y$
+be indicies of transpositions. Then what is $\Tran(\Tran(A, x), y)$?
+To apply the the first transpose we need to break $|A|$ into two vectors,
+so let $|A| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = x$.
+
+Then,
+\[ |\Tran(A, x)| = \vec{r} \oplus \vec{l} \]
+And for all
+$\bar{l} \in \Dim(\vec{l})$ and $\bar{r} \in \Dim(\vec{r})$,
+\[ \Tran(A, x)[\bar{r} \oplus \bar{l}] = A[\bar{l} \oplus \bar{r}] \]
+
+Now to apply a transposition with index of transposition $y$ to $\Tran(A,x)$
+we need to break up $|\Tran(A,x)|$ into two vector, such as
+$|\Tran(A,x)| = \vec{l}' \oplus \vec{r}'$.
+
+Since we've already shown that $|\Tran(A,x)| = \vec{r} \oplus \vec{l}$
+we end up with two conceptual splits of that shape vector that need to
+be reconciled.
+
+\begin{case} $|\vec{l}'| \le |\vec{r}|$
+
+Then we can divide $|\Tran(A,x)|$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
+such that
+\[ |\Tran(A,x)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \vec{l}' = \vec{b} \]
+\[ \vec{r}' = \vec{c} \oplus \vec{a} \]
+\[ \vec{r} = \vec{b} \oplus \vec{c} \]
+\[ \vec{l} = \vec{a} \]
+It helps to think of the $\oplus$ operation as a cut in two separate places in the same
+vector because of the two conceptual splits from the two transpositions to see why this
+logic is valid.
+
+So we can then say,
+\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+
+And since,
+\[ |\Tran(\Tran(A, x), y)| = \vec{r}' \oplus \vec{l}' \]
+It follows that,
+\[ |\Tran(\Tran(A, x), y)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+
+Now, let $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and
+$\bar{c} \in \Dim(\vec{c})$. Notice that because of Theorem 
+\ref{dim_set_ind_concat_thm}, $\bar{c} \oplus \bar{a} \in \Dim(\vec{r}')$ and
+$\bar{b} \oplus \bar{c} \in \Dim(\vec{r})$.
+
+Continuing our definition of transposition,
 \begin{align*}
-	\Tran(\Tran(X, |\vec{l}|), |\vec{r}|)[\bar{l} \oplus \bar{r}]
-	&= \Tran(X, |\vec{l}|)[\bar{r} \oplus \bar{l}] \\
-	&= X[\bar{l} \oplus \bar{r}] \\
+  \Tran(\Tran(A, x), y)[\bar{c} \oplus \bar{a} \oplus \bar{b}]
+  &=
+  \Tran(A, x)[\bar{b} \oplus \bar{c} \oplus \bar{a}] \\
+  &=
+  A[\bar{a} \oplus \bar{b} \oplus \bar{c}]
 \end{align*}
-Therefore, 
-\[ \Tran(\Tran(X, |\vec{l}|), |\vec{r}|) = X \]
+
+See now that this composit operation is also a transposition, $\Tran(A, z)$ where,
+$z = |\vec{a} \oplus \vec{b}|$.
+So by definition,
+\begin{align*}
+  |\Tran(A, z)|
+  &=
+  \vec{c} \oplus \vec{b} \oplus \vec{a} \\
+  &=
+  |\Tran(\Tran(A, x), y)|  
+\end{align*}
+And,
+\begin{align*}
+  \Tran(A, z)[\bar{c} \oplus \bar{a} \oplus \bar{b}]
+  &=
+  A[\bar{a} \oplus \bar{b} \oplus \bar{c}] \\
+  &=
+  \Tran(\Tran(A, x), y)[\bar{c} \oplus \bar{a} \oplus \bar{b}]
+\end{align*}
+\end{case}
+
+\begin{case} $|\vec{l}'| > |\vec{r}|$
+Then we can divide $|\Tran(A,x)|$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
+such that
+\[ |\Tran(A,x)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \vec{l}' = \vec{c} \oplus \vec{a} \]
+\[ \vec{r}' = \vec{b} \]
+\[ \vec{r} = \vec{c} \]
+\[ \vec{l} = \vec{a} \oplus \vec{b} \]
+
+So we can then say,
+\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+
+And since,
+\[ |\Tran(\Tran(A, x), y)| = \vec{r}' \oplus \vec{l}' \]
+It follows that,
+\[ |\Tran(\Tran(A, x), y)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+
+Now, let $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and
+$\bar{c} \in \Dim(\vec{c})$. Notice that because of Theorem 
+\ref{dim_set_ind_concat_thm}, $\bar{c} \oplus \bar{a} \in \Dim(\vec{l}')$ and
+$\bar{a} \oplus \bar{b} \in \Dim(\vec{l})$.
+
+Continuing our definition of transposition,
+\begin{align*}
+  \Tran(\Tran(A, x), y)[\bar{b} \oplus \bar{c} \oplus \bar{a}]
+  &=
+  \Tran(A, x)[\bar{c} \oplus \bar{a} \oplus \bar{b}] \\
+  &=
+  A[\bar{a} \oplus \bar{b} \oplus \bar{c}]
+\end{align*}
+
+See now that this composit operation is also a transposition, $\Tran(A, z)$ where,
+$z = |\vec{a}|$.
+So by definition,
+\begin{align*}
+  |\Tran(A, z)|
+  &=
+  \vec{b} \oplus \vec{c} \oplus \vec{a} \\
+  &=
+  |\Tran(\Tran(A, x), y)|  
+\end{align*}
+And,
+\begin{align*}
+  \Tran(A, z)[\bar{b} \oplus \bar{c} \oplus \bar{a}]
+  &=
+  A[\bar{a} \oplus \bar{b} \oplus \bar{c}] \\
+  &=
+  \Tran(\Tran(A, x), y)[\bar{b} \oplus \bar{c} \oplus \bar{a}]
+\end{align*}
+\end{case}
+
+So I've shown that in both cases, the composit function of two transposes is
+itself a transpose. So transposes of multimatrcies of shape of length $n$ are
+a closed group under composition. Of.
+\end{ppart}
+
+\begin{ppart}
+In this last part, I'll define a bijective map
+$\phi: \mathbb{T}_n \to \mathbb{Z}_n$ for which
+\[ \phi(\Tran_y \circ \Tran_x) = \phi(\Tran(y)) + \phi(\Tran(x)) \]
+Which is the definition of an isomorphism.
+
+Note that I'm letting $\Tran_i$ be a shorthand for ``a transposition
+with index of transposition $i$ that is in $\mathbb{T}_n$''.
+
+So let's just define $\phi$.
+\[ \phi(\Tran_i) = i \]
+Done. I'm a genious.
+
+Ok, the hard part is showing that it preserves the group operations.
+Let's go back to our example in the first part of this proof. Let $A$ be
+any multimatrix with shape length $n$. Then let there be two transpositons
+$\Tran_x$ and $\Tran_y$ which we'll apply in series. First remember that
+to define $\Tran_x$ we needed to divide $|A|$ into $|A| = \vec{l} \oplus \vec{r}$
+where $|\vec{l}| = x$. Then we'd say that
+\[ |\Tran(A, x)| = \vec{r} \oplus \vec{l} \]
+Then to further apply $\Tran(\Tran(A, x), y)$ we need to divide $|\Tran(A,x)|$
+into,
+\[ |\Tran(A, x)| = \vec{l}' \oplus \vec{r}' \]
+Where $|\vec{l}'| = y$.
+That leads to two cases,
+
+\setcounter{case}{0}
+\begin{case} $|\vec{l}'| \le |\vec{r}|$
+
+And in this case we showed that we needed to split up $|A|$ into,
+\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ \vec{l}' = \vec{b} \]
+\[ \vec{r}' = \vec{c} \oplus \vec{a} \]
+\[ \vec{r} = \vec{b} \oplus \vec{c} \]
+\[ \vec{l} = \vec{a} \]
+
+So that,
+\[ |\Tran(A, x)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ |\Tran(\Tran(A, x), y)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+And note that,
+\[ x = |\vec{a}| \]
+\[ y = |\vec{b}| \]
+
+And we showed that the composit $\Tran_z = \Tran_y \circ \Tran_x$ was such
+that,
+\[ z = |\vec{a} \oplus \vec{b}| \]
+
+Consider that $\phi(\Tran_z) = z$, and so,
+\begin{align*}
+  z
+  &= |\vec{a} \oplus \vec{b}| \\
+  &= |\vec{a}| + |\vec{b}| \\
+  &= x + y \\
+  &= y + x \\
+  z &\equiv y + x \mod n \\
+  \phi(\Tran_z) &= \phi(\Tran_y) + \phi(\Tran_x) \\
+  \phi(\Tran_y \circ \Tran_x) &= \phi(\Tran_y) + \phi(\Tran_x)
+\end{align*}
+So in this case the isomorphism works.
+\end{case}
+
+\begin{case} $|\vec{l}'| > |\vec{r}|$
+
+And in this case we showed that we needed to split up $|A|$ into,
+\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ \vec{l}' = \vec{c} \oplus \vec{a} \]
+\[ \vec{r}' = \vec{b} \]
+\[ \vec{r} = \vec{c} \]
+\[ \vec{l} = \vec{a} \oplus \vec{b} \]
+
+So that,
+\[ |\Tran(A, x)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ |\Tran(\Tran(A, x), y)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+And note that,
+\[ x = |\vec{a} \oplus \vec{b}| \]
+\[ y = |\vec{c} \oplus \vec{a}| \]
+
+And we showed that the composit $\Tran_z = \Tran_y \circ \Tran_x$ was such
+that,
+\[ z = |\vec{a}| \]
+
+Consider that $\phi(\Tran_z) = z$, and so,
+\begin{align*}
+  z
+  &= |\vec{a}| \\
+  &\equiv |\vec{a}| + n \mod n \\
+  &\equiv |\vec{a}| + |\vec{a} \oplus \vec{b} \oplus \vec{c}| \mod n \\
+  &\equiv |\vec{a} \oplus \vec{a} \oplus \vec{b} \oplus \vec{c}| \mod n \\
+  &\equiv |\vec{c} \oplus \vec{a} \oplus \vec{a} \oplus \vec{b}| \mod n \\
+  &\equiv |\vec{c} \oplus \vec{a}| + |\vec{a} \oplus \vec{b}| \mod n \\
+  &\equiv y + x \mod n \\
+  \phi(\Tran_z) &= \phi(\Tran_y) + \phi(\Tran_x) \\
+  \phi(\Tran_y \circ \Tran_x) &= \phi(\Tran_y) + \phi(\Tran_x)
+\end{align*}
+So also in this case the isomorphism works.
+\end{case}
+
+So, in both cases $\phi$ is a valid isomorphism between $(\mathbb{T}_n, \circ)$
+and $(\mathbb{Z}_n, +)$.
+\end{ppart}
 \end{proof}
 
+Well what does that mean? I'm so glad you asked... weirdo who doesn't know what
+an isomorphism is but is several chapters into a hobby math book. It means that...
+
+\begin{corollary}[Stacked Transpose]
+For any multimatrix $A$ whose shape is $n$ long (an $n$ dimensional multimatrix
+in other words), it is always true that
+\[ \Tran(\Tran(A, x),y) = \Tran(A, \remainder(x+y,n)) \]
+\end{corollary}
+
+\begin{example}
+Let's take a look at a concrete example. Say we have a
+multimatrix $A$ who's shape is $\left<11, 3, 7, 5\right>$. 
+Then see that,
+\[ |\Tran(A, 2)| = \left<7, 5, 11, 3\right> \]
+And applying another transpose,
+\[ |\Tran(\Tran(A, 2), 3)| = \left<3, 7, 5, 11\right> \]
+Notice that our corollary says that this double transpose should be
+equal to the transpose $\Tran(A, \remainder(2+3, 4))$ which would
+be $\Tran(A, 1)$ and indeed it is:
+\begin{align*}
+  |\Tran(A, 1)|
+  &= \left<3, 7, 5, 11\right> \\
+  &= |\Tran(\Tran(A, 2), 3)|
+\end{align*}
+\end{example}
+
+Another useful corollary from Theorem \ref{tran_int_iso} shows you how to
+undo transposition operations with other transposition operations.
+
+\begin{corollary}[Inverse Transpose]
+Let $A$ be a multimatrix such that $||A|| = n$. And let
+$x$ be some integer. Then, the inverse of $\Tran_x$ is
+$\Tran_{-x}$. That is,
+\[ \Tran(\Tran(A, x), -x) = X \]
+\end{corollary}
+
+\begin{example}
+Say you have a multimatrix, $A$, of shape $\left<2,7,1,8,3\right>$.
+Let's apply a transpose to it, $\Tran_3$, and we'll get the shape,
+\[ |\Tran(A, 3)| = \left<8,3,2,7,1\right> \]
+Now, to get back to $A$ we can apply another transpose $\Tran_{-3}$ according
+to the above corollary.
+Our extended definition of transposition (Def. \ref{tran_ext})
+tells us that this is equal to $\Tran_{\remainder(-3, 5)} = \Tran_{2}$.
+So the inverse of $\Tran_3$ is $\Tran_2$, which we can see here:
+\begin{align*}
+  |\Tran(\Tran(A, 3), 2)|
+  &= \left<2,7,1,8,3\right> \\
+  &= |A|
+\end{align*}
+\end{example}
+
+TODO: explosition
+
 \begin{theorem}[Identity Transpose]
+TODO: setup
 \[ \Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x}) \]
 \end{theorem}
 \begin{proof}
@@ -1427,6 +1762,8 @@ Therefore
 $\Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x})$
 \end{proof}
 
+TODO: exposition here
+
 \begin{theorem}[Transposition of Multimatrix Multiplication]
 \label{mm_tran_mult}
 Let $|A| = \vec{a} \oplus \vec{c}$ and $|B| = \vec{c} \oplus \vec{b}$ then
@@ -1458,6 +1795,8 @@ Then,
 \end{align*}
 \end{proof}
 
+TODO: exposition here
+
 \begin{theorem}[Communicativity of Scalar Multiplication and Transposition]
 Let $s$ be a scalar, $x$ be in $\mathbb{N} \cup \{0\}$, and $A$ be
 a multimatrix on which $\Tran(A, x)$ is defined. Then,
@@ -1476,6 +1815,8 @@ let $\bar{x} \in \Dim(\vec{x})$ and $\bar{a} \in \Dim(\vec{a})$. So,
 Therefore $s\Tran(A, x) = \Tran(sA, x)$.
 \end{proof}
 
+TODO: exposition here
+
 \begin{theorem}[Communicativity of Addition and Transposition]
 \label{com_add_tran_thm}
 Let $x$ be in $\mathbb{N} \cup \{0\}$ and let $A$ and $B$ be
@@ -1485,30 +1826,6 @@ Then,
 \end{theorem}
 \begin{proof}
 Left as an exercise for the reader (Exercise \ref{com_add_tran_ex}).
-\end{proof}
-
-\begin{theorem}[Stacked Transposition]
-\[ \Tran(\Tran(A, x), y) = \Tran(A, x+y) \]
-\end{theorem}
-\begin{proof}
-Let $|A| = \vec{x} \oplus \vec{y} \oplus \vec{a}$ where $|\vec{x}| = x$ and
-$|\vec{y}| = y$. Note that,
-\[ |\Tran(A, x)| = \vec{y} \oplus \vec{a} \oplus \vec{x} \]
-And,
-\[ |\Tran(\Tran(A, x), y)| = \vec{a} \oplus \vec{x} \oplus \vec{y} \]
-Also that,
-\[ |\Tran(A, x+y)| = \vec{a} \oplus \vec{x} \oplus \vec{y} \]
-So $|\Tran(\Tran(A, x), y)| = \Tran(A, x+y)$ which is necessary but not
-sufficient for this proof.
-
-To show the elementwise equivalence, let $\bar{x} \in \Dim(\vec{x})$,
-$\bar{y} \in \Dim(\vec{y})$, and $\bar{a} \in \Dim(\vec{a})$. Then,
-\begin{align*}
-  \Tran(\Tran(A, x), y)[\bar{a} \oplus \bar{x} \oplus \bar{y}]
-  &= A[\bar{x} \oplus \bar{y} \oplus \bar{a}] \\
-  &= \Tran(A, x+y)[\bar{a} \oplus \bar{x} \oplus \bar{y}]
-\end{align*}
-Which shows that $\Tran(\Tran(A, x), y) = \Tran(A, x+y)$
 \end{proof}
 
 \section{Exercises}
@@ -1824,6 +2141,7 @@ Therefore $d(sF(X))/dX = s(dF(X)/dX)$
 
 \begin{landscape}
 \begin{theorem}[Multiplication Rule]
+\label{multiplication_rule}
 Let $|F| = \vec{f} \oplus \vec{c}$, $|G| = \vec{c} \oplus \vec{g}$,
 and $|X| = \vec{x}$. Then,
 \begin{align*}
@@ -2024,7 +2342,7 @@ Which, taking a look at the definition of multidimensional matrix multiplication
 
 \begin{displayquote}
 ``I'm not saying Machine Learning is a portal to a demon universe, I'm just saying
-that some doors are best left unopened.'' - James Mickens, AKA `Galactic Viceroy of Research Excellence', USENIX Security '18-Q
+that some doors are best left unopened.'' - James Mickens, AKA `Galactic Viceroy of Research Excellence', USENIX Security 2018
 \end{displayquote}
 
 \begin{definition}[Sum]
@@ -2077,12 +2395,55 @@ such that
 \end{definition}
 
 \begin{theorem}[Derivative of Sum of Squares]
+Let $X$ be any multimatrix then,
 \[ \frac{d \SoS(X)}{dX} = 2X \]
 \end{theorem}
 \begin{proof}
-Notice that $\SoS(X) = X \mmult{|\vec{x}|} X$...
-
-TODO
+Let $|X| = \vec{x}$. Notice that $\SoS(X) = X \mmult{|\vec{x}|} X$ since,
+$|X \mmult{|\vec{x}|} X| = \left<\right>$ and,
+\[
+  \left(X \mmult{|\vec{x}|} X\right)[\left<\right> \oplus \left<\right>]
+  =
+  \sum_{\forall \bar{x} \in \Dim(\vec{x})}
+    X[\left<\right> \oplus \bar{x}]
+    X[\bar{x} \oplus \left<\right>]
+\]
+Then, by the multiplication rule (Thm. \ref{multiplication_rule}),
+\begin{align*}
+  \frac{d\left(X \mmult{|\vec{x}|} X\right)}{dX}
+  &=
+  X \mmult{|\vec{x}|} \frac{dX}{dX} +
+  \Tran\left(
+    \Tran(X, |\vec{x}|)
+      \mmult{|\vec{x}|}
+    \Tran\left(\frac{dX}{dX}, |\vec{x}|\right),
+    |\vec{x} \oplus \vec{x}|
+  \right) \\
+  &=
+  X \mmult{|\vec{x}|} \Ident^2(|X|) +
+  \Tran\left(
+    X
+      \mmult{|\vec{x}|}
+    \Tran\left(\Ident^2(|X|), |\vec{x}|\right),
+    |\vec{x} \oplus \vec{x}|
+  \right) \\
+  &=
+  X +
+  \Tran\left(
+    X
+      \mmult{|\vec{x}|}
+    \Ident^2(|X|),
+    |\vec{x} \oplus \vec{x}|
+  \right) \\
+  &=
+  X +
+  \Tran\left(
+    X,
+    |\vec{x} \oplus \vec{x}|
+  \right) \\
+  &= X + X \\
+  &= 2X
+\end{align*}
 \end{proof}
 
 \begin{definition}[Softmax]
