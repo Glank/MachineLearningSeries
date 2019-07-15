@@ -1,13 +1,13 @@
-paper.pdf: paper.tex
-	pdflatex paper
-	-bibtex paper
-	pdflatex paper
-	pdflatex paper
+book.pdf: book.tex book.bib
+	pdflatex book
+	-bibtex book
+	pdflatex book
+	pdflatex book
 
 clean:
-	-rm paper.aux
-	-rm paper.log
-	-rm paper.pdf
-	-rm paper.bbl
-	-rm paper.blg
-	-rm paper.toc
+	-rm book.aux
+	-rm book.log
+	-rm book.pdf
+	-rm book.bbl
+	-rm book.blg
+	-rm book.toc

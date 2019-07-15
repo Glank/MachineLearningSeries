@@ -11,20 +11,24 @@
 \usepackage{etoolbox}
 \usepackage{csquotes}
 \usepackage[normalem]{ulem}
+\usepackage[toc,page]{appendix}
 
-\title{Multimatrices and Their Derivatives}
+\title{%
+  Multimatrices and Their Derivatives \\
+  \large An Impractical Guide to Global Conquest}
 \author{Ernest Kirstein}
 \date{\today}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[chapter]
 
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[chapter]
 \newtheorem{exercise}{Exercise}[chapter]
-
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[chapter]
 \newtheorem{corollary}{Corollary}[theorem]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{example}{Example}[chapter]
+\newtheorem{drule}{Rule}
 
 \newtheoremstyle{ppart}{}{}{}{}{}{:}{ }{}
 \theoremstyle{ppart}
@@ -59,18 +63,19 @@
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
+\newcommand{\dmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\,\bullet\,}$}}}
 
 \begin{document}
 
 \maketitle
 
 \chapter*{Preface}
-I was working my way through a hobby programming project, trying to get my
-machine to do some learning, and ran into a problem.
+I was working my way through a hobby programming project, trying to create a so called
+`deep fake' of Danny DeVito's face on Scarlett Johansson's body, and ran into a problem.
 The existing notation for taking derivatives of matrix equations is terrible.
 It's so deliberately obtuse that I could only conclude that some hidden cabal of
-mathematicians is actively working to sabotage our glorious yet-to-be-built
-AI overlords. I, for one, will not stand for such blasphemy.
+mathematicians is actively working to sabotage the rise of our glorious AI overlords.
+I, for one, will not stand for such heresy.
 
 So, I set out to invent a system of my own. Much to my surprise, some of the
 results with were rather elegant. For example, I stumbled onto a
@@ -93,7 +98,7 @@ multimatricies - and how they can simplify derivatives of matrix equations.
 
 \begin{displayquote}
 ``If you're a bit touched, like I am, you may want to make a dedicated tool.'' -
-This Old Tony, `Making Springs At Home'
+This Old Tony, `Making Springs At Home' \cite{youtube:tony}
 \end{displayquote}
 
 \section{Motivating the Multimatrix}
@@ -229,7 +234,46 @@ We'll use the notation $M[\bar{v}]$ to reference any individual scalar value of 
 at indicies $\bar{v} \in \Dim(|M|)$. 
 \end{definition}
 
-I'll give you a theorem here and make you prove it yourself because I'm a jerk.
+That's a huge informtion dump so look at an example.
+
+\begin{example}
+Let $M$ be one of these newfangled `multimatrix' things. According to our
+definition, we also need to define a shape for the multimatrix. Let's
+say that our shape is $\left<5,7,9,2,3\right>$. In our notation, that
+means that,
+\[ |M| = \left<5,7,9,2,3\right> \]
+Let's name this shape vector, $|M| = \vec{m}$. Notice that this is
+a 5 dimensional multimatrix because $|\vec{m}| = 5$. Also note the
+subtle difference in $||M||$ which is 5 and $|M|$ which is $\vec{m}$.
+
+Let's look at some individual elements of $M$. We can say that,
+\[ M[5,4,3,2,1] = 3 \]
+And,
+\[ M[4,3,2,1,1] = -8.5 \]
+We can say that because we're just making up this multimatrix, but also
+because $\left<5,4,3,2,1\right>$ and $\left<4,3,2,1,1\right>$
+are both in $\Dim(\vec{m})$. That is to say, they're both valid
+indexes of $M$.
+
+Remember that $\Dim(\vec{m})$ is the set of valid indexes of $M$.
+You can tell that the size of  $\Dim(\vec{m})$ is
+$5 \times 7 \times 9 \times 2 \times 3 = 1890$, which is the number of
+elements of $M$.
+
+If $\left<5,4,3,2,1\right> = \bar{a}$ and $\left<4,3,2,1,1\right> = \bar{b}$
+then we can say that $\bar{a} \in \Dim(\vec{m})$ and $\bar{b} \in \Dim(\vec{m})$
+because both are valid indexes of $M$.
+
+We can uses the indexes to reference $M$ like this,
+\[ M[\bar{a}] = 3 \]
+And this,
+\[ M[\bar{b}] = -8.5 \]
+\end{example}
+
+Now that you seem to understand.. Don't give me that look... well if you're confused
+you should have been asking questions, moving on. Now that \textit{most of you}
+seem to have understood, I'll give you a theorem to prove.
+
 \begin{theorem}[Dimensional Set and Index Concatenation]
 \label{dim_set_ind_concat_thm}
 If $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$ then,
@@ -367,7 +411,8 @@ What is the shape of $df/dX$? If $\bar{v} \in \Dim(|df/dX|)$ then what is
 \begin{displayquote}
 ``The universe is a cruel, uncaring void. The key to being happy isn't a search
 for meaning. It's to just keep yourself busy with unimportant nonsense, and eventually,
-you'll be dead.'' - Mr. Peanutbutter, BoJack Horseman
+you'll be dead.'' - Mr. Peanutbutter (BoJack Horseman Season 1, Episode 12
+\cite{bojack})
 \end{displayquote}
 
 \section{Defining Multiplication}
@@ -392,12 +437,12 @@ $|C| = \left< r_a, c_b \right>$. Each element of $C$ is a sum of the product of
 every combination of the corresponding row of $A$ and the corresponding column of
 $B$,
 
-\[ C[r_a, c_b] = \sum_{\forall i} A[r_a, i] B[i, c_b] \]
+\[ C[r_c, c_c] = \sum_{\forall i} A[r_c, i] B[i, c_c] \]
 
 Easily done. The hard part isn't doing the calculation. The hard part getting over
 your naive belief that mathematical operations should be rooted in some concrete
 concept rather than ``this is the way it's done because it makes the equations
-you'll see later work.''
+work.''
 
 So now consider how we would multiply two matricies $A$ and $B$ if they had more
 than two dimensions. Let's use a concrete example to make the problems more
@@ -528,10 +573,26 @@ $\bar{x}_1$ & $\bar{x}_2$ & $(A \mmult{2} B)[\bar{x}]$ & = & = \\
 \end{example}
 \newpage
 
+It's important to notice that this operation is identital to standard
+matrix multiplication for two dimensional multimatrices. For instance,
+if $A$ and $B$ are two dimensional multimatricies with shapes
+$|A| = \left<l_a, r_a\right>$ and $|B| = \left<l_b, r_b\right>$
+their product $A \mmult{1} B$ is valid if and only if $r_a = l_b$ and
+the result is of shape $|A \mmult{1} B| = \left<l_a, r_b\right>$.
+And of course, the value at each index
+$\left<l_c, r_c\right> \in \Dim(|A \mmult{1} B|)$ is,
+\[
+  (A \mmult{1} B)[l_c, r_c]
+  =
+  \sum_{\forall 1 \le x \le r_a} 
+  A[l_c, x] B[x, r_c]
+\]
+All of which would be the same if this was regular matrix multiplication.
+
 \section{Rules of Multimatrix Multiplication}
 
 Like two dimensional matrix multiplication, multimatrix multiplication is
-\textit{not} communicative. And it is only weakly associative. That sounds like
+not (usually) communicative. And it is only weakly associative. That sounds like
 nonsense, and ideed it is, but I shall prove it to you.
 
 Multimatrix multiplication may not even make sense dimensionally when you move
@@ -693,6 +754,16 @@ the same shape and every cell with the same index in each is equal, the two
 values must be equal.
 \end{proof}
 
+TODO: exposition
+
+\begin{theorem}[Communicativity of Multiplication]
+Let $|A| = \vec{x}$ and $|B| = \vec{x}$. Then,
+\[ A \mmult{|\vec{x}|} B = B \mmult{|\vec{x}|} A \]
+\end{theorem}
+\begin{proof}
+TODO
+\end{proof}
+
 \section{Multiplicative Identities}
 
 Multiplicative identities for multimatricies depend on the shape of the
@@ -807,6 +878,7 @@ The square identity also pops up in the derivative of a multimatrix
 with respect to itself.
 
 \begin{theorem}[Self Derivative]
+\label{self_derivative}
 Let $X$ be some multimatrix. Then,
 \[ \frac{dX}{dX} = \Ident^2(|X|) \]
 \end{theorem}
@@ -840,6 +912,7 @@ functions. Which is one of the reaspons I needed to expand my definition of
 identities beyond $\Ident^2(\vec{v})$.
 
 \begin{theorem}[Elementwise Derivative]
+\label{elementwise_derivative}
 Let $M$ be an element wise function on $X$. That is, Let $M(X)$ be a function
 such that,
 \[ M(X) : \mathbb{R}^{\vec{x}} \to \mathbb{R}^{\vec{x}} \]
@@ -992,6 +1065,86 @@ and $\bar{b} \in \Dim(\vec{b}):$
 	A[\bar{a}] B[\bar{b}] \\
 \end{align*}
 \end{proof}
+
+\section{Multimatrix Hadamard Product}
+
+\begin{displayquote}
+TODO
+\end{displayquote}
+
+What the hell is a `Hadamard product'? The Hadamar product of two matricies
+is how one would actually expect matrix multiplication to work.
+
+In short, if two matricies, $A$ and $B$ have the same shape,
+\[ |A| = |B| = \left<r,c\right> \]
+Then their Hadamard Product, $A \bullet B$, is the same shape and each element
+is just the product of the corresponding elements of $A$ and $B$. That is,
+\[ (A \bullet B)[r,c] = A[r,c] B[r,c] \]
+
+This seems to extend quite naturally into the world of multimatricies.
+But hold on - there's a catch. While the Hadamard product only logically applies
+to regular matricies when their shapes are exactly equal, there are case where
+the Hadamard product can easily be applied to differently shaped multimatricies,
+they just need to have overlapping portions of their shape vectors, just as
+with multimatrix multiplication.
+
+\begin{definition}[Multimatrix Hadamard Product]
+\label{multi_had_prod}
+Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$
+and $|B| = \vec{c} \oplus \vec{b}$. Also let $c = |\vec{c}|$.
+Then, the multimatrix Hadamard product, $A \dmult{c} B$, is a multimatrix
+such that,
+\[ |A \dmult{n} B| = \vec{a} \oplus \vec{c} \oplus \vec{b} \]
+And for any $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$,
+and $\bar{c} \in \Dim(\vec{c})$,
+\[
+  (A \dmult{n} B)[\bar{a} \oplus \bar{c} \oplus \bar{b}]
+  = A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}]
+\]
+\end{definition}
+
+TODO: exposition
+
+\begin{theorem}[Equivalent Zero Hadamard Product and Multiplication]
+\[ A \dmult{0} B = A \mmult{0} B \]
+\end{theorem}
+\begin{proof}
+TODO: exercise?
+\end{proof}
+
+TODO: associative?
+
+TODO: exposition
+
+\begin{theorem}[Equivalent Hadamard Product and Multiplication Chains]
+When $X_1 \ldots X_{m-1}$ are all in $\mathbb{R}^{\vec{x}}$ and
+$|X_m| = \vec{x} \oplus \vec{r}$ for any $\vec{r}$,
+\[
+  (((\Ident^n(\vec{x})
+  \mmult{|\vec{x}|} X_1) \mmult{|\vec{x}|} X_2) \mmult{|\vec{x}|} X_3)
+  \ldots X_m
+  =
+  \Ident^{n-m}(\vec{x})
+  \dmult{|\vec{x}|} X_1 \dmult{|\vec{x}|} X_2 \dmult{|\vec{x}|} X_3
+  \ldots X_m
+\]
+And when $X_2 \ldots X_m$ are all in $\mathbb{R}^{\vec{x}}$ and
+$|X_1| = \vec{l} \oplus \vec{x}$ for any $\vec{l}$,
+\[
+  X_1 \mmult{|\vec{x}|} (X_2 \mmult{|\vec{x}|} (X_3
+  \ldots (X_m \mmult{|\vec{x}|} 
+  \Ident^n(\vec{x}))))
+  =
+  X_1 \dmult{|\vec{x}|} X_2 \dmult{|\vec{x}|} X_3
+  \ldots X_m \dmult{|\vec{x}|} 
+  \Ident^{n-m}(\vec{x})
+\]
+\end{theorem}
+\begin{proof}
+TODO 
+\end{proof}
+
+TODO: Communicative property
 
 \section{Exercises}
 
@@ -1719,10 +1872,12 @@ So the inverse of $\Tran_3$ is $\Tran_2$, which we can see here:
 \end{align*}
 \end{example}
 
-TODO: explosition
+Now that you understand the basics of transposition, let's take a look
+at some theorems involving it.
 
 \begin{theorem}[Identity Transpose]
-TODO: setup
+Let $n$ be a positive integer and let $\vec{x}$ be a positive length
+shape vector. Then for any integer $k$,
 \[ \Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x}) \]
 \end{theorem}
 \begin{proof}
@@ -1748,7 +1903,7 @@ Let $X'$ be some ordered permutation of $X$, then we can reason that,
 	\right.\\
  &=\Ident^n(\vec{n})\left[\bigoplus X\right]
 \end{align*}
-Since for
+Since for the permutation
 $X' = \left\{\bar{x}_{k+1}, \bar{x}_{k+2} \ldots \bar{x}_{n},
 \bar{x}_1, \bar{x}_2 \ldots \bar{x}_k\right\}$
 \begin{align*}
@@ -1762,7 +1917,11 @@ Therefore
 $\Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x})$
 \end{proof}
 
-TODO: exposition here
+The above theorem is useful whenever you come accross a transpose of a
+multimatrix identity.
+
+Another useful theorem for whenever you need to change the order of
+multimatrix multiplications is this one,
 
 \begin{theorem}[Transposition of Multimatrix Multiplication]
 \label{mm_tran_mult}
@@ -2094,6 +2253,7 @@ we have shown that,
 
 
 \begin{theorem}[Addition Rule]
+\label{addition_drule}
 \[ \frac{d(F(X) + G(X))}{dX} = \frac{dF(X)}{dX} + \frac{dG(X)}{dX} \]
 \end{theorem}
 \begin{proof}
@@ -2119,7 +2279,9 @@ A rule for derivatives involving scalar multiplication also seems generally
 useful. Of course, by the Theorem \ref{s_mm_mult_equiv}, this is just a very specific
 case of Theorem \ref{right_mult_derivative} but the proof is simple and worth
 the additional ink, I think,
+
 \begin{theorem}[Scalar Multiplication Rule]
+\label{scalar_mult_drule}
 \[ \frac{d(sF(X))}{dX} = s\frac{dF(X)}{dX} \]
 \end{theorem}
 \begin{proof}
@@ -2817,6 +2979,8 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 \end{proof}
 \end{landscape}
 
+\begin{appendices}
+
 \chapter{Solutions to the Exercises}
 
 \solutionsection{1}
@@ -2858,8 +3022,96 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 \end{enumerate}
 \end{solution}
 
+\chapter{Derivative Rule List}
 
-\bibliography{paper}
+\begin{drule}
+Self Derivative (Thm. \ref{self_derivative})
+\[ \frac{dX}{dX} = \Ident^2(|X|) \]
+\end{drule}
+
+\begin{drule}
+Elementwise Derivative (Thm. \ref{elementwise_derivative})
+\[ \frac{dM(X)}{dX} = \Ident^3(|X|) \mmult{||X||} M'(X) \]
+\end{drule}
+
+\begin{drule}
+Empty Shape Multimatrix and Scalar Domain Derivative Equivalence
+(Thm. \ref{s_mm_domain_equiv})
+\[ G(X) = F(X[\left<\right>]) \]
+Implies,
+\[ \frac{dF(x)}{dx} = \frac{dG(X)}{dX} \]
+\end{drule}
+
+\begin{drule}
+Empty Shape Multimatrix and Scalar Range Derivative Equivalence
+(Thm. \ref{s_mm_range_equiv})
+\[ F(X)[\left<\right>] = f(X) \]
+Implies,
+\[ \frac{df(X)}{dX} = \frac{dF(X)}{dX} \]
+\end{drule}
+
+\begin{drule}
+Transpose Derivative
+(Thm. \ref{tran_derivative})
+\[ |X| = \vec{l} \oplus \vec{r} \]
+Implies,
+\[
+ \frac{d\Tran(X, |\vec{l}|)}{dX} =
+ \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), |\vec{r}|)
+\]
+\end{drule}
+
+\begin{drule}
+Right Multiplicative Derivative
+(Thm. \ref{right_mult_derivative})
+\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
+\end{drule}
+
+\begin{drule}
+Left Multiplicative Derivative
+(Thm. \ref{left_mult_derivative})
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n) \]
+\end{drule}
+
+\begin{drule}
+Addition Rule
+(Thm. \ref{addition_drule})
+\[ \frac{d(F(X) + G(X))}{dX} = \frac{dF(X)}{dX} + \frac{dG(X)}{dX} \]
+\end{drule}
+
+\begin{drule}
+Scalar Multiplication Rule
+(Thm. \ref{scalar_mult_drule})
+\[ \frac{d(sF(X))}{dX} = s\frac{dF(X)}{dX} \]
+\end{drule}
+
+\begin{drule}
+Multiplication Rule
+(Thm. \ref{multiplication_rule})
+
+Let $|F| = \vec{f} \oplus \vec{c}$, $|G| = \vec{c} \oplus \vec{g}$,
+and $|X| = \vec{x}$. Then,
+\begin{align*}
+ \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX} =&
+ F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} + \\
+ &\Tran\left(
+   \Tran(G(X), |\vec{c}|)
+     \mmult{|\vec{c}|}
+   \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right),
+   |\vec{g} \oplus \vec{x}|
+ \right)
+\end{align*}
+\end{drule}
+
+\begin{drule}
+Chain Rule
+(Thm. \ref{mmm_chain_rule})
+\[ \frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{||G||} \frac{dG}{dX} \]
+\end{drule}
+
+\end{appendices}
+
+\bibliography{book}
 \bibliographystyle{ieeetr}
 
 \end{document}
