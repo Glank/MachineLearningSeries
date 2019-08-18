@@ -215,12 +215,41 @@ void TestIdentityMultiplication() {
   }
 }
 
+void TestSparseMultiplication() {
+  std::cout << "TestSparseMultiplication..." << std::endl;
+
+  SparseMMatrix a({2,2});
+  a.set({0,0}, 2);
+  a.set({1,1}, 7);
+  
+  SparseMMatrix b({2,3});
+  b.set({0,1}, -2);
+  b.set({0,2}, 3);
+  b.set({1,1}, 5);
+  b.set({1,2}, 6);
+
+  SparseMMatrix out({2,3});
+  Multiply(1, &a, &b, &out);
+
+  SparseMMatrix expected({2,3});
+  expected.set({0,1}, 2*-2);
+  expected.set({0,2}, 2*3);
+  expected.set({1,1}, 7*5);
+  expected.set({1,2}, 7*6);
+
+  if (!AreEqual(&out, &expected)) {
+    std::cerr << "Error multiplying sparse matricies. Should be equal." << std::endl;
+    std::exit(1);
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
   TestMMatrixMultiplication();
   TestMMatrixMultiplicationAssociation();
   TestIdentityMultiplication();
+  TestSparseMultiplication();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }

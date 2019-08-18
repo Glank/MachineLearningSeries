@@ -1066,6 +1066,39 @@ and $\bar{b} \in \Dim(\vec{b}):$
 \end{align*}
 \end{proof}
 
+\section{Multiplicative Inverses}
+
+Given a multimatrix, $M$, you might ask, ``What is the multiplicative inverse of $M$?''
+And I would have to tell you that your question is not well formed.
+
+Since multimatrix multiplication is a trinary operation, you need to factor in the
+index of multipliction. Consider multiplication by $M$ a function on $X$ - some other
+multimatrix. That is, 
+\[ F(X; M, m) = M \mmult{m} X \]
+
+What we're looking for in a `multiplicative inverse' is actually a function which,
+when composed with $F$, results in $X$. That is,
+
+\[ (F^{-1} \circ F)(X) = F^{-1}(M \mmult{m} X) = X \]
+
+That inverse function, $F^{-1}$ also needs to be a multiplication operation to
+really be a `multiplicative inverse', so we can assume that it is defined by
+some multimatrix $N$ and some inverting index of multiplication $n$, such that,
+
+\[ F^{-1} (Y; N, n) = N \mmult{n} Y \]
+
+Let's say that $M$ has some shape $\vec{l} \oplus \vec{r}$ such that $|\vec{r}| = m$.
+Then it is only applicable for an $m$ overlap multiplication on some $X$ where,
+$|X| = \vec{r} \oplus \vec{x}$ for some $\vec{x}$.
+
+So since,
+\[ |M \mmult{m} X| = \vec{l} \oplus \vec{x}\]
+and
+\[ |N \mmult{n} (M \mmult{m} X)| = |X| = \vec{r} \oplus \vec{x} \]
+It must be true that, $n = |\vec{l}|$ and $|N| = \vec{r} \oplus \vec{l}$.
+
+TODO
+
 \section{Hadamard Product}
 
 What the hell is a `Hadamard product'? The Hadamard product \cite{wiki:hadamard}
@@ -2173,7 +2206,9 @@ For all $\bar{a}$, $\bar{x}_1$, $\bar{n}$ and $\bar{x}_2$. Therefore,
 \begin{landscape}
 \begin{theorem}[Left Multiplicative Derivative]
 \label{left_mult_derivative}
-\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n) \]
+If $|X| = \vec{x} \oplus \vec{n}$ and $|A| = \vec{n} \oplus \vec{a}$
+and $n = |\vec{n}|$ and $a = |\vec{a}|$ then,
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n) \]
 \end{theorem}
 \begin{proof}
 Let $|X| = \vec{x} \oplus \vec{n}$ and $|A| = \vec{n} \oplus \vec{a}$. Then,
@@ -2212,7 +2247,7 @@ $\bar{x}_1, \bar{x}_2 \in \Dim(\vec{x}), \bar{a}_1 \in \Dim(\vec{a}),
 \end{align*}
 We can also show that,
 \begin{align*}
-	\left(\Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n)\right)
+	\left(\Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n)\right)
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 	&=
 	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a}_1)}
@@ -2235,14 +2270,14 @@ Then since,
 	\frac{d(X \mmult{n} A)}{dX}
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 	=
-	\left(\Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n)\right)
+	\left(\Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n)\right)
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 \]
 we have shown that,
 \[
 	\frac{d(X \mmult{n} A)}{dX}
 	=
-	\Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n)
+	\Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n)
 \]
 \end{proof}
 \end{landscape}
