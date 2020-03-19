@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 namespace mmatrix {
 
@@ -58,6 +59,11 @@ void DenseMMatrix::set(int i, float value) {
 const vector<int>& DenseMMatrix::shape() const {
   return shape_;
 }
+void DenseMMatrix::zero() {
+  for (int i = 0; i < values_.size(); i++) {
+    values_[i] = 0;
+  }
+}
 
 SparseMMatrix::SparseMMatrix(const std::vector<int>& shape) : shape_(shape) {}
 float SparseMMatrix::get(int i) const {
@@ -82,6 +88,12 @@ const std::vector<int>& SparseMMatrix::shape() const {
 }
 const internal::Type* SparseMMatrix::type() const {
   return &type_;
+}
+void SparseMMatrix::zero() {
+  values_.clear();
+}
+int SparseMMatrix::size() const {
+  return values_.size();
 }
 namespace {
 internal::Type InitSparseMMatrixType() {
@@ -191,17 +203,30 @@ void Multiply(int n, const SparseMMatrix* a, const SparseMMatrix* b,
     }
     rBound *= b->shape()[n+i];
   }
-  // TODO: take advantage of sparse multiplication
-  for (int vl = 0; vl < lBound; vl++) {
-    for (int vr = 0; vr < rBound; vr++) {
-      float sum = 0;
-      for (int vm = 0; vm < midBound; vm++) {
-        int va = vl+vm*lBound;
+
+  int a_index_ops = a->size()*rBound;
+  int b_index_ops = b->size()*lBound;
+
+  out->zero();
+  if (a_index_ops <= b_index_ops) {
+    for (const auto& a_pair : *a) {
+      int vl = a_pair.first % lBound;
+      int vm = a_pair.first / lBound;
+      for (int vr = 0; vr < rBound; vr++) {
+        int vo = vl+vr*lBound;
         int vb = vm+vr*midBound;
-        sum += a->get(va)*b->get(vb);
+        out->set(vo, out->get(vo) + a_pair.second*b->get(vb));
       }
-      int vo = vl+vr*lBound;
-      out->set(vo, sum);
+    }
+  } else {
+    for (const auto& b_pair : *b) {
+      int vm = b_pair.first % midBound;
+      int vr = b_pair.first / midBound;
+      for (int vl = 0; vl < lBound; vl++) {
+        int va = vl+vm*lBound;
+        int vo = vl+vr*lBound;
+        out->set(vo, out->get(vo) + a->get(va)*b_pair.second);
+      }
     }
   }
 }

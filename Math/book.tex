@@ -103,16 +103,16 @@ This Old Tony, `Making Springs At Home' \cite{youtube:tony}
 
 \section{Motivating the Multimatrix}
 
-Let us consider a traditional matrix equation - one contrived on the spot for the
-purposes of adding an additional layer of confusion to the situation.
+To demonstrate how the problem with traditional matricies, let's take a look at a
+simple matrix equation. 
 
-As is tradition, let one matrix $X$ represent the scientific education level of
-undergraduates, who work in a densely packed 3 by 5 grid (which is also traditional).
+Let one matrix $X$ represent the level of scientific education level of a set of
+undergraduates who work in a densely packed 3 by 5 office.
 Then let $B$ represent the belief each of those undergradutes has in a higher power.
 
-It has been shown that an undergraduate's belief in a higher power fluctuates with
-respect to their scientific education in a sinusoidal pattern
-(Weinersmith, 2010 \cite{weinersmith:education}).
+As we all know, Weinersmith's hypothisis states that an undergraduate's belief in a
+higher power fluctuates with respect to their scientific education in a sinusoidal
+pattern (Weinersmith, 2010 \cite{weinersmith:education}).
 
 Formally, the shape of these two matricies are defined,
 $|B| = |X| = \left< 3,5 \right>$.
@@ -173,10 +173,12 @@ And so, the size of the complete derivate would be,
 \[
 \mbox{size}\left(\frac{dB}{dX}\right) = \mbox{size}(B) \mbox{size}(X)
 \]
-And perhaps we could even let this help us define the `shape' of the complete
-derivative. This complete derivative would need to be composed of partial
-derivatives, so it would make sense to just smush the shapes of the input
-matrix and the output matrix together,
+Perhaps we could even let this help us define the `shape' of the complete
+derivative. Note that there seem to be four independent indicies to each element
+of this matrix, namely $r_1$, $c_1$, $r_2$, and $c_2$.
+And since a complete derivative would need to be composed of partial derivatives
+it would make sense to just smush the shapes of the input matrix and the output
+matrix together,
 \begin{align*}
 \left|\frac{dB}{dX}\right| &= |B| \oplus |X| \\
  &= \left< 3, 5 \right> \oplus \left< 3, 5 \right> \\
@@ -188,9 +190,9 @@ The ordering here is arbitrary. There is no reason why the dimensionality of
 of the independent variable \textit{needs} to be concatenated to the right of the
 dimensionality of the output. What's important is that the dimensionality of
 both output and indepenedent variable are preserved. Let us declare this to
-be our convention since, for the purpose of this work, mine is the divinely revealed
-word of god, graciously passed down to you lowly mortals (I've typeset
-my mad ranblings with \LaTeX ~therefore they must be reasonably coherent. QED).
+be our convention. I've typeset it in \LaTeX ~therefore it can no longer be
+changed. Those are the rules that I've just made up and I'm backing them up with
+dozens more pages of incoherent rambling.
 
 Our total derivate is therefore a multidimensional object with four indicies.
 Suppose we try to pull a single partial derivative from this complete derivative,
@@ -217,7 +219,7 @@ A multimatrix $M$ is a multidimensional object that has some shape,
 $\vec{v} \in \mathbb{N}^n$, where $n \in \mathbb{N} \cup \{0\}$
 is the number of dimensions of $M$.
 
-Let $\vec{v}$ be the natural number vector which describes the shape of
+Let $\vec{v}$ be the vector which describes the shape of
 $M$, then $\vec{v} = |M|$. And for any other $\bar{v} \in \mathbb{N}^n$, $\bar{v}$
 is a valid index of $M$ if and only if each value of $\bar{v}$ is less than or equal
 to the value of it's corresponding index in $\vec{v}$.
@@ -464,7 +466,7 @@ arbitrarily depend on the shape of the two matricies.
 
 What we really need is an operation which covers both lines of reasoning. To do
 so, we need to compleately abandon conventional algebras, and indeed any hope of
-returning to sanity. That's right, we're introducing a ternary operator.
+returning to sanity. We need... a ternary operator.
 
 I would argue that there shall always be some component of, 
 ``How many dimensions are you combining?'' inherent
@@ -754,14 +756,25 @@ the same shape and every cell with the same index in each is equal, the two
 values must be equal.
 \end{proof}
 
-TODO: exposition
+Along the same vein, it's also true that there is a consistent time when
+multimatrix multiplication is communicative - when both multimatricies are
+the same shape and the multiplication is combining them completely into a
+scalar by combining their full width.
 
 \begin{theorem}[Communicativity of Multiplication]
 Let $|A| = \vec{x}$ and $|B| = \vec{x}$. Then,
 \[ A \mmult{|\vec{x}|} B = B \mmult{|\vec{x}|} A \]
 \end{theorem}
 \begin{proof}
-TODO
+Let $A$, $B$, and $\vec{x}$ be as described above. Notice that then $|A \mmult{|\vec{x}|} B|$
+results in a zero dimensional multimatrix - a multimatrix with one element which is effectively
+just a scalar.
+\begin{align*}
+(A \mmult{|\vec{x}|} B)[\{\}]
+  &= \sum_{\forall \bar{x} \in \Dim(\vec{x})} A[\bar{x}]B[\bar{x}] \\
+  &= \sum_{\forall \bar{x} \in \Dim(\vec{x})} B[\bar{x}]A[\bar{x}] \\
+  &= (B \mmult{|\vec{x}|} A)[\{\}]
+\end{align*}
 \end{proof}
 
 \section{Multiplicative Identities}
@@ -1911,8 +1924,8 @@ shape vector. Then for any integer $k$,
 \end{theorem}
 \begin{proof}
 Consider that for some ordered set of indicies
-$\{\bar{x}_1, \bar{x}_2, \ldots \bar{x}_n\} = X$ such that each
-$\bar{x}_i \in X \implies \bar{x}_i \in \Dim(\vec{x})$.
+$\{\bar{x}_1, \bar{x}_2, \ldots \bar{x}_n\} = X$ such that for each
+$\bar{x}_i$ it is true that $\bar{x}_i \in \Dim(\vec{x})$.
 Let $X'$ be some ordered permutation of $X$, then we can reason that,
 \begin{align*}
  \Ident^n(\vec{x})\left[\bigoplus X'\right]

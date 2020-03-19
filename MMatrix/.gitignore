@@ -3,3 +3,4 @@ test_jpeg_decoder
 *.o
 *.dSYM/*
 bin/
+*.swp

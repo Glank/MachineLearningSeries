@@ -243,6 +243,49 @@ void TestSparseMultiplication() {
   }
 }
 
+void TestSparseMultiplicationThorough() {
+  std::cout << "TestSparseMultiplicationThorough..." << std::endl;
+
+  std::srand(314);
+
+  for (int trials = 0; trials < 100; trials++) {
+
+    SparseMMatrix a_s ({5,5,5});
+    DenseMMatrix a_d ({5,5,5});
+    a_d.zero();
+  
+    SparseMMatrix b_s ({5,5,5});
+    DenseMMatrix b_d ({5,5,5});
+    b_d.zero();
+
+    int a_vals = std::rand() % 125;
+    for(int i = 0; i < a_vals; i++) {
+      std::vector<int> index = {std::rand()%5, std::rand()%5, std::rand()%5};
+      int val = std::rand()%11-5;
+      a_s.set(index, val);
+      a_d.set(index, val);
+    }
+    int b_vals = std::rand() % 125;
+    for(int i = 0; i < b_vals; i++) {
+      std::vector<int> index = {std::rand()%5, std::rand()%5, std::rand()%5};
+      int val = std::rand()%11-5;
+      b_s.set(index, val);
+      b_d.set(index, val);
+    }
+
+    SparseMMatrix out_s({5,5});
+    DenseMMatrix out_d({5,5});
+
+    Multiply(2, &a_s, &b_s, &out_s);
+    Multiply(2, &a_d, &b_d, &out_d);
+
+    if (!AreEqual(&out_s, &out_d)) {
+      std::cerr << "Error multiplying sparse matricies. Should be equal." << std::endl;
+      std::exit(1);
+    }
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -250,6 +293,7 @@ int main() {
   TestMMatrixMultiplicationAssociation();
   TestIdentityMultiplication();
   TestSparseMultiplication();
+  TestSparseMultiplicationThorough();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }

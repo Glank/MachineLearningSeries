@@ -1,7 +1,7 @@
 #ifndef MMATRIX_H
 #define MMATRIX_H
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -48,6 +48,8 @@ class MMatrixInterface {
   virtual const std::vector<int>& shape() const = 0;
   // Returns the most generic type "::mmatrix::MMatrixInterface" by default.
   virtual const internal::Type* type() const;
+  // Sets all values of the matrix to zero.
+  virtual void zero() = 0;
  private:
   const static internal::Type type_;
 };
@@ -62,6 +64,7 @@ class DenseMMatrix : public MMatrixInterface {
   float get(int i) const override;
   void set(int i, float value) override;
   const std::vector<int>& shape() const override;
+  void zero() override;
 
  private:
   std::vector<float> values_;
@@ -78,18 +81,22 @@ class SparseMMatrix : public MMatrixInterface {
   float get(int i) const override;
   void set(int i, float value) override;
   const std::vector<int>& shape() const override;
+  void zero() override;
+
+  // Returns the number of non-zero values in the matrix.
+  int size() const;
 
   const internal::Type* type() const override;
 
-  std::map<int, float>::iterator begin() { return values_.begin(); }
-  std::map<int, float>::iterator end() { return values_.end(); }
-  std::map<int, float>::const_iterator cbegin() { return values_.cbegin(); }
-  std::map<int, float>::const_iterator cend() { return values_.cend(); }
-  std::map<int, float>::const_iterator begin() const { return values_.cbegin(); }
-  std::map<int, float>::const_iterator end() const { return values_.cend(); }
+  std::unordered_map<int, float>::iterator begin() { return values_.begin(); }
+  std::unordered_map<int, float>::iterator end() { return values_.end(); }
+  std::unordered_map<int, float>::const_iterator cbegin() { return values_.cbegin(); }
+  std::unordered_map<int, float>::const_iterator cend() { return values_.cend(); }
+  std::unordered_map<int, float>::const_iterator begin() const { return values_.cbegin(); }
+  std::unordered_map<int, float>::const_iterator end() const { return values_.cend(); }
  private:
   // Maps the value index to non-zero values.
-  std::map<int, float> values_;
+  std::unordered_map<int, float> values_;
 
   std::vector<int> shape_;
   const static internal::Type type_;
