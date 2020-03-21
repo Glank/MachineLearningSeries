@@ -10,17 +10,6 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-namespace internal {
-
-bool Type::hasProperty(TypeProperty property) const {
-  return properties_.find(property) != properties_.end();
-}
-void Type::addProperty(TypeProperty property) {
-  properties_.insert(property);
-}
-
-} // namespace internal
-
 float MMatrixInterface::get(int i) const {
   vector<int> indices(shape().size(), 0);
   FromValueIndex(shape(), i, &indices);
@@ -36,11 +25,6 @@ float MMatrixInterface::get(const vector<int>& indices) const {
 }
 void MMatrixInterface::set(const vector<int>& indices, float value) {
   set(ToValueIndex(shape(), indices), value);
-}
-const internal::Type MMatrixInterface::type_ =
-  internal::Type("::mmatrix::MMatrixInterface");
-const internal::Type* MMatrixInterface::type() const {
-  return &type_;
 }
 
 DenseMMatrix::DenseMMatrix(const vector<int>& shape) : shape_(shape) {
@@ -64,6 +48,9 @@ void DenseMMatrix::zero() {
     values_[i] = 0;
   }
 }
+internal::MMatrixType DenseMMatrix::type() const {
+  return internal::kMMatrixType_Dense;
+}
 
 SparseMMatrix::SparseMMatrix(const std::vector<int>& shape) : shape_(shape) {}
 float SparseMMatrix::get(int i) const {
@@ -86,8 +73,8 @@ void SparseMMatrix::set(int i, float value) {
 const std::vector<int>& SparseMMatrix::shape() const {
   return shape_;
 }
-const internal::Type* SparseMMatrix::type() const {
-  return &type_;
+internal::MMatrixType SparseMMatrix::type() const {
+  return internal::kMMatrixType_Sparse;
 }
 void SparseMMatrix::zero() {
   values_.clear();
@@ -95,14 +82,6 @@ void SparseMMatrix::zero() {
 int SparseMMatrix::size() const {
   return values_.size();
 }
-namespace {
-internal::Type InitSparseMMatrixType() {
-  internal::Type type("::mmatrix::SparseMMatrix");
-  type.addProperty(internal::kTypeProperty_Sparse);
-  return type;
-}
-} // namespace
-const internal::Type SparseMMatrix::type_ = InitSparseMMatrixType();
 
 int ToValueIndex(const vector<int>& shape, const vector<int>& indices) {
   int vindex = 0;
@@ -123,86 +102,10 @@ void FromValueIndex(const vector<int>& shape, int vindex, vector<int>* indices) 
   }
 }
 
-void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
-    MMatrixInterface* out) {
-  if (a == nullptr || b == nullptr || out == nullptr) {
-    throw std::invalid_argument("Multiply cannot take null arguments.");
-  }
-  // ||a|| = l + n
-  // ||b|| = n + r
-  int l = a->shape().size()-n;
-  int r = b->shape().size()-n;
-  if (l < 0 || r < 0) {
-    throw std::out_of_range("Invalid multiplication size");
-  }
-  int midBound = 1;
-  for (int i = 0; i < n; i++) {
-    if (a->shape()[l+i] != b->shape()[i]) {
-      throw std::out_of_range("Invalid multiplication shapes.");
-    }
-    midBound *= b->shape()[i];
-  }
-  int lBound  = 1;
-  for (int i = 0; i < l; i++) {
-    if (a->shape()[i] != out->shape()[i]) {
-      throw std::out_of_range("Invalid left output multiplication shape.");
-    }
-    lBound *= a->shape()[i];
-  }
-  int rBound = 1;
-  for (int i = 0; i < r; i++) {
-    if (b->shape()[n+i] != out->shape()[l+i]) {
-      throw std::out_of_range("Invalid right output multiplication shape.");
-    }
-    rBound *= b->shape()[n+i];
-  }
-  for (int vl = 0; vl < lBound; vl++) {
-    for (int vr = 0; vr < rBound; vr++) {
-      float sum = 0;
-      for (int vm = 0; vm < midBound; vm++) {
-        int va = vl+vm*lBound;
-        int vb = vm+vr*midBound;
-        sum += a->get(va)*b->get(vb);
-      }
-      int vo = vl+vr*lBound;
-      out->set(vo, sum);
-    }
-  }
-}
-
-void Multiply(int n, const SparseMMatrix* a, const SparseMMatrix* b,
-    MMatrixInterface* out) {
-  if (a == nullptr || b == nullptr || out == nullptr) {
-    throw std::invalid_argument("Multiply cannot take null arguments.");
-  }
-  // ||a|| = l + n
-  // ||b|| = n + r
-  int l = a->shape().size()-n;
-  int r = b->shape().size()-n;
-  if (l < 0 || r < 0) {
-    throw std::out_of_range("Invalid multiplication size");
-  }
-  int midBound = 1;
-  for (int i = 0; i < n; i++) {
-    if (a->shape()[l+i] != b->shape()[i]) {
-      throw std::out_of_range("Invalid multiplication shapes.");
-    }
-    midBound *= b->shape()[i];
-  }
-  int lBound  = 1;
-  for (int i = 0; i < l; i++) {
-    if (a->shape()[i] != out->shape()[i]) {
-      throw std::out_of_range("Invalid left output multiplication shape.");
-    }
-    lBound *= a->shape()[i];
-  }
-  int rBound = 1;
-  for (int i = 0; i < r; i++) {
-    if (b->shape()[n+i] != out->shape()[l+i]) {
-      throw std::out_of_range("Invalid right output multiplication shape.");
-    }
-    rBound *= b->shape()[n+i];
-  }
+namespace {
+void MultiplySparseAB(int n, const SparseMMatrix* a, const SparseMMatrix* b,
+    MMatrixInterface* out, int lBound, int midBound, int rBound) {
+  //std::cout << "AB" << std::endl;
 
   int a_index_ops = a->size()*rBound;
   int b_index_ops = b->size()*lBound;
@@ -227,6 +130,101 @@ void Multiply(int n, const SparseMMatrix* a, const SparseMMatrix* b,
         int vo = vl+vr*lBound;
         out->set(vo, out->get(vo) + a->get(va)*b_pair.second);
       }
+    }
+  }
+}
+void MultiplySparseA(int n, const SparseMMatrix* a, const MMatrixInterface* b,
+  MMatrixInterface* out, int lBound, int midBound, int rBound) {
+  //std::cout << "A" << std::endl;
+  out->zero();
+  for (const auto& a_pair : *a) {
+    int vl = a_pair.first % lBound;
+    int vm = a_pair.first / lBound;
+    for (int vr = 0; vr < rBound; vr++) {
+      int vo = vl+vr*lBound;
+      int vb = vm+vr*midBound;
+      out->set(vo, out->get(vo) + a_pair.second*b->get(vb));
+    }
+  }
+}
+void MultiplySparseB(int n, const MMatrixInterface* a, const SparseMMatrix* b,
+  MMatrixInterface* out, int lBound, int midBound, int rBound) {
+  //std::cout << "B" << std::endl;
+  out->zero();
+  for (const auto& b_pair : *b) {
+    int vm = b_pair.first % midBound;
+    int vr = b_pair.first / midBound;
+    for (int vl = 0; vl < lBound; vl++) {
+      int va = vl+vm*lBound;
+      int vo = vl+vr*lBound;
+      out->set(vo, out->get(vo) + a->get(va)*b_pair.second);
+    }
+  }
+}
+}  // namespace
+
+void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
+    MMatrixInterface* out) {
+  if (a == nullptr || b == nullptr || out == nullptr) {
+    throw std::invalid_argument("Multiply cannot take null arguments.");
+  }
+
+  // ||a|| = l + n
+  // ||b|| = n + r
+  int l = a->shape().size()-n;
+  int r = b->shape().size()-n;
+  if (l < 0 || r < 0) {
+    throw std::out_of_range("Invalid multiplication size");
+  }
+  int midBound = 1;
+  for (int i = 0; i < n; i++) {
+    if (a->shape()[l+i] != b->shape()[i]) {
+      throw std::out_of_range("Invalid multiplication shapes.");
+    }
+    midBound *= b->shape()[i];
+  }
+  int lBound  = 1;
+  for (int i = 0; i < l; i++) {
+    if (a->shape()[i] != out->shape()[i]) {
+      throw std::out_of_range("Invalid left output multiplication shape.");
+    }
+    lBound *= a->shape()[i];
+  }
+  int rBound = 1;
+  for (int i = 0; i < r; i++) {
+    if (b->shape()[n+i] != out->shape()[l+i]) {
+      throw std::out_of_range("Invalid right output multiplication shape.");
+    }
+    rBound *= b->shape()[n+i];
+  }
+
+  // Cast to more specific types if applicable to speed up execution.
+  if (a->type() == internal::kMMatrixType_Sparse
+      && b->type() == internal::kMMatrixType_Sparse) {
+    MultiplySparseAB(n, static_cast<const SparseMMatrix*>(a),
+      static_cast<const SparseMMatrix*>(b), out,
+      lBound, midBound, rBound);
+    return;
+  } else if (a->type() == internal::kMMatrixType_Sparse) {
+    MultiplySparseA(n, static_cast<const SparseMMatrix*>(a), b, out,
+      lBound, midBound, rBound);
+    return;
+  } else if (b->type() == internal::kMMatrixType_Sparse) {
+    MultiplySparseB(n, a, static_cast<const SparseMMatrix*>(b), out,
+      lBound, midBound, rBound);
+    return;
+  }
+
+  for (int vl = 0; vl < lBound; vl++) {
+    for (int vr = 0; vr < rBound; vr++) {
+      float sum = 0;
+      for (int vm = 0; vm < midBound; vm++) {
+        int va = vl+vm*lBound;
+        int vb = vm+vr*midBound;
+        sum += a->get(va)*b->get(vb);
+      }
+      int vo = vl+vr*lBound;
+      out->set(vo, sum);
     }
   }
 }

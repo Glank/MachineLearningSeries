@@ -11,22 +11,9 @@ namespace mmatrix {
 
 namespace internal {
 
-typedef uint64_t TypeProperty;
-constexpr TypeProperty kTypeProperty_Sparse = 1;
-
-class Type {
- public:
-  Type(const std::string& class_name) : class_name_(class_name) {}
-  virtual ~Type() = default;
-  const std::string& className() const { return class_name_; }
-  // Returns true if this matrix has the specified property.
-  bool hasProperty(TypeProperty property) const;
-  // This should only be called by the class setting up the types.
-  void addProperty(TypeProperty property);
- private:
-  std::string class_name_;
-  std::unordered_set<TypeProperty> properties_;
-};
+typedef uint64_t MMatrixType;
+constexpr MMatrixType kMMatrixType_Dense = 0;
+constexpr MMatrixType kMMatrixType_Sparse = 1;
 
 }  // namespace internal
 
@@ -46,12 +33,10 @@ class MMatrixInterface {
   virtual void set(const std::vector<int>& indices, float value);
   // Returns the shape (size of dimensions) of this matrix.
   virtual const std::vector<int>& shape() const = 0;
-  // Returns the most generic type "::mmatrix::MMatrixInterface" by default.
-  virtual const internal::Type* type() const;
+  // Returns the most specific class type of the MMatrix.
+  virtual internal::MMatrixType type() const = 0;
   // Sets all values of the matrix to zero.
   virtual void zero() = 0;
- private:
-  const static internal::Type type_;
 };
 
 class DenseMMatrix : public MMatrixInterface {
@@ -65,6 +50,7 @@ class DenseMMatrix : public MMatrixInterface {
   void set(int i, float value) override;
   const std::vector<int>& shape() const override;
   void zero() override;
+  internal::MMatrixType type() const override;
 
  private:
   std::vector<float> values_;
@@ -82,11 +68,10 @@ class SparseMMatrix : public MMatrixInterface {
   void set(int i, float value) override;
   const std::vector<int>& shape() const override;
   void zero() override;
+  internal::MMatrixType type() const override;
 
   // Returns the number of non-zero values in the matrix.
   int size() const;
-
-  const internal::Type* type() const override;
 
   std::unordered_map<int, float>::iterator begin() { return values_.begin(); }
   std::unordered_map<int, float>::iterator end() { return values_.end(); }
@@ -99,7 +84,6 @@ class SparseMMatrix : public MMatrixInterface {
   std::unordered_map<int, float> values_;
 
   std::vector<int> shape_;
-  const static internal::Type type_;
 };
 
 int ToValueIndex(const std::vector<int>& shape, const std::vector<int>& indices);
@@ -108,9 +92,6 @@ void FromValueIndex(const std::vector<int>& shape, int vindex,
 
 void Multiply(int n, const MMatrixInterface* a,
   const MMatrixInterface* b, MMatrixInterface* out);
-
-void Multiply(int n, const SparseMMatrix* a, const SparseMMatrix* b,
-  MMatrixInterface* out);
 
 // Throws an error when matricies aren't even the same shape.
 // Epsilon is an optional small positive value under which differences are

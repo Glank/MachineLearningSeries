@@ -286,6 +286,19 @@ void TestSparseMultiplicationThorough() {
   }
 }
 
+void ManualTestSparseSwitch() {
+  std::cout << "ManualTestSparseSwitch..." << std::endl;
+
+  SparseMMatrix sparse({1});
+  DenseMMatrix dense({1});
+  DenseMMatrix out({1});
+
+  Multiply(1, &dense, &dense, &out);
+  Multiply(1, &sparse, &dense, &out);
+  Multiply(1, &dense, &sparse, &out);
+  Multiply(1, &sparse, &sparse, &out);
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -294,6 +307,7 @@ int main() {
   TestIdentityMultiplication();
   TestSparseMultiplication();
   TestSparseMultiplicationThorough();
+  ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }
