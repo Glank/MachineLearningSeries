@@ -229,6 +229,22 @@ void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
   }
 }
 
+void AddTo(const MMatrixInterface* m, MMatrixInterface* out) {
+  if (m == nullptr || out == nullptr) {
+    throw std::invalid_argument("AddTo cannot take null arguments.");
+  }
+
+  // bound = product of m's shape
+  int bound = 1;
+  for (int s : m->shape()) {
+    bound *= s;
+  }
+  
+  for (int i = 0; i < bound; i++) {
+    out->set(i, out->get(i)+m->get(i));
+  }
+}
+
 bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon) {
   if (a == nullptr || b == nullptr) {
     throw std::invalid_argument("AreEqual cannot take null arguments.");
@@ -274,5 +290,6 @@ unique_ptr<MMatrixInterface> Ident(int n, const vector<int>& base_shape) {
   }
   return ident;
 }
+
 
 }  // namespace mmatrix

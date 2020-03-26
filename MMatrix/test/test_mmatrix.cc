@@ -299,6 +299,36 @@ void ManualTestSparseSwitch() {
   Multiply(1, &sparse, &sparse, &out);
 }
 
+void TestAddTo() {
+  std::cout << "TestAddTo..." << std::endl;
+
+  SparseMMatrix a({2,3});
+  a.set({0,0}, 2);
+  a.set({1,1}, 7);
+  
+  SparseMMatrix b({2,3});
+  b.set({0,1}, -2);
+  b.set({0,2}, 3);
+  b.set({1,1}, 5);
+  b.set({1,2}, 6);
+
+  SparseMMatrix out({2,3});
+  AddTo(&a, &out);
+  AddTo(&b, &out);
+
+  SparseMMatrix expected({2,3});
+  expected.set({0,0}, 2);
+  expected.set({0,1}, -2);
+  expected.set({0,2}, 3);
+  expected.set({1,1}, 12);
+  expected.set({1,2}, 6);
+
+  if (!AreEqual(&out, &expected)) {
+    std::cerr << "Error adding matricies. Should be equal." << std::endl;
+    std::exit(1);
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -307,7 +337,8 @@ int main() {
   TestIdentityMultiplication();
   TestSparseMultiplication();
   TestSparseMultiplicationThorough();
-  ManualTestSparseSwitch();
+  TestAddTo();
+  //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }
