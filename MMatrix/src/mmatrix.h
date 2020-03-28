@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_set>
 #include <vector>
+#include <functional>
 
 namespace mmatrix {
 
@@ -94,6 +95,9 @@ void Multiply(int n, const MMatrixInterface* a,
   const MMatrixInterface* b, MMatrixInterface* out);
 
 void AddTo(const MMatrixInterface* m, MMatrixInterface* out);
+
+void Elementwise(std::function<float(float)> f, const MMatrixInterface* m,
+  MMatrixInterface* out);
 
 // Throws an error when matricies aren't even the same shape.
 // Epsilon is an optional small positive value under which differences are

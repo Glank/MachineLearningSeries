@@ -329,6 +329,29 @@ void TestAddTo() {
   }
 }
 
+void TestElementwise() {
+  std::cout << "TestElementwise..." << std::endl;
+
+  std::function<float(float)> f = [](float x) { return x*2; };
+
+  SparseMMatrix m({2,1});
+  m.set({0,0}, 1);
+  m.set({1,0}, 3);
+
+  SparseMMatrix out({2,1});
+  
+  Elementwise(f, &m, &out);
+
+  SparseMMatrix expected({2,1});
+  expected.set({0,0}, 2);
+  expected.set({1,0}, 6);
+
+  if (!AreEqual(&out, &expected)) {
+    std::cerr << "Error applying elementwise op. Should be equal." << std::endl;
+    std::exit(1);
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -338,6 +361,7 @@ int main() {
   TestSparseMultiplication();
   TestSparseMultiplicationThorough();
   TestAddTo();
+  TestElementwise();
   //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;
   return 0;

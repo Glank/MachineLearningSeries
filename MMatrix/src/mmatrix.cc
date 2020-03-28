@@ -245,6 +245,22 @@ void AddTo(const MMatrixInterface* m, MMatrixInterface* out) {
   }
 }
 
+void Elementwise(std::function<float(float)> f, const MMatrixInterface* m,
+    MMatrixInterface* out) {
+  if (m == nullptr || out == nullptr) {
+    throw std::invalid_argument("Elementwise cannot take null arguments.");
+  }
+
+  int bound = 1;
+  for (int s : m->shape()) {
+    bound *= s;
+  }
+
+  for (int i = 0; i < bound; i++) {
+    out->set(i, f(m->get(i)));
+  }
+}
+
 bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon) {
   if (a == nullptr || b == nullptr) {
     throw std::invalid_argument("AreEqual cannot take null arguments.");
