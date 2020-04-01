@@ -256,8 +256,33 @@ void Elementwise(std::function<float(float)> f, const MMatrixInterface* m,
     bound *= s;
   }
 
+  // TODO: handle sparse matrixies better
   for (int i = 0; i < bound; i++) {
     out->set(i, f(m->get(i)));
+  }
+}
+
+void Transpose(int n, const MMatrixInterface* m, MMatrixInterface* out) {
+  if (m == nullptr || out == nullptr) {
+    throw std::invalid_argument("Transpose cannot take null arguments.");
+  }
+
+  int lBound = 1;
+  int rBound = 1;
+  for (int i = 0; i < n; i++) {
+    lBound *= m->shape().at(i);
+  }
+  for (int i = n; i < m->shape().size(); i++) {
+    rBound *= m->shape().at(i);
+  }
+
+  // TODO: handle sparse matrixies better
+  for(int l = 0; l < lBound; l++) {
+    for (int r = 0; r < rBound; r++) {
+      int im = l+r*lBound;
+      int io = r+l*rBound;
+      out->set(io, m->get(im));
+    }
   }
 }
 

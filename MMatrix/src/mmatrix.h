@@ -99,6 +99,8 @@ void AddTo(const MMatrixInterface* m, MMatrixInterface* out);
 void Elementwise(std::function<float(float)> f, const MMatrixInterface* m,
   MMatrixInterface* out);
 
+void Transpose(int n, const MMatrixInterface* m, MMatrixInterface* out);
+
 // Throws an error when matricies aren't even the same shape.
 // Epsilon is an optional small positive value under which differences are
 // still considered "equal". So, if epsilon=0.0001, then technically different

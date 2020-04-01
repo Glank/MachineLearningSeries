@@ -352,6 +352,29 @@ void TestElementwise() {
   }
 }
 
+void TestTranspose() {
+  std::cout << "TestTranspose..." << std::endl;
+
+  std::function<float(float)> f = [](float x) { return x*2; };
+
+  SparseMMatrix m({5,4,3,2});
+  m.set({3,2,1,0}, 1);
+  m.set({1,2,2,1}, 3);
+
+  SparseMMatrix out({3,2,5,4});
+  
+  Transpose(2, &m, &out);
+
+  SparseMMatrix expected({3,2,5,4});
+  expected.set({1,0,3,2}, 1);
+  expected.set({2,1,1,2}, 3);
+
+  if (!AreEqual(&out, &expected)) {
+    std::cerr << "Error applying transpose op. Should be equal." << std::endl;
+    std::exit(1);
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -362,6 +385,7 @@ int main() {
   TestSparseMultiplicationThorough();
   TestAddTo();
   TestElementwise();
+  TestTranspose();
   //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;
   return 0;
