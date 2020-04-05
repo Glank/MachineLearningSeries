@@ -189,7 +189,8 @@ Where $\oplus$ is the concatenate operator.
 The ordering here is arbitrary. There is no reason why the dimensionality of
 of the independent variable \textit{needs} to be concatenated to the right of the
 dimensionality of the output. What's important is that the dimensionality of
-both output and indepenedent variable are preserved. Let us declare this to
+both output and indepenedent variable are preserved and that our notation is
+consistent. Let us declare this to
 be our convention. I've typeset it in \LaTeX ~therefore it can no longer be
 changed. Those are the rules that I've just made up and I'm backing them up with
 dozens more pages of incoherent rambling.
@@ -202,7 +203,7 @@ so maybe something like this:
 \frac{dB}{dX}[1,2,3,4] = \frac{\partial B_{1,2}}{\partial X_{3,4}}
 \]
 
-And since we're defining our own notation, let's splurge and reference our original
+And since we're defining our own notation, let's go wild and reference our original
 matricies in a similar manner:
 \[
 \frac{dB}{dX}[1,2,3,4] = \frac{\partial B[1,2]}{\partial X[3,4]}
@@ -815,7 +816,8 @@ square identity it relates to a multiplication operation.
 
 \begin{theorem}[Multimatrix Multiplicative Identity]
 \label{mm_ident}
-For all $\vec{m}$ and $\vec{n}$ on which the operations are valid,
+For all multimaticies, $A$, and all vectors, $\vec{m}$ and $\vec{n}$,  on which
+these operations are valid,
 \[
  A \mmult{|\vec{m}|} \Ident^2(\vec{m}) = A
 \]
@@ -885,6 +887,19 @@ that,
 \end{align*}
 Therefore $\Ident^2(\vec{n}) \mmult{|\vec{n}|} A = A$
 \end{ppart}
+\end{proof}
+
+\begin{theorem}[Multiplicative Identity Implication]
+\label{mm_ident_imp}
+Similarly, if there is a matrix $X$ of shape $\vec{x} \oplus \vec{x}$ such that
+for all matricies, $A$, for which the operation is defined,
+
+\[A \mmult{|\vec{x}|} X = A \]
+
+Then $X = \Ident^2(\vec{x})$.
+\end{theorem}
+\begin{proof}
+TODO
 \end{proof}
 
 The square identity also pops up in the derivative of a multimatrix
@@ -1081,36 +1096,34 @@ and $\bar{b} \in \Dim(\vec{b}):$
 
 \section{Multiplicative Inverses}
 
-Given a multimatrix, $M$, you might ask, ``What is the multiplicative inverse of $M$?''
+Given a multimatrix, $X$, you might ask, ``What is the multiplicative inverse of $X$?''
 And I would have to tell you that your question is not well formed.
 
-Since multimatrix multiplication is a trinary operation, you need to factor in the
-index of multipliction. Consider multiplication by $M$ a function on $X$ - some other
-multimatrix. That is, 
-\[ F(X; M, m) = M \mmult{m} X \]
+\begin{align*}
+  (M \mmult{m} X) \mmult{n} Y &= M \\
+  |M| &= \vec{l} \oplus \vec{m} \\
+  |X| &= \vec{m} \oplus \vec{x} \\
+  |\vec{m}| &= m \\
+  |M \mmult{m} X| &= \vec{l} \oplus \vec{x} \\
+  |(M \mmult{m} X) \mmult{n} Y| &= |M| \\
+  &= \vec{l} \oplus \vec{m} \\
+  \therefore |Y| &= \vec{x} \oplus \vec{m} \\
+  n &= |\vec{x}|
+\end{align*}
 
-What we're looking for in a `multiplicative inverse' is actually a function which,
-when composed with $F$, results in $X$. That is,
+By Thm. \ref{mm_associativity}, we can then say that,
 
-\[ (F^{-1} \circ F)(X) = F^{-1}(M \mmult{m} X) = X \]
+\begin{align*}
+  (M \mmult{m} X) \mmult{n} Y &= M \mmult{m} (X \mmult{n} Y) \\
+  M &= M \mmult{m} (X \mmult{n} Y)
+\end{align*}
 
-That inverse function, $F^{-1}$ also needs to be a multiplication operation to
-really be a `multiplicative inverse', so we can assume that it is defined by
-some multimatrix $N$ and some inverting index of multiplication $n$, such that,
+Then by Thm. \ref{mm_ident_imp}, since $|X \mmult{n} Y| = \vec{m} \oplus \vec{m}$ and for all
+$M$ where the operation is defined $M \mmult{m} (X \mmult{n} Y) = M$, it follows that
+$X \mmult{n} Y = \Ident^2(\vec{m})$.
+ 
 
-\[ F^{-1} (Y; N, n) = N \mmult{n} Y \]
-
-Let's say that $M$ has some shape $\vec{l} \oplus \vec{r}$ such that $|\vec{r}| = m$.
-Then it is only applicable for an $m$ overlap multiplication on some $X$ where,
-$|X| = \vec{r} \oplus \vec{x}$ for some $\vec{x}$.
-
-So since,
-\[ |M \mmult{m} X| = \vec{l} \oplus \vec{x}\]
-and
-\[ |N \mmult{n} (M \mmult{m} X)| = |X| = \vec{r} \oplus \vec{x} \]
-It must be true that, $n = |\vec{l}|$ and $|N| = \vec{r} \oplus \vec{l}$.
-
-TODO
+% TODO
 
 \section{Hadamard Product}
 
