@@ -60,6 +60,8 @@
 \DeclareMathOperator{\Softmax}{Softmax}
 \DeclareMathOperator{\Sum}{\Sigma}
 \DeclareMathOperator{\remainder}{mod}
+\DeclareMathOperator{\RMult}{RMult}
+\DeclareMathOperator{\LMult}{LMult}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
@@ -810,7 +812,7 @@ $\Ident^3(\vec{v})$ the cubic identity of $\vec{v}$.
 
 That definition seems rather arbitrary but stick with me, I know what I'm
 talking about. I've got a \sout{doctorate}
-masters degree in \sout{mathematics} \sout{a real engineering field}, fine, software
+masters degree in \sout{mathematics} I mean \sout{a real engineering field}, fine, software
 engineering. Whatever. Just look at how the
 square identity it relates to a multiplication operation.
 
@@ -889,17 +891,46 @@ Therefore $\Ident^2(\vec{n}) \mmult{|\vec{n}|} A = A$
 \end{ppart}
 \end{proof}
 
-\begin{theorem}[Multiplicative Identity Implication]
+There is an obvious corollary to that which you might consider an
+alternate definition of $\Ident^2$.
+
+\begin{corollary}[Multiplicative Identity Implication]
 \label{mm_ident_imp}
-Similarly, if there is a matrix $X$ of shape $\vec{x} \oplus \vec{x}$ such that
+If there is a matrix $X$ of shape $\vec{x} \oplus \vec{x}$ such that
 for all matricies, $A$, for which the operation is defined,
 
 \[A \mmult{|\vec{x}|} X = A \]
 
 Then $X = \Ident^2(\vec{x})$.
-\end{theorem}
+
+Or if for all matricies, $B$, for which the operation is defined,
+
+\[X \mmult{|\vec{x}|} B = B \]
+
+Then, again, $X = \Ident^2(\vec{x})$.
+\end{corollary}
 \begin{proof}
-TODO
+Let $X$ be a matrix of shape $\vec{x} \oplus \vec{x}$. 
+\begin{ppart}
+If for all multimatrixes, $A$, on which $A \mmult{|\vec{x}|} X$ is defined, 
+$A \mmult{|\vec{x}|} X = A$ this implies that, in the case of $A = \Ident^2(\vec{x})$,
+
+\begin{align*}
+  A \mmult{|\vec{x}|} X &= A \\
+ \Ident^2(\vec{x}) \mmult{|\vec{x}|} X &= \Ident^2(\vec{x}) \\
+  X &= \Ident^2(\vec{x}) 
+\end{align*}
+\end{ppart}
+\begin{ppart}
+If for all multimatrixes, $B$, on which $X \mmult{|\vec{x}|} B$ is defined, 
+$X \mmult{|\vec{x}|} B = B$ this implies that, in the case of $B = \Ident^2(\vec{x})$,
+
+\begin{align*}
+  X \mmult{|\vec{x}|} B &= B \\
+  X \mmult{|\vec{x}|} \Ident^2(\vec{x}) &= \Ident^2(\vec{x}) \\
+  X &= \Ident^2(\vec{x}) 
+\end{align*}
+\end{ppart}
 \end{proof}
 
 The square identity also pops up in the derivative of a multimatrix
@@ -1097,33 +1128,169 @@ and $\bar{b} \in \Dim(\vec{b}):$
 \section{Multiplicative Inverses}
 
 Given a multimatrix, $X$, you might ask, ``What is the multiplicative inverse of $X$?''
-And I would have to tell you that your question is not well formed.
+And I would have to tell you that your question is not well formed. Do you mean left multiplication
+or right multiplication? Multiplication by what width? It's not clear which of these specifications
+is even required: consider that multiplication is not communicative for regular 2d matricies but
+those have simple multiplicative inverses (if an inverse exists). 
 
+So let's clarify what we can.
+
+\begin{definition}[Multiplicative Functions]
+Let us declare the function $\RMult[m,X](M)$ to be the function defined 
+by the tuple,
+\[ \left<m,X\right> \in \{  (\{0\} \cup \mathbb{N}) \times \mathbb{R}^{\vec{m} \oplus \vec{x}}  :  |\vec{m}| = m \} \]
+such that,
+\[ \RMult[m,X](M) : \mathbb{R}^{\vec{l} \oplus \vec{m}} \to \mathbb{R}^{\vec{l} \oplus \vec{x}} \]
+\[ \RMult[m,X](M) = M \mmult{m} X \]
+
+Let us also declare the function $\LMult[m,X](M)$ to be the function defined 
+by the tuple,
+\[ \left<m,X\right> \in \{  (\{0\} \cup \mathbb{N}) \times \mathbb{R}^{\vec{x} \oplus \vec{m}}  :  |\vec{m}| = m \} \]
+such that,
+\[ \LMult[m,X](M) : \mathbb{R}^{\vec{m} \oplus \vec{r}} \to \mathbb{R}^{\vec{x} \oplus \vec{r}} \]
+\[ \LMult[m,X](M) = X \mmult{m} M \]
+
+The the set of all these functions be $\RMult$ and $\LMult$ respectively.
+\end{definition}
+
+That will let us formally define a multiplicative inverse:
+
+\begin{definition}[Multiplicative Inverse]
+For any $\RMult[m,X]$ and $\RMult[n,Y]$ if, for all valid inputs of $\RMult[m,X]$, $M$,
+\[ \RMult[n,Y] \circ \RMult[m,X] (M) = M \]
+Then $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$. In other words,
+\[ \RMult[n,Y] \in \RMult[m,X]^{-1} \]
+
+Similarly, for any $\LMult[m,X]$ and $\LMult[n,Y]$ if, for all valid inputs of $\LMult[m,X]$, $M$,
+\[ \LMult[n,Y] \circ \LMult[m,X] (M) = M \]
+Then $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$. In other words,
+\[ \LMult[n,Y] \in \LMult[m,X]^{-1} \]
+\end{definition}
+
+Note that those inverses are defined as sets of operations, not individual operations. 
+You'll see why in a bit but to clear up any early confusion you should note that multimatrix
+multiplicative inverses aren't unique. For example, $\RMult[2,\Ident^2(\left<2,2\right>)]$ has
+two multiplicative inverse I can think of off the top of my head;
+$\RMult[2,\Ident^2(\left<2,2\right)]$ or
+$\RMult[1,\Ident^2(\left<2\right>)]$.
+
+\begin{theorem}[Relation of Inverse to Identity]
+If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $|X| = \vec{m} \oplus \vec{x}$ and $|\vec{m}| = m$
+then $X \mmult{n} Y = \Ident^2(\vec{m})$.
+And if $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$ where $|X| = \vec{x} \oplus \vec{m}$ and $|\vec{m}| = m$
+then $Y \mmult{n} X = \Ident^2(\vec{m})$.
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $X$ be a multimatrix such that $|X| = \vec{m} \oplus \vec{x}$ and $|\vec{m}| = m$.
+If $\RMult[n,Y]$ is the inverse of $\RMult[m,X]$ then, for all $M$,
 \begin{align*}
-  (M \mmult{m} X) \mmult{n} Y &= M \\
-  |M| &= \vec{l} \oplus \vec{m} \\
-  |X| &= \vec{m} \oplus \vec{x} \\
-  |\vec{m}| &= m \\
-  |M \mmult{m} X| &= \vec{l} \oplus \vec{x} \\
-  |(M \mmult{m} X) \mmult{n} Y| &= |M| \\
-  &= \vec{l} \oplus \vec{m} \\
-  \therefore |Y| &= \vec{x} \oplus \vec{m} \\
-  n &= |\vec{x}|
+  \RMult[n,Y] \circ \RMult[m,X] (M) &= M \\
+  (M \mmult{m} X) \mmult{n} Y &= M
 \end{align*}
 
-By Thm. \ref{mm_associativity}, we can then say that,
-
+This is also true in the case where $M = \Ident^2(\vec{m})$. In which case,
 \begin{align*}
-  (M \mmult{m} X) \mmult{n} Y &= M \mmult{m} (X \mmult{n} Y) \\
-  M &= M \mmult{m} (X \mmult{n} Y)
+  (\Ident^2(\vec{m}) \mmult{m} X) \mmult{n} Y &= \Ident^2(\vec{m}) \\
+  X \mmult{n} Y &= \Ident^2(\vec{m}) \\
+\end{align*}
+\end{ppart}
+\begin{ppart}
+Let $X$ be a multimatrix such that $|X| = \vec{x} \oplus \vec{m}$ and $|\vec{m}| = m$.
+If $\LMult[n,Y]$ is the inverse of $\LMult[m,X]$ then, for all $M$,
+\begin{align*}
+  \LMult[n,Y] \circ \LMult[m,X] (M) &= M \\
+  Y \mmult{n} (X \mmult{m} M) &= M
 \end{align*}
 
-Then by Thm. \ref{mm_ident_imp}, since $|X \mmult{n} Y| = \vec{m} \oplus \vec{m}$ and for all
-$M$ where the operation is defined $M \mmult{m} (X \mmult{n} Y) = M$, it follows that
-$X \mmult{n} Y = \Ident^2(\vec{m})$.
+This is also true in the case where $M = \Ident^2(\vec{m})$. In which case,
+\begin{align*}
+  Y \mmult{n} (X \mmult{m} \Ident^2(\vec{m})) &= \Ident^2(\vec{m}) \\
+  Y \mmult{n} X &= \Ident^2(\vec{m})
+\end{align*}
+\end{ppart}
+\end{proof}
+
+\begin{theorem}[Shape of Inverses]
+If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $|X| = \vec{m} \oplus \vec{x}$ and
+$|\vec{m}| = m$ then $n \le ||X||-m$.
+
+Also, if $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$ where $|X| = \vec{x} \oplus \vec{m}$ and
+$|\vec{m}| = m$ then $n \le ||X||-m$.
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $\RMult[n,Y]$ be an inverse of $\RMult[m,X]$ where $|X| = \vec{m} \oplus \vec{x}$ and
+$|\vec{m}| = m$.
+Let $M$ be some valid input of $\RMult[m,X]$.
+In other words, $|M| = \vec{l} \oplus \vec{m}$ for some $\vec{l}$.
+So $|M \mmult{m} X| = \vec{l} \oplus \vec{x}$.
+Since $\RMult[n,Y]$ is a valid operation on $M \mmult{m} X$, $n \le |\vec{l} \oplus \vec{x}|$.
+And since there is no restriction on $\vec{l}$ it's only useful to say that $n \le |\vec{x}|$.
+Given that $||X|| = |\vec{x}| + m$ it follows that $n \le ||X|| - m$.
+\end{ppart}
+\begin{ppart}
+Let $\LMult[n,Y]$ be an inverse of $\LMult[m,X]$ where $|X| = \vec{x} \oplus \vec{m}$ and
+$|\vec{m}| = m$.
+Let $M$ be some valid input of $\LMult[m,X]$.
+In other words, $|M| = \vec{m} \oplus \vec{r}$ for some $\vec{r}$.
+So $|X \mmult{m} M| = \vec{x} \oplus \vec{r}$.
+Since $\RMult[n,Y]$ is a valid operation on $X \mmult{m} M$, $n \le |\vec{x} \oplus \vec{r}|$.
+And since there is no restriction on $\vec{r}$ it's only useful to say that $n \le |\vec{x}|$.
+Given that $||X|| = |\vec{x}| + m$ it follows that $n \le ||X|| - m$.
+\end{ppart}
+\end{proof}
+
+
+\begin{theorem}[Relation of Identity to Inverse]
+If $X \mmult{n} Y = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{m} \oplus \vec{x}$,
+and $n \le ||X||-m$, that implies that $\RMult[n, Y]$ is an inverse of $\RMult[m, X]$.
+
+Also,  if $Y \mmult{n} X = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{x} \oplus \vec{m}$,
+and $n \le ||X||-m$, that implies that $\LMult[n, Y]$ is an inverse of $\LMult[m, X]$.
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $X \mmult{n} Y = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{m} \oplus \vec{x}$, and $n \le ||X||-m$.
+We know that $n \le |\vec{x}|$ since $|\vec{x}| = ||X||-m$.
+Then we can split up $\vec{x}$ into $\vec{x_l} \oplus \vec{x_r}$ where $|\vec{x_r}| = n$.
+So $|Y| = \vec{x_r} \oplus \vec{y}$ for some $\vec{y}$ since $X \mmult{n} Y$ is defined.
+We can then find the shape $|X \mmult{n} Y| = \vec{m} \oplus \vec{x_l} \oplus \vec{y}$.
+Then for any $M$ such that $M \mmult{m} X$ is defined, i.e. any $M$ of shape $\vec{l} \oplus \vec{m}$ for some $\vec{l}$,
+we can tell that $M \mmult{m} (X \mmult{n} Y)$ is also defined.
+And since $n \le ||X||-m$ that implies $n+m \le ||X||$ so $M \mmult{m} (X \mmult{n} Y) = (M \mmult{m} X) \mmult{n} Y$
+by Theorem \ref{mm_associativity}.
+And if we just replace $X \mmult{n} Y$ with it's given value, then for all $M$ on which the $\RMult[m,X]$ is defined,
+\begin{align*}
+  (M \mmult{m} X) \mmult{n} Y &= M \mmult{m} (X \mmult{n} Y)  \\
+  &= M \mmult{m} \Ident^2(\vec{m}) \\
+  &= M \\
+  \RMult[n,Y] \circ \RMult[m,X](M) &= M
+\end{align*}
+Therefore $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$.
+\end{ppart}
+\begin{ppart}
+Let $Y \mmult{n} X = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{x} \oplus \vec{m}$, and $n \le ||X||-m$.
+We know that $n \le |\vec{x}|$ since $|\vec{x}| = ||X||-m$.
+Then we can split up $\vec{x}$ into $\vec{x_l} \oplus \vec{x_r}$ where $|\vec{x_l}| = n$.
+So $|Y| = \vec{y} \oplus \vec{x_l}$ for some $\vec{y}$ since $Y \mmult{n} X$ is defined.
+We can then find the shape $|Y \mmult{n} X| = \vec{y} \oplus \vec{x_r} \oplus \vec{m}$.
+Then for any $M$ such that $X \mmult{m} M$ is defined, i.e. any $M$ of shape $\vec{m} \oplus \vec{r}$ for some $\vec{r}$,
+we can tell that $(Y \mmult{n} X) \mmult{m} M$ is also defined.
+And since $n \le ||X||-m$ that implies $n+m \le ||X||$ so $(Y \mmult{n} X) \mmult{m} M = Y \mmult{n} (X \mmult{m} M)$
+by Theorem \ref{mm_associativity}.
+And if we just replace $Y \mmult{n} X$ with it's given value, then for all $M$ on which the $\LMult[m,X]$ is defined,
+\begin{align*}
+  Y \mmult{n} (X \mmult{m} M) &= (Y \mmult{n} X) \mmult{m} M  \\
+  &= \Ident^2(\vec{m}) \mmult{m} M\\
+  &= M \\
+  \LMult[n,Y] \circ \LMult[m,X](M) &= M
+\end{align*}
+Therefore $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$.
+\end{ppart}
+\end{proof}
  
-
-% TODO
+%TODO
 
 \section{Hadamard Product}
 
