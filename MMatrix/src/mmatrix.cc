@@ -3,6 +3,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 
 namespace mmatrix {
 
@@ -10,20 +11,20 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-float MMatrixInterface::get(int i) const {
+MMFloat MMatrixInterface::get(int i) const {
   vector<int> indices(shape().size(), 0);
   FromValueIndex(shape(), i, &indices);
   return get(indices);
 }
-void MMatrixInterface::set(int i, float value) {
+void MMatrixInterface::set(int i, MMFloat value) {
   vector<int> indices(shape().size(), 0);
   FromValueIndex(shape(), i, &indices);
   set(indices, value);
 }
-float MMatrixInterface::get(const vector<int>& indices) const {
+MMFloat MMatrixInterface::get(const vector<int>& indices) const {
   return get(ToValueIndex(shape(), indices));
 }
-void MMatrixInterface::set(const vector<int>& indices, float value) {
+void MMatrixInterface::set(const vector<int>& indices, MMFloat value) {
   set(ToValueIndex(shape(), indices), value);
 }
 
@@ -32,12 +33,12 @@ DenseMMatrix::DenseMMatrix(const vector<int>& shape) : shape_(shape) {
   for (int i = 0; i < shape.size(); i++) {
     total_size *= shape[i];
   }
-  values_ = vector<float>(total_size, 0);
+  values_ = vector<MMFloat>(total_size, 0);
 }
-float DenseMMatrix::get(int i) const {
+MMFloat DenseMMatrix::get(int i) const {
   return values_[i];
 }
-void DenseMMatrix::set(int i, float value) {
+void DenseMMatrix::set(int i, MMFloat value) {
   values_[i] = value;
 }
 const vector<int>& DenseMMatrix::shape() const {
@@ -53,14 +54,14 @@ internal::MMatrixType DenseMMatrix::type() const {
 }
 
 SparseMMatrix::SparseMMatrix(const std::vector<int>& shape) : shape_(shape) {}
-float SparseMMatrix::get(int i) const {
+MMFloat SparseMMatrix::get(int i) const {
   const auto v = values_.find(i);
   if (v != values_.end()) {
     return v->second;
   }
   return 0;
 }
-void SparseMMatrix::set(int i, float value) {
+void SparseMMatrix::set(int i, MMFloat value) {
   if (value == 0) {
     const auto it = values_.find(i);
     if (it != values_.end()) {
@@ -217,7 +218,7 @@ void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
 
   for (int vl = 0; vl < lBound; vl++) {
     for (int vr = 0; vr < rBound; vr++) {
-      float sum = 0;
+      MMFloat sum = 0;
       for (int vm = 0; vm < midBound; vm++) {
         int va = vl+vm*lBound;
         int vb = vm+vr*midBound;
@@ -245,7 +246,7 @@ void AddTo(const MMatrixInterface* m, MMatrixInterface* out) {
   }
 }
 
-void Elementwise(std::function<float(float)> f, const MMatrixInterface* m,
+void Elementwise(std::function<MMFloat(MMFloat)> f, const MMatrixInterface* m,
     MMatrixInterface* out) {
   if (m == nullptr || out == nullptr) {
     throw std::invalid_argument("Elementwise cannot take null arguments.");
@@ -286,7 +287,7 @@ void Transpose(int n, const MMatrixInterface* m, MMatrixInterface* out) {
   }
 }
 
-bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon) {
+bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, MMFloat epsilon) {
   if (a == nullptr || b == nullptr) {
     throw std::invalid_argument("AreEqual cannot take null arguments.");
   }
@@ -332,5 +333,77 @@ unique_ptr<MMatrixInterface> Ident(int n, const vector<int>& base_shape) {
   return ident;
 }
 
+std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b) {
+  std::vector<int> out;
+  out.reserve(a.size()+b.size());
+  out.insert(out.end(), a.begin(), a.end());
+  out.insert(out.end(), b.begin(), b.end());
+  return out;
+}
+std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c) {
+  std::vector<int> out;
+  out.reserve(a.size()+b.size());
+  out.insert(out.end(), a.begin(), a.end());
+  out.insert(out.end(), b.begin(), b.end());
+  out.insert(out.end(), c.begin(), c.end());
+  return out;
+}
+
+std::string DebugString(const MMatrixInterface* m) {
+  std::stringstream tmp;
+
+  tmp << '<';
+  int ncells = 1;
+  for (int i = 0; i < m->shape().size(); i++) {
+    if (i != 0) {
+      tmp << ", ";
+    }
+    tmp << m->shape()[i];
+    ncells *= m->shape()[i];
+  }
+  tmp << ">" << std::endl;
+  
+  for (int i = 0; i < ncells; i++) {
+    if (i != 0) {
+      if (i%20 == 0 && i != ncells-1)
+        tmp << "," << std::endl; 
+      else
+        tmp << ", ";
+    }
+    tmp << m->get(i);
+  }
+
+  return tmp.str();
+}
+
+std::string DebugString(const std::vector<int>& v) {
+  std::stringstream tmp;
+  tmp << '<';
+  for (int i = 0; i < v.size(); i++) {
+    if (i != 0) {
+      tmp << ", ";
+    }
+    tmp << v[i];
+  }
+  tmp << ">";
+  return tmp.str();
+}
+
+void Copy(const MMatrixInterface* m, MMatrixInterface* out) {
+  // TODO: improve for sparse matricies
+  if (m->shape().size() != out->shape().size()) {
+    throw std::invalid_argument("Wrong shape for copy.");
+  }
+  int ncells = 1;
+  for (int i = 0; i < m->shape().size(); i++) {
+    if (m->shape()[i] != out->shape()[i]) {
+      throw std::invalid_argument("Wrong shape for copy.");
+    }
+    ncells *= m->shape()[i];
+  }
+  for (int i = 0; i < ncells; i++) {
+    out->set(i, m->get(i));
+  }
+}
 
 }  // namespace mmatrix

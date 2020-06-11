@@ -55,7 +55,7 @@ void TestDenseMMatrixGetSet() {
   for (int a = 0; a < 3; a++) {
     for (int b = 0; b < 3; b++) {
       for (int c = 0; c < 2; c++) {
-        float expected = a*6+b*2+c+1;
+        MMFloat expected = a*6+b*2+c+1;
         if (m.get({a,b,c}) != expected) {
           std::cerr << "Unexpected result in TestDenseMMatrixGetSet" << std::endl;
           std::exit(0);
@@ -190,11 +190,11 @@ void TestIdentityMultiplication() {
         for (int i3 = 0; i3 < 7; i3++) {
           for (int i4 = 0; i4 < 3; i4++) {
             for (int i5 = 0; i5 < 5; i5++) {
-              float expected = 0;
+              MMFloat expected = 0;
               if (i0 == i3 && i1 == i4 && i2 == i5) {
                 expected = 1;
               }
-              float actual = ident->get({i0, i1, i2, i3, i4, i5});
+              MMFloat actual = ident->get({i0, i1, i2, i3, i4, i5});
               if (actual != expected) {
                 std::cout << "Index: ";
                 for(int i : vector<int>{i0, i1, i2, i3, i4, i5}) {
@@ -332,7 +332,7 @@ void TestAddTo() {
 void TestElementwise() {
   std::cout << "TestElementwise..." << std::endl;
 
-  std::function<float(float)> f = [](float x) { return x*2; };
+  std::function<MMFloat(MMFloat)> f = [](MMFloat x) { return x*2; };
 
   SparseMMatrix m({2,1});
   m.set({0,0}, 1);
@@ -355,7 +355,7 @@ void TestElementwise() {
 void TestTranspose() {
   std::cout << "TestTranspose..." << std::endl;
 
-  std::function<float(float)> f = [](float x) { return x*2; };
+  std::function<MMFloat(MMFloat)> f = [](MMFloat x) { return x*2; };
 
   SparseMMatrix m({5,4,3,2});
   m.set({3,2,1,0}, 1);
@@ -375,6 +375,30 @@ void TestTranspose() {
   }
 }
 
+void CheckEq(const std::vector<int>& out, const std::vector<int>& exp) {
+  if (out.size() != exp.size()) {
+    std::cerr << "Wrong size." << std::endl;
+    std::exit(1);
+  }
+  for (int i = 0; i < exp.size(); i++) {
+    if (out[i] != exp[i]) {
+      std::cerr << "Wrong value." << std::endl;
+      std::exit(1);
+    }
+  }
+}
+
+void TestConcat() {
+  std::cout << "TestConcat..." << std::endl;
+
+  std::vector<int> a = {1,2,3}, b = {4, 5}, c = {6};
+
+  std::vector<int> out1 = Concat(a,b);
+  std::vector<int> out2 = Concat(a,b,c);
+  CheckEq(out1, {1,2,3,4,5});
+  CheckEq(out2, {1,2,3,4,5,6});
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -386,6 +410,8 @@ int main() {
   TestAddTo();
   TestElementwise();
   TestTranspose();
+  TestConcat();
+  // Requires instrumenting matrix multiplication
   //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;
   return 0;

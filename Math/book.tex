@@ -14,8 +14,8 @@
 \usepackage[toc,page]{appendix}
 
 \title{%
-  Multimatrices and Their Derivatives \\
-  \large An Impractical Guide to Global Conquest}
+  \sout{Machine Learning for Global Conquest} \\
+  Multimatrices and Their Derivatives}
 \author{Ernest Kirstein}
 \date{\today}
 
@@ -62,21 +62,25 @@
 \DeclareMathOperator{\remainder}{mod}
 \DeclareMathOperator{\RMult}{RMult}
 \DeclareMathOperator{\LMult}{LMult}
+\DeclareMathOperator{\Idx}{Idx}
+\DeclareMathOperator{\size}{size}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
 \newcommand{\dmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\,\bullet\,}$}}}
+\newcommand{\shape}[1]{\left|#1\right|}
 
 \begin{document}
 
 \maketitle
 
 \chapter*{Preface}
-I was working my way through a hobby programming project, trying to create a so called
-`deep fake' of Danny DeVito's face on Scarlett Johansson's body, and ran into a problem.
-The existing notation for taking derivatives of matrix equations is terrible.
-It's so deliberately obtuse that I could only conclude that some hidden cabal of
-mathematicians is actively working to sabotage the rise of our glorious AI overlords.
+I was working my way through a hobby programming project, trying to create deep fakes of
+\sout{polititians in compromising positions} humorous celebrity mashups, when I ran into a problem.
+The existing notation for derivatives of matrix equations is terrible.
+It's so deliberately obtuse that I can only conclude that some hidden cabal of
+mathematicians is actively working to sabotage \sout{the rise of our glorious AI overlords}
+our machine learning research.
 I, for one, will not stand for such heresy.
 
 So, I set out to invent a system of my own. Much to my surprise, some of the
@@ -116,8 +120,8 @@ As we all know, Weinersmith's hypothisis states that an undergraduate's belief i
 higher power fluctuates with respect to their scientific education in a sinusoidal
 pattern (Weinersmith, 2010 \cite{weinersmith:education}).
 
-Formally, the shape of these two matricies are defined,
-$|B| = |X| = \left< 3,5 \right>$.
+Suppose the shape of these two matricies are defined,
+$\shape{B} = \shape{X} = \left< 3,5 \right>$.
 And each element of $B$ will be the sine of the corresponding element of
 $X$. That is, \[B_{r,c} = \sin(X_{r,c})\]
 Which I'll write more simply as, \[B = \sin(X)\]
@@ -173,7 +177,7 @@ of $X$.
 
 And so, the size of the complete derivate would be,
 \[
-\mbox{size}\left(\frac{dB}{dX}\right) = \mbox{size}(B) \mbox{size}(X)
+\size\left(\frac{dB}{dX}\right) = \size(B) \size(X)
 \]
 Perhaps we could even let this help us define the `shape' of the complete
 derivative. Note that there seem to be four independent indicies to each element
@@ -182,7 +186,7 @@ And since a complete derivative would need to be composed of partial derivatives
 it would make sense to just smush the shapes of the input matrix and the output
 matrix together,
 \begin{align*}
-\left|\frac{dB}{dX}\right| &= |B| \oplus |X| \\
+\shape{\frac{dB}{dX}} &= \shape{B} \oplus \shape{X} \\
  &= \left< 3, 5 \right> \oplus \left< 3, 5 \right> \\
  &= \left< 3, 5, 3, 5 \right>
 \end{align*}
@@ -192,12 +196,14 @@ The ordering here is arbitrary. There is no reason why the dimensionality of
 of the independent variable \textit{needs} to be concatenated to the right of the
 dimensionality of the output. What's important is that the dimensionality of
 both output and indepenedent variable are preserved and that our notation is
-consistent. Let us declare this to
+consistent.
+
+Let us declare this to
 be our convention. I've typeset it in \LaTeX ~therefore it can no longer be
 changed. Those are the rules that I've just made up and I'm backing them up with
 dozens more pages of incoherent rambling.
 
-Our total derivate is therefore a multidimensional object with four indicies.
+So anyways, our total derivate is a multidimensional object with four indicies.
 Suppose we try to pull a single partial derivative from this complete derivative,
 what could our notation look like? Four underscript indicies would be unwieldy,
 so maybe something like this:
@@ -367,7 +373,7 @@ whose elements we can define as,
 &= \delta_{\bar{b}\bar{x}}\cos(\bar{x})
 \end{align*}
 
-Which isn't a huge improvement over our original notation. What would be great is
+Which isn't a huge improvement over the original notation. What would be great is
 if we could define the total derivative without going down into the partial derivatives
 at all, which we'll be able to do in later chapters. As a sneak peak (a whole
 chapter ahead), that'll look like this:
@@ -422,9 +428,8 @@ you'll be dead.'' - Mr. Peanutbutter (BoJack Horseman Season 1, Episode 12
 
 \section{Defining Multiplication}
 
-The multiplication of traditional matricies is a calculation that, when one first
-encouters it, inspires thoughts such as, ``What the shit?'' or, ``Get me a knife,
-I gotta to stab someone.''
+The multiplication of traditional matricies is a calculation that, when first
+encoutered, inspires thoughts of omnicide.
 
 After seeing the method used in practice, one slowly comes to understand the
 reason behind the madness. That is, that madness is the natural state of things
@@ -452,6 +457,7 @@ work.''
 So now consider how we would multiply two matricies $A$ and $B$ if they had more
 than two dimensions. Let's use a concrete example to make the problems more
 structurally sound.
+
 Let $|A| = \left<5,7,7\right>$ and $|B| = \left<7,7,2,4\right>$.
 First of all, can we even multiply the two together? Hm... maybe? $|A|$ ends with
 $\left<\ldots, 7\right>$ and $|B|$ starts with $\left<7,\ldots\right>$ so it would
@@ -503,7 +509,7 @@ Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$. I would
 define their values in a three dimensional grid but I fear that my three dimensional
 \LaTeX skills aren't up to the task (and three dimensional monitors are quite hard to
 come by). So here is where we leave behind nice graphical representations of
-things, and I'll just define the elements of $A$ and $B$ in the tables below.
+things and I'll just define the elements of $A$ and $B$ in the tables below.
 \begin{table}[h!]
 \begin{center}
 \begin{tabular}{c c c | c}
@@ -598,7 +604,7 @@ All of which would be the same if this was regular matrix multiplication.
 
 Like two dimensional matrix multiplication, multimatrix multiplication is
 not (usually) communicative. And it is only weakly associative. That sounds like
-nonsense, and ideed it is, but I shall prove it to you.
+nonsense, and indeed it is, but I shall prove it to you.
 
 Multimatrix multiplication may not even make sense dimensionally when you move
 around parentheses. Take for example multimatricies $A$, $B$, and $C$ such that,
@@ -1024,7 +1030,7 @@ multiples of their base shape lengths.
 
 \begin{landscape}
 \begin{theorem}[Identity Contraction]
-For all $m, n, k \in \mathbb{N}$ and $\vec{x}$ as a valid multimatrix shape,
+For all $m, n, k \in \mathbb{N}$ (note $m$, $n$, and $k$ are non-zero) and $\vec{x}$ as a valid multimatrix shape,
 where $m > k$ and $n > k$,
 \[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{theorem}
@@ -1290,7 +1296,252 @@ Therefore $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$.
 \end{ppart}
 \end{proof}
  
-%TODO
+This is all well and good, but I'm sure what you really want to know is how to find a multiplicative inverse.
+It seams increadibly complicated until you realize that there is a way to relate any multimatrix multiplication
+to a 2d matrix multiplication. We'll first need to define a special function:
+
+\begin{definition}[Indexing Function]
+Let $\vec{x}$ be some shape vector and $\bar{x} \in \Dim(\vec{x})$. Then the indexing function is one which transforms
+that $\bar{x}$ into a unique integer (i.e. it is one-to-one):
+\[
+  \Idx[\vec{x}](\bar{x}) = \sum_{1 \le i \le |\vec{x}|} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
+\]
+And then inverse function takes an integer and returns a vector in $\Dim(\vec{x})$:
+\[ |\Idx[\vec{x}]^{-1}(n)| = |\vec{x}| \]
+\[
+  \Idx[\vec{x}]^{-1}(n)[i] =
+    \left\lfloor
+      \frac{\remainder\left(n, \prod_{1 \le j \le i} \vec{x}[j]\right)}
+      {\prod_{1 \le k < i} \vec{x}[k]}
+    \right\rfloor + 1
+\]
+Where $\Idx[\vec{x}]^{-1}(n)[i]$ is the $i$th value of the vector output of $\Idx[\vec{x}]^{-1}(n)$.
+Also, $\remainder$ is the remainder function.
+\end{definition}
+
+\begin{landscape}
+Let's prove those properties of the indexing function before moving on. If we prove that the inverse function
+really is an inverse, then that implies the function is one-to-one. So let's just do that:
+
+\begin{proof}
+Let $\bar{x} \in \Dim(\vec{x})$ and let $k$ be any index of $\bar{x}$.
+
+\begin{align*}
+  \Idx[\vec{x}]^{-1}(\Idx[\vec{x}](\bar{x}))[k] &= 
+  \left\lfloor
+    \frac{\remainder\left(
+      \sum_{1 \le i \le |\vec{x}|} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+      , \prod_{1 \le m \le k} \vec{x}[m]\right)}
+    {\prod_{1 \le n < k} \vec{x}[n]}
+  \right\rfloor + 1 \\
+  &=
+  \left\lfloor
+    \frac{\remainder\left(
+      \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+      , \prod_{1 \le m \le k} \vec{x}[m]\right)}
+    {\prod_{1 \le n < k} \vec{x}[n]}
+  \right\rfloor + 1 \\
+  &=
+  \left\lfloor
+    \frac{
+      \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+    }
+    {\prod_{1 \le n < k} \vec{x}[n]}
+  \right\rfloor + 1 \\
+  &=
+  \left\lfloor
+    \frac{
+      \sum_{1 \le i < k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+    }
+    {\prod_{1 \le n < k} \vec{x}[n]}
+    +
+    (\bar{x}[k]-1)
+  \right\rfloor + 1 \\
+  &= \bar{x}[k]-1+1 \\
+  &= \bar{x}[k]
+\end{align*}
+
+A couple of leaps of logic there rely on the fact that 
+\[
+  \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
+  < \prod_{1 \le m \le k} \vec{x}[m]
+\]
+Which is true because
+\begin{align*}
+  \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \sum_{1 \le i \le k} \left( \bar{x}[i]\prod_{1 \le j < i} \vec{x}[j] - \prod_{1 \le j < i} \vec{x}[j] \right)
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \sum_{1 \le i \le k} \left( \bar{x}[i]\prod_{1 \le j < i} \vec{x}[j] \right)
+  - \sum_{1 \le i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \sum_{1 \le i \le k} \left( \prod_{1 \le j < i+1} \vec{x}[j] \right)
+  - \sum_{1 \le i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \left( \prod_{1 \le j < k+1} \vec{x}[j] \right)
+  + \sum_{1 \le i < k} \left( \prod_{1 \le j < i+1} \vec{x}[j] \right)
+  - \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  - 1
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \left( \prod_{1 \le j \le k} \vec{x}[j] \right)-1
+  + \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  - \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \left( \prod_{1 \le j \le k} \vec{x}[j] \right)-1
+  &< \prod_{1 \le m \le k} \vec{x}[m]
+\end{align*}
+Note in the 4th step there that $\bar{x}[i] \le \vec{x}[i]$ so replacing it with $\vec{x}[i]$
+will not increase the maximum value.
+
+So, that concludes the proof. Since the inverse works for any index of $\bar{x}$ we know that the inverse works to restore the
+whole of the vector. Thus, $\Idx[\vec{x}]^{-1}$ is indeed the inverse of $\Idx[\vec{x}]$.
+\end{proof}
+
+TODO:exposition 
+
+\begin{theorem}[Index of Concatenated Vectors]
+Let $\vec{a}$ and $\vec{b}$ be any two vectors of natural numbers. Then for all $\bar{a} \in \Dim(\vec{a})$
+and $\bar{b} \in \Dim(\vec{b})$:
+\[ \Idx[\vec{a} \oplus \vec{b}](\bar{a} \oplus \bar{b}) = \Idx[\vec{a}](\bar{a}) + |\Dim(\vec{a})| \Idx[\vec{b}](\bar{b}) \]
+\end{theorem}
+\begin{proof}
+Let $\vec{a}$ and $\vec{b}$ be any two vectors of natural numbers. Then for all $\bar{a} \in \Dim(\vec{a})$
+and $\bar{b} \in \Dim(\vec{b})$:
+\begin{align*}
+  \Idx[\vec{a} \oplus \vec{b}](\bar{a} \oplus \bar{b})
+  &= 
+  \sum_{1 \le i \le |\vec{a} \oplus \vec{b}|} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \\
+  &= 
+  \left( \sum_{1 \le i \le |\vec{a}|} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \right) +
+  \left( \sum_{|\vec{a}|+1 \le i \le |\vec{a}|+|\vec{b}|} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \right)\\
+  &= 
+  \left( \sum_{1 \le i \le |\vec{a}|} \left( (\bar{a}[i]-1) \prod_{1 \le j < i} \vec{a}[j] \right) \right) +
+  \left( \sum_{|\vec{a}|+1 \le i \le |\vec{a}|+|\vec{b}|} \left( (\bar{b}[i-|\vec{a}|]-1) \prod_{1 \le j \le |\vec{a}|} \vec{a}[j] \prod_{1 \le j < i-|\vec{a}|} \vec{b}[j] \right) \right)\\
+  &= 
+  \left( \sum_{1 \le i \le |\vec{a}|} \left( (\bar{a}[i]-1) \prod_{1 \le j < i} \vec{a}[j] \right) \right) +
+  \left( \sum_{1 \le i \le |\vec{b}|} \left( (\bar{b}[i|]-1) |\Dim(\vec{a})| \prod_{1 \le j < i|} \vec{b}[j] \right) \right)\\
+  &= 
+  \Idx[\vec{a}](\bar{a}) +
+  |\Dim(\vec{a})| \sum_{1 \le i \le |\vec{b}|} \left( (\bar{b}[i|]-1) \prod_{1 \le j < i|} \vec{b}[j] \right)\\
+  &= 
+  \Idx[\vec{a}](\bar{a}) +
+  |\Dim(\vec{a})| \Idx[\vec{b}](\bar{b})
+\end{align*}
+\end{proof}
+
+Now you might be wondering what that indexing function has to do with inverting
+multimatricies. I said before that it we would need to show how the multiplication
+of two multimatricies can be converted into an equivelent multiplication of two
+2d matricies. Here's how that's done,
+
+\begin{theorem}[Reshaping Multimatrix Multiplication]
+Let $A$ and $B$ be two multimatricies of shapes $|A| = \vec{a} \oplus \vec{c}$ and
+$|B| = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting in the $|\vec{c}|$
+width multiplication of $A$ and $B$, that is,
+\[ A \mmult{|\vec{c}|} B = C \]
+Now, let $\vec{x}$, $\vec{y}$, and $\vec{z}$ be any vectors such that
+$|\Dim(\vec{a})| = |\Dim(\vec{x})|$,
+$|\Dim(\vec{b})| = |\Dim(\vec{y})|$,
+and 
+$|\Dim(\vec{c})| = |\Dim(\vec{z})|$.
+Then for multimatricies $X$, $Y$, and $Z$ defined such that,
+\[\forall i : 0 \le i < \size(A) \]
+\[ X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i)] = A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i)] \]
+
+\[\forall j : 0 \le j < \size(B)\]
+\[ Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(j)] = B[\Idx[\vec{c} \oplus \vec{b}]^{-1}(j)] \]
+
+and,
+
+\[\forall k : 0 \le k < \size(C)\]
+\[ Z[\Idx[\vec{x} \oplus \vec{y}]^{-1}(k)] = C[\Idx[\vec{a} \oplus \vec{b}]^{-1}(k)] \]
+
+it is true that,
+
+\[ X \mmult{|\vec{z}|} Y = Z \]
+\end{theorem}
+\begin{proof}
+Let $A$ and $B$ be two multimatricies of shapes $|A| = \vec{a} \oplus \vec{c}$ and
+$|B| = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting from,
+\[ A \mmult{|\vec{c}|} B = C \]
+
+Now, let $\vec{x}$, $\vec{y}$, and $\vec{z}$ be any vectors such that
+$|\Dim(\vec{a})| = |\Dim(\vec{x})|$,
+$|\Dim(\vec{b})| = |\Dim(\vec{y})|$,
+and 
+$|\Dim(\vec{c})| = |\Dim(\vec{z})|$.
+And let multimatricies $X$, $Y$, and $Z$ be defined such that,
+\[\forall i : 0 \le i < \size(A) \]
+\[ X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i)] = A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i)] \]
+
+\[\forall j : 0 \le j < \size(B)\]
+\[ Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(j)] = B[\Idx[\vec{c} \oplus \vec{b}]^{-1}(j)] \]
+
+and,
+
+\[\forall k : 0 \le k < \size(C)\]
+\[ Z[\Idx[\vec{x} \oplus \vec{y}]^{-1}(k)] = C[\Idx[\vec{a} \oplus \vec{b}]^{-1}(k)] \]
+
+Then for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
+
+\begin{align*}
+  (A \mmult{|\vec{c}|} B)[\bar{a} \oplus \bar{b}]
+  &= C[\bar{a} \oplus \bar{b}] \\
+  &=
+  \sum_{\forall \bar{c} \in \Dim(\vec{c})} A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}] \\
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{c})|} A[\bar{a} \oplus \Idx[\vec{c}]^{-1}(i_c)] B[\Idx[\vec{c}]^{-1}(i_c) \oplus \bar{b}]
+\end{align*}
+
+Now let $i_a = \Idx[\vec{a}](\bar{a})$ and $i_b = \Idx[\vec{b}](\bar{b})$ and,
+\begin{align*}
+  C[\Idx[\vec{a}  \oplus \vec{b}]^{-1}(i_a + |\Dim(\vec{a})| i_b)]
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{c})|} A[\Idx[\vec{a}]^{-1}(i_a) \oplus \Idx[\vec{c}]^{-1}(i_c)] B[\Idx[\vec{c}]^{-1}(i_c) \oplus \Idx[\vec{b}]^{-1}(i_b)] \\
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{c})|} A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i_a + |\Dim(\vec{a})|i_c)]
+                                     B[\Idx[\vec{c} \oplus \vec{b}]^{-1}(i_c + |\Dim(\vec{c})|i_b)] \\
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{c})|} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + |\Dim(\vec{a})|i_c)]
+                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + |\Dim(\vec{c})|i_b)] \\
+  Z[\Idx[\vec{x}  \oplus \vec{y}]^{-1}(i_a + |\Dim(\vec{a})| i_b)]
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{c})|} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + |\Dim(\vec{a})|i_c)]
+                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + |\Dim(\vec{c})|i_b)] \\
+  Z[\Idx[\vec{x}  \oplus \vec{y}]^{-1}(i_a + |\Dim(\vec{x})| i_b)]
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{z})|} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + |\Dim(\vec{x})|i_c)]
+                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + |\Dim(\vec{z})|i_b)] \\
+  Z[\Idx[\vec{x}]^{-1}(i_a) \oplus \Idx[\vec{y}]^{-1}(i_b)]
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{z})|} X[\Idx[\vec{x}]^{-1}(i_a) \oplus \Idx[\vec{z}]^{-1}(i_c)]
+                                     Y[\Idx[\vec{z}]^{-1}(i_c) \oplus \Idx[\vec{y}]^{-1}(i_b)]
+\end{align*}
+Then if you let $\bar{x} = \Idx[\vec{x}](i_a)$ and $\bar{y} = \Idx[\vec{y}](i_b)$,
+\begin{align*}
+  Z[\bar{x} \oplus \bar{y}]
+  &=
+  \sum_{0 \le i_c < |\Dim(\vec{z})|} X[\bar{x} \oplus \Idx[\vec{z}]^{-1}(i_c)]
+                                     Y[\Idx[\vec{z}]^{-1}(i_c) \oplus \bar{y}] \\
+  &=
+  \sum_{\forall \bar{z} \in \Dim(\vec{z})} X[\bar{x} \oplus \bar{z}]
+                                     Y[\bar{z} \oplus \bar{y}] \\
+  &= X \mmult{|\vec{z}|} Y
+\end{align*}
+\end{proof}
+\end{landscape}
+
+Therefore for any $\RMult(m,X)$ you can potentially find an inverse with
+multiplication width $n \le ||X||-m$ by simply reshaping the problem into
+one using standard two dimensional matricies wich already has thoroughly
+explored methods for solving.
+For example, to find an $\RMult(n,Y)$ which is the inverse of $\RMult(m,X)$
+you'd reshape $X \mmult{n} Y = \Ident^2(\vec{m})$ into $A \mmult{1} B = \Ident^2(\left<\size(\Dim(\vec{m}))\right>)$
+where $|A| = \left<\size(\Dim(\vec{m} \oplus \vec{x_l})), \size(\Dim(\vec{x_r}))\right>$
+and   $|B| = \left<\size(\Dim(\vec{x_r})),  \size(\Dim(\vec{y}))\right>$.
+Then solve for $B$ and return the problem to the original shape to get $Y$.
+
+%todo: give example
 
 \section{Hadamard Product}
 
@@ -1316,11 +1567,11 @@ Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$
 and $|B| = \vec{c} \oplus \vec{b}$. Also let $c = |\vec{c}|$.
 Then, the multimatrix Hadamard product, $A \dmult{c} B$, is a multimatrix
 such that,
-\[ |A \dmult{n} B| = \vec{a} \oplus \vec{c} \oplus \vec{b} \]
+\[ |A \dmult{c} B| = \vec{a} \oplus \vec{c} \oplus \vec{b} \]
 And for any $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$,
 and $\bar{c} \in \Dim(\vec{c})$,
 \[
-  (A \dmult{n} B)[\bar{a} \oplus \bar{c} \oplus \bar{b}]
+  (A \dmult{c} B)[\bar{a} \oplus \bar{c} \oplus \bar{b}]
   = A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}]
 \]
 \end{definition}
@@ -1331,10 +1582,31 @@ TODO: exposition
 \[ A \dmult{0} B = A \mmult{0} B \]
 \end{theorem}
 \begin{proof}
-TODO: exercise?
+Let $|A| = \vec{a}$ and $|B| = \vec{b}$ then,
+\[ |A \dmult{0} B| = \vec{a} \oplus \vec{b} = |A \mmult{0} B| \]
+And for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
+\[ (A \dmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] = (A \mmult{0} B)[\bar{a} \oplus \bar{b}] \]
 \end{proof}
 
-TODO: associative?
+TODO: exposition
+
+\begin{theorem}[Hadamard Product Associativity]
+Let $A$, $B$, and $C$ be multimatrixes such that $|A| = \vec{a} \oplus \vec{m}$,
+$|B| = \vec{m} \oplus \vec{b} \oplus \vec{n}$ and $|C| = \vec{n} \oplus \vec{c}$,
+where $|\vec{m}| = m$ and $|\vec{n}| = n$.
+Then $(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
+\end{theorem}
+\begin{proof}
+For all $\bar{a} \in \Dim(\vec{a})$, etc,
+\begin{align*}
+((A \dmult{m} B) \dmult{n} C)[\bar{a} \oplus \bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}]
+  &= (A \dmult{m} B)[\bar{a} \oplus \bar{m} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &= (A[\bar{a} \oplus \bar{m}] B[\bar{m} \oplus \bar{b} \oplus \bar{n}]) C[\bar{n} \oplus \bar{c}] \\
+  &= A[\bar{a} \oplus \bar{m}] (B[\bar{m} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}]) \\
+  &= A[\bar{a} \oplus \bar{m}] (B \dmult{n} C)[\bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}] \\
+  &= (A \dmult{m} (B \dmult{n} C))[\bar{a} \oplus \bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}]
+\end{align*}
+\end{proof}
 
 TODO: exposition
 
@@ -1366,7 +1638,21 @@ $|X_1| = \vec{l} \oplus \vec{x}$ for any $\vec{l}$,
 TODO 
 \end{proof}
 
-TODO: Communicative property
+TODO: exposition
+
+\begin{theorem}[Communicativity of Hadamard Products]
+If $A$ and $B$ are multimatrices of the same shape, $|A| = |B| = \vec{x}$,
+then $A \dmult{|\vec{x}|} B = B \dmult{|\vec{x}|} A$.
+\end{theorem}
+\begin{proof}
+For any $\bar{x} \in \Dim(\vec{x})$,
+\begin{align*}
+(A \dmult{|\vec{x}|} B)[\bar{x}]
+  &= A[\bar{x}] B[\bar{x}] \\
+  &= B[\bar{x}] A[\bar{x}] \\
+  &= (B \dmult{|\vec{x}|} A)[\bar{x}]
+\end{align*}
+\end{proof}
 
 \section{Exercises}
 
@@ -1937,7 +2223,7 @@ And,
 
 So I've shown that in both cases, the composit function of two transposes is
 itself a transpose. So transposes of multimatrcies of shape of length $n$ are
-a closed group under composition. Of.
+a closed group under composition.
 \end{ppart}
 
 \begin{ppart}
@@ -2097,6 +2383,9 @@ So the inverse of $\Tran_3$ is $\Tran_2$, which we can see here:
 Now that you understand the basics of transposition, let's take a look
 at some theorems involving it.
 
+%TODO: I think this is even more general.
+% I think that if k = |\vec{a}| mod |\vec{a} \oplus \vec{b}| then
+% \Tran(\Ident^n(\vec{a} \oplus \vec{b}), k) = \Ident^n(\vec{b} \oplus \vec{a})
 \begin{theorem}[Identity Transpose]
 Let $n$ be a positive integer and let $\vec{x}$ be a positive length
 shape vector. Then for any integer $k$,
@@ -2669,6 +2958,43 @@ Therefore
 \end{proof}
 \end{landscape}
 
+\begin{theorem}[Hadamard Multiplication Rule]
+Let $F(X)$ and $G(X)$ be functions of $X$ where
+$|F(X)| = \vec{a} \oplus \vec{c}$ and $|G(X)| = \vec{c} \oplus \vec{b}$
+then,
+\[
+  \frac{d(F(X) \dmult{|\vec{c}|} G(X))}{dX} =
+    F(X) \dmult{|\vec{c}|} \frac{dG}{dX} +
+    \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right)
+\]
+\end{theorem}
+\begin{landscape}
+\begin{proof}
+For $\vec{x} = |X|$ and for $\bar{a} \in \Dim(\vec{a})$ etc,
+\begin{align*}
+\frac{d(F(X) \dmult{|\vec{c}|} G(X))}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+  &= \frac{\partial (F(X) \dmult{|\vec{c}|} G(X))[\bar{a} \oplus \bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
+  &= \frac{\partial (F(X)[\bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{a}])}{\partial X[\bar{x}]} \\
+  &= \frac{\partial F(X)[\bar{a} \oplus \bar{c}]}{\partial X[\bar{x}]} G(X)[\bar{c} \oplus \bar{b}]
+    + F(X)[\bar{a} \oplus \bar{c}] \frac{\partial G(X)[\bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
+  &= \frac{dF}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{x}] G(X)[\bar{c} \oplus \bar{b}]
+    + F(X)[\bar{a} \oplus \bar{c}] \frac{dG}{dX}[\bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \frac{dF}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{x}] G(X)[\bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \Tran\left(\frac{dF}{dX}, ||F||\right)[\bar{x} \oplus \bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X)\right) [\bar{x} \oplus \bar{a} \oplus \bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left\{ F(X) \dmult{|\vec{c}|} \frac{dG}{dX}
+    + \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right) \right\}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+\end{align*}
+\end{proof}
+\end{landscape}
+
 \begin{theorem}[Chain Rule]
 \label{mmm_chain_rule}
 Let $F(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}^{\vec{f}}$
@@ -2834,7 +3160,7 @@ Then, by the multiplication rule (Thm. \ref{multiplication_rule}),
 
 \begin{definition}[Softmax]
 Let $\Softmax(X)$ be the function
-$\Softmax : \mathbb{R}^{\vec{X}} \to \mathbb{R}^{\vec{X}}$
+$\Softmax : \mathbb{R}^{\vec{x}} \to \mathbb{R}^{\vec{x}}$
 such that $\forall \bar{x} \in \Dim(\vec{x}):$
 \[
   \Softmax(X)[\bar{x}] = \frac{
@@ -2863,8 +3189,9 @@ Notice that
 \[
 	\Softmax(X) = \exp(X) \mmult{0} \left( \Sum(\exp(X)) \right)^{-1}
 \]
-So,
-\begin{alignat}{3}
+That right hand term is a scalar so it does have a multiplicative inverse.
+Next,
+\begin{alignat*}{3}
 	\frac{d\Softmax(X)}{dX}
 	&=&&
 	\frac{d \left( \exp(X) \mmult{0} \left( \Sum(\exp(X)) \right)^{-1} \right)}{dX} \\
@@ -2963,7 +3290,7 @@ So,
 	&=&&
 	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
 	\mmult{||X||} \Softmax(X)
-\end{alignat}
+\end{alignat*}
 Let's just verify that against the Wikipedia \cite{wiki:softmax} result:
 \begin{align*}
 	\frac{\partial \Softmax(X)[\bar{x}_1]}{\partial X[\bar{x}_2]}

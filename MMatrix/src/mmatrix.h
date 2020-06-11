@@ -18,20 +18,22 @@ constexpr MMatrixType kMMatrixType_Sparse = 1;
 
 }  // namespace internal
 
+typedef double MMFloat;
+
 class MMatrixInterface {
  public:
   virtual ~MMatrixInterface() = default;
   // Returns the value stored at the given indices.
-  virtual float get(const std::vector<int>& indices) const;
+  virtual MMFloat get(const std::vector<int>& indices) const;
   // Returns the value stored at the given indices represented by i.
   // See ToValueIndex.
-  virtual float get(int i) const;
+  virtual MMFloat get(int i) const;
   // Stores a value at the given indicies represented by i.
   // See ToValueIndex.
-  virtual void set(int i, float value);
+  virtual void set(int i, MMFloat value);
   // Stores a value at the given indicies. Each index must be within it's
   // dimension defined by shape().
-  virtual void set(const std::vector<int>& indices, float value);
+  virtual void set(const std::vector<int>& indices, MMFloat value);
   // Returns the shape (size of dimensions) of this matrix.
   virtual const std::vector<int>& shape() const = 0;
   // Returns the most specific class type of the MMatrix.
@@ -47,14 +49,14 @@ class DenseMMatrix : public MMatrixInterface {
 
   using MMatrixInterface::get;
   using MMatrixInterface::set;
-  float get(int i) const override;
-  void set(int i, float value) override;
+  MMFloat get(int i) const override;
+  void set(int i, MMFloat value) override;
   const std::vector<int>& shape() const override;
   void zero() override;
   internal::MMatrixType type() const override;
 
  private:
-  std::vector<float> values_;
+  std::vector<MMFloat> values_;
   std::vector<int> shape_;
 };
 
@@ -65,8 +67,8 @@ class SparseMMatrix : public MMatrixInterface {
 
   using MMatrixInterface::get;
   using MMatrixInterface::set;
-  float get(int i) const override;
-  void set(int i, float value) override;
+  MMFloat get(int i) const override;
+  void set(int i, MMFloat value) override;
   const std::vector<int>& shape() const override;
   void zero() override;
   internal::MMatrixType type() const override;
@@ -74,15 +76,15 @@ class SparseMMatrix : public MMatrixInterface {
   // Returns the number of non-zero values in the matrix.
   int size() const;
 
-  std::unordered_map<int, float>::iterator begin() { return values_.begin(); }
-  std::unordered_map<int, float>::iterator end() { return values_.end(); }
-  std::unordered_map<int, float>::const_iterator cbegin() { return values_.cbegin(); }
-  std::unordered_map<int, float>::const_iterator cend() { return values_.cend(); }
-  std::unordered_map<int, float>::const_iterator begin() const { return values_.cbegin(); }
-  std::unordered_map<int, float>::const_iterator end() const { return values_.cend(); }
+  std::unordered_map<int, MMFloat>::iterator begin() { return values_.begin(); }
+  std::unordered_map<int, MMFloat>::iterator end() { return values_.end(); }
+  std::unordered_map<int, MMFloat>::const_iterator cbegin() { return values_.cbegin(); }
+  std::unordered_map<int, MMFloat>::const_iterator cend() { return values_.cend(); }
+  std::unordered_map<int, MMFloat>::const_iterator begin() const { return values_.cbegin(); }
+  std::unordered_map<int, MMFloat>::const_iterator end() const { return values_.cend(); }
  private:
   // Maps the value index to non-zero values.
-  std::unordered_map<int, float> values_;
+  std::unordered_map<int, MMFloat> values_;
 
   std::vector<int> shape_;
 };
@@ -96,7 +98,7 @@ void Multiply(int n, const MMatrixInterface* a,
 
 void AddTo(const MMatrixInterface* m, MMatrixInterface* out);
 
-void Elementwise(std::function<float(float)> f, const MMatrixInterface* m,
+void Elementwise(std::function<MMFloat(MMFloat)> f, const MMatrixInterface* m,
   MMatrixInterface* out);
 
 void Transpose(int n, const MMatrixInterface* m, MMatrixInterface* out);
@@ -106,10 +108,18 @@ void Transpose(int n, const MMatrixInterface* m, MMatrixInterface* out);
 // still considered "equal". So, if epsilon=0.0001, then technically different
 // matricies a and b will still be considered equal if none of their elements
 // differ by more than 0.0001.
-bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, float epsilon = 0);
+bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, MMFloat epsilon = 0);
 
 // Returns an n'th order identity with the given base_shape.
 std::unique_ptr<MMatrixInterface> Ident(int n, const std::vector<int>& base_shape);
+
+std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b);
+std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
+
+std::string DebugString(const MMatrixInterface* m);
+std::string DebugString(const std::vector<int>& v);
+
+void Copy(const MMatrixInterface* m, MMatrixInterface* out);
 
 }  // namespace mmatrix
 
