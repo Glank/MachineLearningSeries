@@ -12,6 +12,8 @@
 \usepackage{csquotes}
 \usepackage[normalem]{ulem}
 \usepackage[toc,page]{appendix}
+% package used for \llparenthesis
+\usepackage{stmaryrd}
 
 \title{%
   \sout{Machine Learning for Global Conquest} \\
@@ -229,7 +231,7 @@ $\vec{v} \in \mathbb{N}^n$, where $n \in \mathbb{N} \cup \{0\}$
 is the number of dimensions of $M$.
 
 Let $\vec{v}$ be the vector which describes the shape of
-$M$, then $\vec{v} = |M|$. And for any other $\bar{v} \in \mathbb{N}^n$, $\bar{v}$
+$M$, then $\vec{v} = \shape{M}$. And for any other $\bar{v} \in \mathbb{N}^n$, $\bar{v}$
 is a valid index of $M$ if and only if each value of $\bar{v}$ is less than or equal
 to the value of it's corresponding index in $\vec{v}$.
 That is, $\forall i: 1 \le \bar{v}_i \le \vec{v}_i$.
@@ -242,7 +244,7 @@ Each value of $M$ is a real value, so we'll define the set of all real valued
 multidimensional matricies with shape $\vec{v}$ as $\mathbb{R}^{\vec{v}}$.
 
 We'll use the notation $M[\bar{v}]$ to reference any individual scalar value of $M$
-at indicies $\bar{v} \in \Dim(|M|)$. 
+at indicies $\bar{v} \in \Dim(\shape{M})$. 
 \end{definition}
 
 That's a huge informtion dump so look at an example.
@@ -252,10 +254,10 @@ Let $M$ be one of these newfangled `multimatrix' things. According to our
 definition, we also need to define a shape for the multimatrix. Let's
 say that our shape is $\left<5,7,9,2,3\right>$. In our notation, that
 means that,
-\[ |M| = \left<5,7,9,2,3\right> \]
-Let's name this shape vector, $|M| = \vec{m}$. Notice that this is
-a 5 dimensional multimatrix because $|\vec{m}| = 5$. Also note the
-subtle difference in $||M||$ which is 5 and $|M|$ which is $\vec{m}$.
+\[ \shape{M} = \left<5,7,9,2,3\right> \]
+Let's name this shape vector, $\shape{M} = \vec{m}$. Notice that this is
+a 5 dimensional multimatrix because $\shape{\vec{m}} = 5$. Also note the
+subtle difference in $\shape{\shape{M}}$ which is 5 and $\shape{M}$ which is $\vec{m}$.
 
 Let's look at some individual elements of $M$. We can say that,
 \[ M[5,4,3,2,1] = 3 \]
@@ -305,9 +307,9 @@ of more than one author) can express our derivative notation thusly,
 Let $F(X)$ be some function from $\mathbb{R}^{\vec{x}}$ to $\mathbb{R}^{\vec{f}}$.
 The complete derivative of $F$ with respect to $X$ is therefore in
 $\mathbb{R}^{\vec{f} \oplus \vec{x}}$. That is,
-\[ |F(X)| = \vec{f} \]
-\[ |X| = \vec{x} \]
-\[ \left|\frac{dF}{dX}\right| = \vec{f} \oplus \vec{x} \]
+\[ \shape{F(X)} = \vec{f} \]
+\[ \shape{X} = \vec{x} \]
+\[ \shape{\frac{dF}{dX}} = \vec{f} \oplus \vec{x} \]
 \[
 \forall \bar{f} \in \Dim(\vec{f}),
         \bar{x} \in \Dim(\vec{x}):
@@ -332,8 +334,8 @@ The complete derivative of $f$ with respect to $X$ is therefore in
 $\mathbb{R}^{\vec{x}}$. That is,
 \begin{align*}
 f(X) &\in \mathbb{R} \\
-|X| &= \vec{x} \\
-\left|\frac{df}{dX}\right| &= \vec{x}
+\shape{X} &= \vec{x} \\
+\shape{\frac{df}{dX}} &= \vec{x}
 \end{align*}
 \[
 \forall \bar{x} \in \Dim(\vec{x}):
@@ -348,9 +350,9 @@ Let $F(x)$ be some function from $\mathbb{R}$ to $\mathbb{R}^{\vec{f}}$.
 The complete derivative of $F$ with respect to $X$ is therefore in
 $\mathbb{R}^{\vec{f}}$. That is,
 \begin{align*}
-|F(x)| &= \vec{f} \\
+\shape{F(x)} &= \vec{f} \\
 x &\in \mathbb{R} \\
-\left|\frac{dF}{dx}\right| &= \vec{f}
+\shape{\frac{dF}{dx}} &= \vec{f}
 \end{align*}
 \[
 \forall \bar{f} \in \Dim(\vec{f}):
@@ -364,9 +366,9 @@ question?
 \[\frac{dB}{dX} = ? \]
 Well... sort of. We have to abuse the notation a little and say that $B$ and $X$ are
 just multimatricies with 2 dimensions. Then we can say that the total derivative
-of $B$ with respect to $X$ is a multimatrix with shape $|B| \oplus |X|$,
+of $B$ with respect to $X$ is a multimatrix with shape $\shape{B} \oplus \shape{X}$,
 whose elements we can define as,
-\[\forall \bar{b} \in \Dim(|B|), \bar{x} \in \Dim(|X|):\]
+\[\forall \bar{b} \in \Dim(\shape{B}), \bar{x} \in \Dim(\shape{X}):\]
 \begin{align*}
 \left( \frac{dB}{dX} \right)[\bar{b} \oplus \bar{x}]
 &= \frac{\partial B[\bar{b}]}{\partial X[\bar{x}]} \\
@@ -378,11 +380,11 @@ if we could define the total derivative without going down into the partial deri
 at all, which we'll be able to do in later chapters. As a sneak peak (a whole
 chapter ahead), that'll look like this:
 \[
-\frac{dB}{dX} = \Ident^3(|X|) \mmult{||X||} \cos(X)
+\frac{dB}{dX} = \Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \cos(X)
 \]
 
 But that single line will require defining multimatrix multiplication and
-a mysterious, and possibly dangerious, entity call a cubic identity, $\Ident^3(|X|)$.
+a mysterious, and possibly dangerious, entity call a cubic identity, $\Ident^3(\shape{X})$.
 
 \section{Exercises}
 
@@ -404,8 +406,8 @@ True or false?
 
 \begin{exercise}
 Let $F(X)$ be a function from $\mathbb{R}^{\left<3,7,2\right>}$ to
-$\mathbb{R}^{\left<6, 7\right>}$. That is, $|F(X)| = \left<6,7\right>$
-and for any valid input to $F(X)$, $|X| = \left<3,7,2\right>$.
+$\mathbb{R}^{\left<6, 7\right>}$. That is, $\shape{F(X)} = \left<6,7\right>$
+and for any valid input to $F(X)$, $\shape{X} = \left<3,7,2\right>$.
 Then what is the shape of $dF/dX$?
 \end{exercise}
 
@@ -413,7 +415,7 @@ Then what is the shape of $dF/dX$?
 Let $f(X)$ be the sum of all values of $X$, where
 $X \in \mathbb{R}^{\left<2,3,2\right>}$. That is,
 \[ f(X) = \sum_{\forall \bar{x} \in \Dim(\left<2,3,2\right>)} X[\bar{x}] \]
-What is the shape of $df/dX$? If $\bar{v} \in \Dim(|df/dX|)$ then what is
+What is the shape of $df/dX$? If $\bar{v} \in \Dim(\shape{df/dX})$ then what is
 \[ \frac{df}{dX}[\bar{v}] = ? \]
 \end{exercise}
 
@@ -440,10 +442,10 @@ Multimatrix multiplication is much the same.
 
 Just to review, for two matricies $A$ and $B$, multipication is only defined
 for $A \times B = C$ if $A$ has the same number of columns as $B$ has rows.
-That is, if $|A| = \left< r_a, c_a \right>$ and $|B| = \left< r_b, c_b \right>$
+That is, if $\shape{A} = \left< r_a, c_a \right>$ and $\shape{B} = \left< r_b, c_b \right>$
 then $A \times B$ is valid if and only if $c_a = r_b$. And furthermore,
 the remaining dimensions of $A$ and $B$ define the diminsions of $C$,
-$|C| = \left< r_a, c_b \right>$. Each element of $C$ is a sum of the product of
+$\shape{C} = \left< r_a, c_b \right>$. Each element of $C$ is a sum of the product of
 every combination of the corresponding row of $A$ and the corresponding column of
 $B$,
 
@@ -458,16 +460,16 @@ So now consider how we would multiply two matricies $A$ and $B$ if they had more
 than two dimensions. Let's use a concrete example to make the problems more
 structurally sound.
 
-Let $|A| = \left<5,7,7\right>$ and $|B| = \left<7,7,2,4\right>$.
-First of all, can we even multiply the two together? Hm... maybe? $|A|$ ends with
-$\left<\ldots, 7\right>$ and $|B|$ starts with $\left<7,\ldots\right>$ so it would
+Let $\shape{A} = \left<5,7,7\right>$ and $\shape{B} = \left<7,7,2,4\right>$.
+First of all, can we even multiply the two together? Hm... maybe? $\shape{A}$ ends with
+$\left<\ldots, 7\right>$ and $\shape{B}$ starts with $\left<7,\ldots\right>$ so it would
 make sense that we can somehow squish them together into something. By that reasoning,
 the shape of our after-multiplication output would use the remaining dimensions
-$\left<5, 7, 7, 2, 4\right> = |A \times B|$.
+$\left<5, 7, 7, 2, 4\right> = \shape{A \times B}$.
 
-But $|A|$ also ends with $\left<\ldots, 7, 7\right>$ and $|B|$ starts with
+But $\shape{A}$ also ends with $\left<\ldots, 7, 7\right>$ and $\shape{B}$ starts with
 $\left<7, 7\ldots\right>$ so maybe our multiplication operation should work on that
-additional dimension, leaving us with $\left<5, 2, 4\right> = |A \times B|$.
+additional dimension, leaving us with $\left<5, 2, 4\right> = \shape{A \times B}$.
 But the first definition looks like it could still be useful! It could let us cover 
 two dimensional matrix multiplication completely within our definition. This second
 definition seems more... er... multidimensional... but it also seems to
@@ -481,19 +483,19 @@ I would argue that there shall always be some component of,
 ``How many dimensions are you combining?'' inherent
 in the operation. So we can distinguish our two types of multiplication, and indeed
 an infinite number of types of multiplication, with a new operator, $\mmult{n}$ where
-$|A \mmult{1} B| = \left<5, 7, 7, 2, 4\right>$ and 
-$|A \mmult{2} B| = \left<5, 2, 4\right>$.
+$\shape{A \mmult{1} B} = \left<5, 7, 7, 2, 4\right>$ and 
+$\shape{A \mmult{2} B} = \left<5, 2, 4\right>$.
 
 But the shape is only a small component of the multipliation  operation. Let's
 just jump into the formal definition and I'll explain with an example:
 
 \begin{definition}[Multimatrix Multiplication]
 \label{mm_mult}
-Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$,
-$|B| = \vec{c} \oplus \vec{b}$, and $|\vec{c}| = n$ with
+Let $A$ and $B$ be multimatricies such that $\shape{A} = \vec{a} \oplus \vec{c}$,
+$\shape{B} = \vec{c} \oplus \vec{b}$, and $\shape{\vec{c}} = n$ with
 $n \in \{0\} \cup \mathbb{N}$. We shall call $n$ the 'size' or the 'width'
 or the 'overlap' of the multiplication operation.
-The shape of the result is defined, $|A \mmult{n} B| = \vec{a} \oplus \vec{b}$
+The shape of the result is defined, $\shape{A \mmult{n} B} = \vec{a} \oplus \vec{b}$
 and the value of the result is defined,
 \[
 \forall \bar{a} \in \Dim(\vec{a}), \bar{b} \in \Dim(\vec{b}):
@@ -505,7 +507,7 @@ and the value of the result is defined,
 
 \newpage
 \begin{example}
-Let $|A| = \left<2, 3, 2\right>$ and $|B| = \left<3, 2, 2\right>$. I would
+Let $\shape{A} = \left<2, 3, 2\right>$ and $\shape{B} = \left<3, 2, 2\right>$. I would
 define their values in a three dimensional grid but I fear that my three dimensional
 \LaTeX skills aren't up to the task (and three dimensional monitors are quite hard to
 come by). So here is where we leave behind nice graphical representations of
@@ -552,8 +554,8 @@ $\bar{b}_1$ & $\bar{b}_2$ & $\bar{b}_3$ & $B[\bar{b}]$ \\
 \end{center}
 \end{table}
 
-Given $|A|$ and $|B|$, and by our definition of multimatrix multiplication,
-you can see that $|A \mmult{2} B| = \left<2, 2\right>$. And the values of the
+Given $\shape{A}$ and $\shape{B}$, and by our definition of multimatrix multiplication,
+you can see that $\shape{A \mmult{2} B} = \left<2, 2\right>$. And the values of the
 resulting multimatrix are defined:
 
 \begin{table}[h!]
@@ -587,11 +589,11 @@ $\bar{x}_1$ & $\bar{x}_2$ & $(A \mmult{2} B)[\bar{x}]$ & = & = \\
 It's important to notice that this operation is identital to standard
 matrix multiplication for two dimensional multimatrices. For instance,
 if $A$ and $B$ are two dimensional multimatricies with shapes
-$|A| = \left<l_a, r_a\right>$ and $|B| = \left<l_b, r_b\right>$
+$\shape{A} = \left<l_a, r_a\right>$ and $\shape{B} = \left<l_b, r_b\right>$
 their product $A \mmult{1} B$ is valid if and only if $r_a = l_b$ and
-the result is of shape $|A \mmult{1} B| = \left<l_a, r_b\right>$.
+the result is of shape $\shape{A \mmult{1} B} = \left<l_a, r_b\right>$.
 And of course, the value at each index
-$\left<l_c, r_c\right> \in \Dim(|A \mmult{1} B|)$ is,
+$\left<l_c, r_c\right> \in \Dim(\shape{A \mmult{1} B})$ is,
 \[
   (A \mmult{1} B)[l_c, r_c]
   =
@@ -608,20 +610,20 @@ nonsense, and indeed it is, but I shall prove it to you.
 
 Multimatrix multiplication may not even make sense dimensionally when you move
 around parentheses. Take for example multimatricies $A$, $B$, and $C$ such that,
-$|A| = \left<5,3,2\right>$,
-$|B| = \left<2,7\right>$, and
-$|C| = \left<3,7,2\right>$ where you should be able to see that
+$\shape{A} = \left<5,3,2\right>$,
+$\shape{B} = \left<2,7\right>$, and
+$\shape{C} = \left<3,7,2\right>$ where you should be able to see that
 $(A \mmult{1} B) \mmult{2} C$ is a valid operation since
-$|A \mmult{1} B| = \left<5,3,7\right>$ and
-$|(A \mmult{1} B) \mmult{2} C| = \left<5,2\right>$. But
+$\shape{A \mmult{1} B} = \left<5,3,7\right>$ and
+$\shape{(A \mmult{1} B) \mmult{2} C} = \left<5,2\right>$. But
 $A \mmult{1} (B \mmult{2} C)$ isn't a valid set of operations since even
 $B \mmult{2} C$ is an invalid operation.
 
 But even when the dimensional analysis makes sense, multimatrix multiplication
 may not be associative (Honestly, how could you be so naive?). 
 Take, for example, multimatricies $A$, $B$, and $C$ such
-that $|A| = \left<2,2,2,2\right>$, $|B| = \left<2,2,2\right>$, and
-$|C| = \left<2,2,2,2\right>$. Let,
+that $\shape{A} = \left<2,2,2,2\right>$, $\shape{B} = \left<2,2,2\right>$, and
+$\shape{C} = \left<2,2,2,2\right>$. Let,
 \[
  A[\bar{a}] = 
   \left\{
@@ -683,43 +685,43 @@ However, there are a broad catagory of cases where associativity \textit{does} h
 Let $A$, $B$, and $C$ be multimatricies and $m$ and $n$ in
 $\{0\} \cup \mathbb{N}$.
 If both operations $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$
-are valid dimensionally and $m+n \le ||B||$, then,
+are valid dimensionally and $m+n \le \shape{\shape{B}}$, then,
 \[ (A \mmult{m} B) \mmult{n} C = A \mmult{m} (B \mmult{n} C) \]
 \end{theorem}
 \begin{proof}
 Let $A$, $B$, and $C$ be matricies such that the calculations
 $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$ are both valid
-and $m + n \le ||B||$.
+and $m + n \le \shape{\shape{B}}$.
 Then the following must be true by the definiton of multimatrix multiplication
 (Def. \ref{mm_mult}).
 
 Since $A \mmult{m} B$ is defined, there exist vectors $\vec{a}, \vec{m},$ and
 $\vec{b_1}$ such that 
-$|\vec{m}| = m$,
-$|A| = \vec{a} \oplus \vec{m}$,
+$\shape{\vec{m}} = m$,
+$\shape{A} = \vec{a} \oplus \vec{m}$,
 and
-$|B| = \vec{m} \oplus \vec{b_1}$
+$\shape{B} = \vec{m} \oplus \vec{b_1}$
 
 Since $B \mmult{n} C$ is defined, there exist vectors $\vec{b_2}, \vec{n},$ and
 $\vec{c}$ such that
-$|\vec{n}| = n$,
-$|B| = \vec{b_2} \oplus \vec{n}$
+$\shape{\vec{n}} = n$,
+$\shape{B} = \vec{b_2} \oplus \vec{n}$
 and
-$|C| = \vec{n} \oplus \vec{c}$
+$\shape{C} = \vec{n} \oplus \vec{c}$
 
-Since $|B| = \vec{m} \oplus \vec{b_1} = \vec{b_2} \oplus \vec{n}$ and
-$||B|| \ge |\vec{m}| + |\vec{n}|$, it must follow that, there is some vector $\vec{b}$
+Since $\shape{B} = \vec{m} \oplus \vec{b_1} = \vec{b_2} \oplus \vec{n}$ and
+$\shape{\shape{B}} \ge \shape{\vec{m}} + \shape{\vec{n}}$, it must follow that, there is some vector $\vec{b}$
 such that,
 \[
- |B| = \vec{m} \oplus \vec{b} \oplus \vec{n}
+ \shape{B} = \vec{m} \oplus \vec{b} \oplus \vec{n}
 \]
 Even if $\vec{b}$ is an empty vector. Then,
-\[ |A \mmult{m} B| = \vec{a} \oplus \vec{b} \oplus \vec{n} \]
-\[ |(A \mmult{m} B) \mmult{n} C| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
-\[ |B \mmult{n} C| = \vec{m} \oplus \vec{b} \oplus \vec{c} \]
-\[ |A \mmult{m} (B \mmult{n} C)| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{A \mmult{m} B} = \vec{a} \oplus \vec{b} \oplus \vec{n} \]
+\[ \shape{(A \mmult{m} B) \mmult{n} C} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{B \mmult{n} C} = \vec{m} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{A \mmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 So,
-\[ |(A \mmult{m} B) \mmult{n} C| = |A \mmult{m} (B \mmult{n} C)| \]
+\[ \shape{(A \mmult{m} B) \mmult{n} C} = \shape{A \mmult{m} (B \mmult{n} C)} \]
 Which is necessary, but not sufficient, for our proof.
 
 Looking at each element of the result matricies, let $j$ and $k$ be the values
@@ -771,18 +773,18 @@ the same shape and the multiplication is combining them completely into a
 scalar by combining their full width.
 
 \begin{theorem}[Communicativity of Multiplication]
-Let $|A| = \vec{x}$ and $|B| = \vec{x}$. Then,
-\[ A \mmult{|\vec{x}|} B = B \mmult{|\vec{x}|} A \]
+Let $\shape{A} = \vec{x}$ and $\shape{B} = \vec{x}$. Then,
+\[ A \mmult{\shape{\vec{x}}} B = B \mmult{\shape{\vec{x}}} A \]
 \end{theorem}
 \begin{proof}
-Let $A$, $B$, and $\vec{x}$ be as described above. Notice that then $|A \mmult{|\vec{x}|} B|$
+Let $A$, $B$, and $\vec{x}$ be as described above. Notice that then $\shape{A \mmult{\shape{\vec{x}}} B}$
 results in a zero dimensional multimatrix - a multimatrix with one element which is effectively
 just a scalar.
 \begin{align*}
-(A \mmult{|\vec{x}|} B)[\{\}]
+(A \mmult{\shape{\vec{x}}} B)[\{\}]
   &= \sum_{\forall \bar{x} \in \Dim(\vec{x})} A[\bar{x}]B[\bar{x}] \\
   &= \sum_{\forall \bar{x} \in \Dim(\vec{x})} B[\bar{x}]A[\bar{x}] \\
-  &= (B \mmult{|\vec{x}|} A)[\{\}]
+  &= (B \mmult{\shape{\vec{x}}} A)[\{\}]
 \end{align*}
 \end{proof}
 
@@ -798,7 +800,7 @@ situation even more so, like loosing a troup of clowns in children's cancer ward
 \label{mm_mult_ident}
 Let us define $\Ident^n(\vec{v})$ as the $n^{\text{th}}$ order identity with base shape
 $\vec{v}$. This $\Ident^n(\vec{v})$ is a multimatrix with shape,
-\[ |\Ident^n(\vec{v})| = \bigoplus_{i \in [1, n]} \vec{v} \]
+\[ \shape{\Ident^n(\vec{v})} = \bigoplus_{i \in [1, n]} \vec{v} \]
 That is, it's shape is $n$ successive concatinations of $\vec{v}$.
 Let each element of $\Ident^n(\vec{v})$ is defined as,
 \[ \forall \bar{v_1}, \bar{v_2}, \ldots, \bar{v_n} \text{ each in } \Dim(\vec{v}) : \]
@@ -827,20 +829,20 @@ square identity it relates to a multiplication operation.
 For all multimaticies, $A$, and all vectors, $\vec{m}$ and $\vec{n}$,  on which
 these operations are valid,
 \[
- A \mmult{|\vec{m}|} \Ident^2(\vec{m}) = A
+ A \mmult{\shape{\vec{m}}} \Ident^2(\vec{m}) = A
 \]
 and
 \[
- \Ident^2(\vec{n}) \mmult{|\vec{n}|} A = A
+ \Ident^2(\vec{n}) \mmult{\shape{\vec{n}}} A = A
 \]
 \end{theorem}
 \begin{proof}
 \begin{ppart}
-Let $A$ be a matrix with shape $|A| = \vec{a} \oplus \vec{m}$.
+Let $A$ be a matrix with shape $\shape{A} = \vec{a} \oplus \vec{m}$.
 Then by the definition of multimatrix multiplication (Def. \ref{mm_mult}),
 \[ \forall \bar{a} \in \Dim(\vec{a}), \bar{m_1} \in \Dim(\vec{m}) : \]
 \[
- (A \mmult{|\vec{m}|} \Ident^2(\vec{m}))[\bar{a} \oplus \bar{m_1}]
+ (A \mmult{\shape{\vec{m}}} \Ident^2(\vec{m}))[\bar{a} \oplus \bar{m_1}]
  =
  \sum_{\forall \bar{m_2} \in \Dim(\vec{m})}
  A[\bar{a} \oplus \bar{m_2}] \Ident^2(\vec{m})[\bar{m_2} \oplus \bar{m_1}]
@@ -848,7 +850,7 @@ Then by the definition of multimatrix multiplication (Def. \ref{mm_mult}),
 Then, by the definition of $\Ident^2(\vec{m})$ (Def. \ref{mm_ident}) it follows
 that,
 \begin{align*}
- (A \mmult{|\vec{m}|} \Ident^2(\vec{m}))[\bar{a} \oplus \bar{m_1}]
+ (A \mmult{\shape{\vec{m}}} \Ident^2(\vec{m}))[\bar{a} \oplus \bar{m_1}]
  &=
  \left(
   \sum_{\forall \bar{m_2} \ne \bar{m_1}}
@@ -863,14 +865,14 @@ that,
  &= 0 + A[\bar{a} \oplus \bar{m_1}] \\
  &= A[\bar{a} \oplus \bar{m_1}]
 \end{align*}
-Therefore $A \mmult{|\vec{m}|} \Ident^2(\vec{m}) = A$
+Therefore $A \mmult{\shape{\vec{m}}} \Ident^2(\vec{m}) = A$
 \end{ppart}
 \begin{ppart}
-Let $A$ be a matrix with shape $|A| = \vec{n} \oplus \vec{a}$.
+Let $A$ be a matrix with shape $\shape{A} = \vec{n} \oplus \vec{a}$.
 Then by the definition of multimatrix multiplication (Def. \ref{mm_mult}),
 \[ \forall  \bar{n_1} \in \Dim(\vec{n}), \bar{a} \in \Dim(\vec{a}) : \]
 \[
- (\Ident^2(\vec{n}) \mmult{|\vec{n}|} A)[\bar{n_1} \oplus \bar{a}]
+ (\Ident^2(\vec{n}) \mmult{\shape{\vec{n}}} A)[\bar{n_1} \oplus \bar{a}]
  =
  \sum_{\forall \bar{n_2} \in \Dim(\vec{n})}
  \Ident^2(\vec{n})[\bar{n_1} \oplus \bar{n_2}]A[\bar{n_2} \oplus \bar{a}] 
@@ -878,7 +880,7 @@ Then by the definition of multimatrix multiplication (Def. \ref{mm_mult}),
 Then, by the definition of $\Ident^2(\vec{n})$ (Def. \ref{mm_ident}) it follows
 that,
 \begin{align*}
- (\Ident^2(\vec{n}) \mmult{|\vec{n}|} A)[\bar{n_1} \oplus \bar{a}]
+ (\Ident^2(\vec{n}) \mmult{\shape{\vec{n}}} A)[\bar{n_1} \oplus \bar{a}]
  &=
  \left(
   \sum_{\forall \bar{n_2} \ne \bar{n_1}}
@@ -893,7 +895,7 @@ that,
  &= 0 + A[\bar{n_1} \oplus \bar{a}] \\
  &= A[\bar{n_1} \oplus \bar{a}]
 \end{align*}
-Therefore $\Ident^2(\vec{n}) \mmult{|\vec{n}|} A = A$
+Therefore $\Ident^2(\vec{n}) \mmult{\shape{\vec{n}}} A = A$
 \end{ppart}
 \end{proof}
 
@@ -905,35 +907,35 @@ alternate definition of $\Ident^2$.
 If there is a matrix $X$ of shape $\vec{x} \oplus \vec{x}$ such that
 for all matricies, $A$, for which the operation is defined,
 
-\[A \mmult{|\vec{x}|} X = A \]
+\[A \mmult{\shape{\vec{x}}} X = A \]
 
 Then $X = \Ident^2(\vec{x})$.
 
 Or if for all matricies, $B$, for which the operation is defined,
 
-\[X \mmult{|\vec{x}|} B = B \]
+\[X \mmult{\shape{\vec{x}}} B = B \]
 
 Then, again, $X = \Ident^2(\vec{x})$.
 \end{corollary}
 \begin{proof}
 Let $X$ be a matrix of shape $\vec{x} \oplus \vec{x}$. 
 \begin{ppart}
-If for all multimatrixes, $A$, on which $A \mmult{|\vec{x}|} X$ is defined, 
-$A \mmult{|\vec{x}|} X = A$ this implies that, in the case of $A = \Ident^2(\vec{x})$,
+If for all multimatrixes, $A$, on which $A \mmult{\shape{\vec{x}}} X$ is defined, 
+$A \mmult{\shape{\vec{x}}} X = A$ this implies that, in the case of $A = \Ident^2(\vec{x})$,
 
 \begin{align*}
-  A \mmult{|\vec{x}|} X &= A \\
- \Ident^2(\vec{x}) \mmult{|\vec{x}|} X &= \Ident^2(\vec{x}) \\
+  A \mmult{\shape{\vec{x}}} X &= A \\
+ \Ident^2(\vec{x}) \mmult{\shape{\vec{x}}} X &= \Ident^2(\vec{x}) \\
   X &= \Ident^2(\vec{x}) 
 \end{align*}
 \end{ppart}
 \begin{ppart}
-If for all multimatrixes, $B$, on which $X \mmult{|\vec{x}|} B$ is defined, 
-$X \mmult{|\vec{x}|} B = B$ this implies that, in the case of $B = \Ident^2(\vec{x})$,
+If for all multimatrixes, $B$, on which $X \mmult{\shape{\vec{x}}} B$ is defined, 
+$X \mmult{\shape{\vec{x}}} B = B$ this implies that, in the case of $B = \Ident^2(\vec{x})$,
 
 \begin{align*}
-  X \mmult{|\vec{x}|} B &= B \\
-  X \mmult{|\vec{x}|} \Ident^2(\vec{x}) &= \Ident^2(\vec{x}) \\
+  X \mmult{\shape{\vec{x}}} B &= B \\
+  X \mmult{\shape{\vec{x}}} \Ident^2(\vec{x}) &= \Ident^2(\vec{x}) \\
   X &= \Ident^2(\vec{x}) 
 \end{align*}
 \end{ppart}
@@ -945,10 +947,10 @@ with respect to itself.
 \begin{theorem}[Self Derivative]
 \label{self_derivative}
 Let $X$ be some multimatrix. Then,
-\[ \frac{dX}{dX} = \Ident^2(|X|) \]
+\[ \frac{dX}{dX} = \Ident^2(\shape{X}) \]
 \end{theorem}
 \begin{proof}
-Let $X$ be a multimatrix of shape $|X|=\vec{x}$.
+Let $X$ be a multimatrix of shape $\shape{X}=\vec{x}$.
 By the derivative definition (Def. \ref{mm_derivative}),
 \[
  \forall \bar{x_1} \in \Dim(\vec{x}),
@@ -969,7 +971,7 @@ Since each element of $X$ is independent with respect to itself,
  \right. \\
  &= \Ident^2(\vec{x})[\bar{x_1} \oplus \bar{x_2}]
 \end{align*}
-Therefore $dX/dX = \Ident^2(|X|)$
+Therefore $dX/dX = \Ident^2(\shape{X})$
 \end{proof}
 
 The cubic identity, strangely enough, appear in the derivative of elementwise
@@ -987,11 +989,11 @@ Also, let $M'$ be the elementwise function on $X$ which applies the derivative
 of $M$'s associated scalar function to each element of $X$. That is,
 \[ M'(X)[\bar{x}] = m'(X[\bar{x}]) \]
 Then,
-\[ \frac{dM}{dX} = \Ident^3(|X|) \mmult{||X||} M'(X) \]
+\[ \frac{dM}{dX} = \Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} M'(X) \]
 \end{theorem}
 \begin{proof}
 By the definition of a multimatrix derivative,
-\[ \forall \bar{m} \in \Dim(|M|), \bar{x} \in \Dim(|X|) : \]
+\[ \forall \bar{m} \in \Dim(\shape{M}), \bar{x} \in \Dim(\shape{X}) : \]
 \begin{align*}
  \frac{dM}{dX}[\bar{m} \oplus \bar{x}]
  &= \frac{\partial M[\bar{m}]}{\partial X[\bar{x}]} \\
@@ -1004,16 +1006,16 @@ By the definition of a multimatrix derivative,
  \right. \\
  &= \delta_{\bar{m} \bar{x}} m'(X[\bar{m}])
 \end{align*}
-Since, by our definition of elementwise function, $|M| = |X|$, we can
+Since, by our definition of elementwise function, $\shape{M} = \shape{X}$, we can
 say that, 
 \begin{align*}
- (\Ident^3(|X|) \mmult{||X||} M'(X))[\bar{m} \oplus \bar{x}]
- &= \sum_{\forall \bar{y} \in \Dim(|X|)}
- \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] M'(X)[\bar{y}] \\
- &= \sum_{\forall \bar{y} \in \Dim(|X|)}
- \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
+ (\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} M'(X))[\bar{m} \oplus \bar{x}]
+ &= \sum_{\forall \bar{y} \in \Dim(\shape{X})}
+ \Ident^3(\shape{X})[\bar{m} \oplus \bar{x} \oplus \bar{y}] M'(X)[\bar{y}] \\
+ &= \sum_{\forall \bar{y} \in \Dim(\shape{X})}
+ \Ident^3(\shape{X})[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
  &= \sum_{\forall \bar{y} = \bar{m} = \bar{x}}
- \Ident^3(|X|)[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
+ \Ident^3(\shape{X})[\bar{m} \oplus \bar{x} \oplus \bar{y}] m'(X[\bar{y}]) \\
  &= \left\{
   \begin{array}{ll}
     m'(X[\bar{m}]) & \mbox{if } \bar{m} = \bar{x} \\
@@ -1022,7 +1024,7 @@ say that,
  \right. \\
  &= \delta_{\bar{m} \bar{x}} m'(X[\bar{m}])
 \end{align*}
-Therefore $dM/dX = \Ident^3(|X|) \mmult{||X||} M'(X)$
+Therefore $dM/dX = \Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} M'(X)$
 \end{proof}
 
 Multimatrix identities also tend to cancel eachother out when multiplied by
@@ -1032,7 +1034,7 @@ multiples of their base shape lengths.
 \begin{theorem}[Identity Contraction]
 For all $m, n, k \in \mathbb{N}$ (note $m$, $n$, and $k$ are non-zero) and $\vec{x}$ as a valid multimatrix shape,
 where $m > k$ and $n > k$,
-\[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
+\[ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{theorem}
 \begin{proof}
 Consider that for some indicies
@@ -1041,7 +1043,7 @@ and $\{\bar{b_1}, \bar{b_2}, \ldots \bar{b}_{n-k}\}$ where each
 $\bar{a_i} \in \Dim(\vec{x})$ and each $\bar{b_i} \in \Dim(\vec{x})$,
 
 \begin{align*}
-&\left( \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right)
+&\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
 [\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] = \\
 &\sum_{\forall \bar{c_1}, \bar{c_2}, \ldots \bar{c_k} \in \Dim(\vec{x})}
 \Ident^m(\vec{x})
@@ -1056,7 +1058,7 @@ will be 0 whenever the any $\bar{c_i} \ne \bar{c_j}$ - we can simplify that to a
 the same $c$.
 
 \begin{align*}
-&\left( \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right)
+&\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
 [\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] = \\
 &\sum_{\forall \bar{c} \in \Dim(\vec{x})}
 \Ident^m(\vec{x})
@@ -1076,7 +1078,7 @@ be any value in the range of all $\bar{a_i}$ and $\bar{b_i}$ and this is not a
 zero width multiplication ($k >= 1$). Therefore,
 
 \begin{align*}
-\left( \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right)
+\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
 [\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] =
 \left\{
   \begin{array}{ll}
@@ -1090,14 +1092,14 @@ Which is an identity matrix! And since the dimensional rules of multimatrix
 multiplication show that,
 
 \[
- \left|\left| \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) \right|\right|
+ \shape{\shape{ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) }}
  =
- ||\Ident^m(\vec{x})|| + ||\Ident^n(\vec{x})|| - 2k|\vec{x}|
+ \shape{\shape{\Ident^m(\vec{x})}} + \shape{\shape{\Ident^n(\vec{x})}} - 2k\shape{\vec{x}}
 \]
 
 We've shown that,
 
-\[ \Ident^m(\vec{x}) \mmult{k|\vec{x}|} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
+\[ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{proof}
 \end{landscape}
 
@@ -1109,7 +1111,7 @@ a bit like Tommy Wiseau writing my own sex scene into the script... twice... God
 what a tool.
 
 \begin{theorem}[Zero Overlap Multiplication]
-Anyways, if $|A| = \vec{a}$ and $|B| = \vec{b}$, for every $\bar{a} \in \Dim(\vec{a})$
+Anyways, if $\shape{A} = \vec{a}$ and $\shape{B} = \vec{b}$, for every $\bar{a} \in \Dim(\vec{a})$
 and $\bar{b} \in \Dim(\vec{b}):$
 
 \[ (A \mmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] \]
@@ -1144,14 +1146,14 @@ So let's clarify what we can.
 \begin{definition}[Multiplicative Functions]
 Let us declare the function $\RMult[m,X](M)$ to be the function defined 
 by the tuple,
-\[ \left<m,X\right> \in \{  (\{0\} \cup \mathbb{N}) \times \mathbb{R}^{\vec{m} \oplus \vec{x}}  :  |\vec{m}| = m \} \]
+\[ \left<m,X\right> \in \{  (\{0\} \cup \mathbb{N}) \times \mathbb{R}^{\vec{m} \oplus \vec{x}}  :  \shape{\vec{m}} = m \} \]
 such that,
 \[ \RMult[m,X](M) : \mathbb{R}^{\vec{l} \oplus \vec{m}} \to \mathbb{R}^{\vec{l} \oplus \vec{x}} \]
 \[ \RMult[m,X](M) = M \mmult{m} X \]
 
 Let us also declare the function $\LMult[m,X](M)$ to be the function defined 
 by the tuple,
-\[ \left<m,X\right> \in \{  (\{0\} \cup \mathbb{N}) \times \mathbb{R}^{\vec{x} \oplus \vec{m}}  :  |\vec{m}| = m \} \]
+\[ \left<m,X\right> \in \{  (\{0\} \cup \mathbb{N}) \times \mathbb{R}^{\vec{x} \oplus \vec{m}}  :  \shape{\vec{m}} = m \} \]
 such that,
 \[ \LMult[m,X](M) : \mathbb{R}^{\vec{m} \oplus \vec{r}} \to \mathbb{R}^{\vec{x} \oplus \vec{r}} \]
 \[ \LMult[m,X](M) = X \mmult{m} M \]
@@ -1181,14 +1183,14 @@ $\RMult[2,\Ident^2(\left<2,2\right)]$ or
 $\RMult[1,\Ident^2(\left<2\right>)]$.
 
 \begin{theorem}[Relation of Inverse to Identity]
-If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $|X| = \vec{m} \oplus \vec{x}$ and $|\vec{m}| = m$
+If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $\shape{X} = \vec{m} \oplus \vec{x}$ and $\shape{\vec{m}} = m$
 then $X \mmult{n} Y = \Ident^2(\vec{m})$.
-And if $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$ where $|X| = \vec{x} \oplus \vec{m}$ and $|\vec{m}| = m$
+And if $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$ where $\shape{X} = \vec{x} \oplus \vec{m}$ and $\shape{\vec{m}} = m$
 then $Y \mmult{n} X = \Ident^2(\vec{m})$.
 \end{theorem}
 \begin{proof}
 \begin{ppart}
-Let $X$ be a multimatrix such that $|X| = \vec{m} \oplus \vec{x}$ and $|\vec{m}| = m$.
+Let $X$ be a multimatrix such that $\shape{X} = \vec{m} \oplus \vec{x}$ and $\shape{\vec{m}} = m$.
 If $\RMult[n,Y]$ is the inverse of $\RMult[m,X]$ then, for all $M$,
 \begin{align*}
   \RMult[n,Y] \circ \RMult[m,X] (M) &= M \\
@@ -1202,7 +1204,7 @@ This is also true in the case where $M = \Ident^2(\vec{m})$. In which case,
 \end{align*}
 \end{ppart}
 \begin{ppart}
-Let $X$ be a multimatrix such that $|X| = \vec{x} \oplus \vec{m}$ and $|\vec{m}| = m$.
+Let $X$ be a multimatrix such that $\shape{X} = \vec{x} \oplus \vec{m}$ and $\shape{\vec{m}} = m$.
 If $\LMult[n,Y]$ is the inverse of $\LMult[m,X]$ then, for all $M$,
 \begin{align*}
   \LMult[n,Y] \circ \LMult[m,X] (M) &= M \\
@@ -1218,53 +1220,53 @@ This is also true in the case where $M = \Ident^2(\vec{m})$. In which case,
 \end{proof}
 
 \begin{theorem}[Shape of Inverses]
-If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $|X| = \vec{m} \oplus \vec{x}$ and
-$|\vec{m}| = m$ then $n \le ||X||-m$.
+If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $\shape{X} = \vec{m} \oplus \vec{x}$ and
+$\shape{\vec{m}} = m$ then $n \le \shape{\shape{X}}-m$.
 
-Also, if $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$ where $|X| = \vec{x} \oplus \vec{m}$ and
-$|\vec{m}| = m$ then $n \le ||X||-m$.
+Also, if $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$ where $\shape{X} = \vec{x} \oplus \vec{m}$ and
+$\shape{\vec{m}} = m$ then $n \le \shape{\shape{X}}-m$.
 \end{theorem}
 \begin{proof}
 \begin{ppart}
-Let $\RMult[n,Y]$ be an inverse of $\RMult[m,X]$ where $|X| = \vec{m} \oplus \vec{x}$ and
-$|\vec{m}| = m$.
+Let $\RMult[n,Y]$ be an inverse of $\RMult[m,X]$ where $\shape{X} = \vec{m} \oplus \vec{x}$ and
+$\shape{\vec{m}} = m$.
 Let $M$ be some valid input of $\RMult[m,X]$.
-In other words, $|M| = \vec{l} \oplus \vec{m}$ for some $\vec{l}$.
-So $|M \mmult{m} X| = \vec{l} \oplus \vec{x}$.
-Since $\RMult[n,Y]$ is a valid operation on $M \mmult{m} X$, $n \le |\vec{l} \oplus \vec{x}|$.
-And since there is no restriction on $\vec{l}$ it's only useful to say that $n \le |\vec{x}|$.
-Given that $||X|| = |\vec{x}| + m$ it follows that $n \le ||X|| - m$.
+In other words, $\shape{M} = \vec{l} \oplus \vec{m}$ for some $\vec{l}$.
+So $\shape{M \mmult{m} X} = \vec{l} \oplus \vec{x}$.
+Since $\RMult[n,Y]$ is a valid operation on $M \mmult{m} X$, $n \le \shape{\vec{l} \oplus \vec{x}}$.
+And since there is no restriction on $\vec{l}$ it's only useful to say that $n \le \shape{\vec{x}}$.
+Given that $\shape{\shape{X}} = \shape{\vec{x}} + m$ it follows that $n \le \shape{\shape{X}} - m$.
 \end{ppart}
 \begin{ppart}
-Let $\LMult[n,Y]$ be an inverse of $\LMult[m,X]$ where $|X| = \vec{x} \oplus \vec{m}$ and
-$|\vec{m}| = m$.
+Let $\LMult[n,Y]$ be an inverse of $\LMult[m,X]$ where $\shape{X} = \vec{x} \oplus \vec{m}$ and
+$\shape{\vec{m}} = m$.
 Let $M$ be some valid input of $\LMult[m,X]$.
-In other words, $|M| = \vec{m} \oplus \vec{r}$ for some $\vec{r}$.
-So $|X \mmult{m} M| = \vec{x} \oplus \vec{r}$.
-Since $\RMult[n,Y]$ is a valid operation on $X \mmult{m} M$, $n \le |\vec{x} \oplus \vec{r}|$.
-And since there is no restriction on $\vec{r}$ it's only useful to say that $n \le |\vec{x}|$.
-Given that $||X|| = |\vec{x}| + m$ it follows that $n \le ||X|| - m$.
+In other words, $\shape{M} = \vec{m} \oplus \vec{r}$ for some $\vec{r}$.
+So $\shape{X \mmult{m} M} = \vec{x} \oplus \vec{r}$.
+Since $\RMult[n,Y]$ is a valid operation on $X \mmult{m} M$, $n \le \shape{\vec{x} \oplus \vec{r}}$.
+And since there is no restriction on $\vec{r}$ it's only useful to say that $n \le \shape{\vec{x}}$.
+Given that $\shape{\shape{X}} = \shape{\vec{x}} + m$ it follows that $n \le \shape{\shape{X}} - m$.
 \end{ppart}
 \end{proof}
 
 
 \begin{theorem}[Relation of Identity to Inverse]
-If $X \mmult{n} Y = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{m} \oplus \vec{x}$,
-and $n \le ||X||-m$, that implies that $\RMult[n, Y]$ is an inverse of $\RMult[m, X]$.
+If $X \mmult{n} Y = \Ident^2(\vec{m})$, $\shape{\vec{m}} = m$, $\shape{X} = \vec{m} \oplus \vec{x}$,
+and $n \le \shape{\shape{X}}-m$, that implies that $\RMult[n, Y]$ is an inverse of $\RMult[m, X]$.
 
-Also,  if $Y \mmult{n} X = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{x} \oplus \vec{m}$,
-and $n \le ||X||-m$, that implies that $\LMult[n, Y]$ is an inverse of $\LMult[m, X]$.
+Also,  if $Y \mmult{n} X = \Ident^2(\vec{m})$, $\shape{\vec{m}} = m$, $\shape{X} = \vec{x} \oplus \vec{m}$,
+and $n \le \shape{\shape{X}}-m$, that implies that $\LMult[n, Y]$ is an inverse of $\LMult[m, X]$.
 \end{theorem}
 \begin{proof}
 \begin{ppart}
-Let $X \mmult{n} Y = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{m} \oplus \vec{x}$, and $n \le ||X||-m$.
-We know that $n \le |\vec{x}|$ since $|\vec{x}| = ||X||-m$.
-Then we can split up $\vec{x}$ into $\vec{x_l} \oplus \vec{x_r}$ where $|\vec{x_r}| = n$.
-So $|Y| = \vec{x_r} \oplus \vec{y}$ for some $\vec{y}$ since $X \mmult{n} Y$ is defined.
-We can then find the shape $|X \mmult{n} Y| = \vec{m} \oplus \vec{x_l} \oplus \vec{y}$.
+Let $X \mmult{n} Y = \Ident^2(\vec{m})$, $\shape{\vec{m}} = m$, $\shape{X} = \vec{m} \oplus \vec{x}$, and $n \le \shape{\shape{X}}-m$.
+We know that $n \le \shape{\vec{x}}$ since $\shape{\vec{x}} = \shape{\shape{X}}-m$.
+Then we can split up $\vec{x}$ into $\vec{x_l} \oplus \vec{x_r}$ where $\shape{\vec{x_r}} = n$.
+So $\shape{Y} = \vec{x_r} \oplus \vec{y}$ for some $\vec{y}$ since $X \mmult{n} Y$ is defined.
+We can then find the shape $\shape{X \mmult{n} Y} = \vec{m} \oplus \vec{x_l} \oplus \vec{y}$.
 Then for any $M$ such that $M \mmult{m} X$ is defined, i.e. any $M$ of shape $\vec{l} \oplus \vec{m}$ for some $\vec{l}$,
 we can tell that $M \mmult{m} (X \mmult{n} Y)$ is also defined.
-And since $n \le ||X||-m$ that implies $n+m \le ||X||$ so $M \mmult{m} (X \mmult{n} Y) = (M \mmult{m} X) \mmult{n} Y$
+And since $n \le \shape{\shape{X}}-m$ that implies $n+m \le \shape{\shape{X}}$ so $M \mmult{m} (X \mmult{n} Y) = (M \mmult{m} X) \mmult{n} Y$
 by Theorem \ref{mm_associativity}.
 And if we just replace $X \mmult{n} Y$ with it's given value, then for all $M$ on which the $\RMult[m,X]$ is defined,
 \begin{align*}
@@ -1276,14 +1278,14 @@ And if we just replace $X \mmult{n} Y$ with it's given value, then for all $M$ o
 Therefore $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$.
 \end{ppart}
 \begin{ppart}
-Let $Y \mmult{n} X = \Ident^2(\vec{m})$, $|\vec{m}| = m$, $|X| = \vec{x} \oplus \vec{m}$, and $n \le ||X||-m$.
-We know that $n \le |\vec{x}|$ since $|\vec{x}| = ||X||-m$.
-Then we can split up $\vec{x}$ into $\vec{x_l} \oplus \vec{x_r}$ where $|\vec{x_l}| = n$.
-So $|Y| = \vec{y} \oplus \vec{x_l}$ for some $\vec{y}$ since $Y \mmult{n} X$ is defined.
-We can then find the shape $|Y \mmult{n} X| = \vec{y} \oplus \vec{x_r} \oplus \vec{m}$.
+Let $Y \mmult{n} X = \Ident^2(\vec{m})$, $\shape{\vec{m}} = m$, $\shape{X} = \vec{x} \oplus \vec{m}$, and $n \le \shape{\shape{X}}-m$.
+We know that $n \le \shape{\vec{x}}$ since $\shape{\vec{x}} = \shape{\shape{X}}-m$.
+Then we can split up $\vec{x}$ into $\vec{x_l} \oplus \vec{x_r}$ where $\shape{\vec{x_l}} = n$.
+So $\shape{Y} = \vec{y} \oplus \vec{x_l}$ for some $\vec{y}$ since $Y \mmult{n} X$ is defined.
+We can then find the shape $\shape{Y \mmult{n} X} = \vec{y} \oplus \vec{x_r} \oplus \vec{m}$.
 Then for any $M$ such that $X \mmult{m} M$ is defined, i.e. any $M$ of shape $\vec{m} \oplus \vec{r}$ for some $\vec{r}$,
 we can tell that $(Y \mmult{n} X) \mmult{m} M$ is also defined.
-And since $n \le ||X||-m$ that implies $n+m \le ||X||$ so $(Y \mmult{n} X) \mmult{m} M = Y \mmult{n} (X \mmult{m} M)$
+And since $n \le \shape{\shape{X}}-m$ that implies $n+m \le \shape{\shape{X}}$ so $(Y \mmult{n} X) \mmult{m} M = Y \mmult{n} (X \mmult{m} M)$
 by Theorem \ref{mm_associativity}.
 And if we just replace $Y \mmult{n} X$ with it's given value, then for all $M$ on which the $\LMult[m,X]$ is defined,
 \begin{align*}
@@ -1304,10 +1306,10 @@ to a 2d matrix multiplication. We'll first need to define a special function:
 Let $\vec{x}$ be some shape vector and $\bar{x} \in \Dim(\vec{x})$. Then the indexing function is one which transforms
 that $\bar{x}$ into a unique integer (i.e. it is one-to-one):
 \[
-  \Idx[\vec{x}](\bar{x}) = \sum_{1 \le i \le |\vec{x}|} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
+  \Idx[\vec{x}](\bar{x}) = \sum_{1 \le i \le \shape{\vec{x}}} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
 \]
 And then inverse function takes an integer and returns a vector in $\Dim(\vec{x})$:
-\[ |\Idx[\vec{x}]^{-1}(n)| = |\vec{x}| \]
+\[ \shape{\Idx[\vec{x}]^{-1}(n)} = \shape{\vec{x}} \]
 \[
   \Idx[\vec{x}]^{-1}(n)[i] =
     \left\lfloor
@@ -1330,7 +1332,7 @@ Let $\bar{x} \in \Dim(\vec{x})$ and let $k$ be any index of $\bar{x}$.
   \Idx[\vec{x}]^{-1}(\Idx[\vec{x}](\bar{x}))[k] &= 
   \left\lfloor
     \frac{\remainder\left(
-      \sum_{1 \le i \le |\vec{x}|} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+      \sum_{1 \le i \le \shape{\vec{x}}} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
       , \prod_{1 \le m \le k} \vec{x}[m]\right)}
     {\prod_{1 \le n < k} \vec{x}[n]}
   \right\rfloor + 1 \\
@@ -1402,7 +1404,7 @@ TODO:exposition
 \begin{theorem}[Index of Concatenated Vectors]
 Let $\vec{a}$ and $\vec{b}$ be any two vectors of natural numbers. Then for all $\bar{a} \in \Dim(\vec{a})$
 and $\bar{b} \in \Dim(\vec{b})$:
-\[ \Idx[\vec{a} \oplus \vec{b}](\bar{a} \oplus \bar{b}) = \Idx[\vec{a}](\bar{a}) + |\Dim(\vec{a})| \Idx[\vec{b}](\bar{b}) \]
+\[ \Idx[\vec{a} \oplus \vec{b}](\bar{a} \oplus \bar{b}) = \Idx[\vec{a}](\bar{a}) + \shape{\Dim(\vec{a})} \Idx[\vec{b}](\bar{b}) \]
 \end{theorem}
 \begin{proof}
 Let $\vec{a}$ and $\vec{b}$ be any two vectors of natural numbers. Then for all $\bar{a} \in \Dim(\vec{a})$
@@ -1410,22 +1412,22 @@ and $\bar{b} \in \Dim(\vec{b})$:
 \begin{align*}
   \Idx[\vec{a} \oplus \vec{b}](\bar{a} \oplus \bar{b})
   &= 
-  \sum_{1 \le i \le |\vec{a} \oplus \vec{b}|} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \\
+  \sum_{1 \le i \le \shape{\vec{a} \oplus \vec{b}}} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \\
   &= 
-  \left( \sum_{1 \le i \le |\vec{a}|} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \right) +
-  \left( \sum_{|\vec{a}|+1 \le i \le |\vec{a}|+|\vec{b}|} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \right)\\
+  \left( \sum_{1 \le i \le \shape{\vec{a}}} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \right) +
+  \left( \sum_{\shape{\vec{a}}+1 \le i \le \shape{\vec{a}}+\shape{\vec{b}}} \left( ((\bar{a} \oplus \bar{b})[i]-1) \prod_{1 \le j < i} (\vec{a} \oplus \vec{b})[j] \right) \right)\\
   &= 
-  \left( \sum_{1 \le i \le |\vec{a}|} \left( (\bar{a}[i]-1) \prod_{1 \le j < i} \vec{a}[j] \right) \right) +
-  \left( \sum_{|\vec{a}|+1 \le i \le |\vec{a}|+|\vec{b}|} \left( (\bar{b}[i-|\vec{a}|]-1) \prod_{1 \le j \le |\vec{a}|} \vec{a}[j] \prod_{1 \le j < i-|\vec{a}|} \vec{b}[j] \right) \right)\\
+  \left( \sum_{1 \le i \le \shape{\vec{a}}} \left( (\bar{a}[i]-1) \prod_{1 \le j < i} \vec{a}[j] \right) \right) +
+  \left( \sum_{\shape{\vec{a}}+1 \le i \le \shape{\vec{a}}+\shape{\vec{b}}} \left( (\bar{b}[i-\shape{\vec{a}}]-1) \prod_{1 \le j \le \shape{\vec{a}}} \vec{a}[j] \prod_{1 \le j < i-\shape{\vec{a}}} \vec{b}[j] \right) \right)\\
   &= 
-  \left( \sum_{1 \le i \le |\vec{a}|} \left( (\bar{a}[i]-1) \prod_{1 \le j < i} \vec{a}[j] \right) \right) +
-  \left( \sum_{1 \le i \le |\vec{b}|} \left( (\bar{b}[i|]-1) |\Dim(\vec{a})| \prod_{1 \le j < i|} \vec{b}[j] \right) \right)\\
-  &= 
-  \Idx[\vec{a}](\bar{a}) +
-  |\Dim(\vec{a})| \sum_{1 \le i \le |\vec{b}|} \left( (\bar{b}[i|]-1) \prod_{1 \le j < i|} \vec{b}[j] \right)\\
+  \left( \sum_{1 \le i \le \shape{\vec{a}}} \left( (\bar{a}[i]-1) \prod_{1 \le j < i} \vec{a}[j] \right) \right) +
+  \left( \sum_{1 \le i \le \shape{\vec{b}}} \left( (\bar{b}[i]-1) \shape{\Dim(\vec{a})} \prod_{1 \le j < i} \vec{b}[j] \right) \right)\\
   &= 
   \Idx[\vec{a}](\bar{a}) +
-  |\Dim(\vec{a})| \Idx[\vec{b}](\bar{b})
+  \shape{\Dim(\vec{a})} \sum_{1 \le i \le \shape{\vec{b}}} \left( (\bar{b}[i]-1) \prod_{1 \le j < i} \vec{b}[j] \right)\\
+  &= 
+  \Idx[\vec{a}](\bar{a}) +
+  \shape{\Dim(\vec{a})} \Idx[\vec{b}](\bar{b})
 \end{align*}
 \end{proof}
 
@@ -1435,15 +1437,15 @@ of two multimatricies can be converted into an equivelent multiplication of two
 2d matricies. Here's how that's done,
 
 \begin{theorem}[Reshaping Multimatrix Multiplication]
-Let $A$ and $B$ be two multimatricies of shapes $|A| = \vec{a} \oplus \vec{c}$ and
-$|B| = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting in the $|\vec{c}|$
+Let $A$ and $B$ be two multimatricies of shapes $\shape{A} = \vec{a} \oplus \vec{c}$ and
+$\shape{B} = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting in the $\shape{\vec{c}}$
 width multiplication of $A$ and $B$, that is,
-\[ A \mmult{|\vec{c}|} B = C \]
+\[ A \mmult{\shape{\vec{c}}} B = C \]
 Now, let $\vec{x}$, $\vec{y}$, and $\vec{z}$ be any vectors such that
-$|\Dim(\vec{a})| = |\Dim(\vec{x})|$,
-$|\Dim(\vec{b})| = |\Dim(\vec{y})|$,
+$\shape{\Dim(\vec{a})} = \shape{\Dim(\vec{x})}$,
+$\shape{\Dim(\vec{b})} = \shape{\Dim(\vec{y})}$,
 and 
-$|\Dim(\vec{c})| = |\Dim(\vec{z})|$.
+$\shape{\Dim(\vec{c})} = \shape{\Dim(\vec{z})}$.
 Then for multimatricies $X$, $Y$, and $Z$ defined such that,
 \[\forall i : 0 \le i < \size(A) \]
 \[ X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i)] = A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i)] \]
@@ -1458,18 +1460,18 @@ and,
 
 it is true that,
 
-\[ X \mmult{|\vec{z}|} Y = Z \]
+\[ X \mmult{\shape{\vec{z}}} Y = Z \]
 \end{theorem}
 \begin{proof}
-Let $A$ and $B$ be two multimatricies of shapes $|A| = \vec{a} \oplus \vec{c}$ and
-$|B| = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting from,
-\[ A \mmult{|\vec{c}|} B = C \]
+Let $A$ and $B$ be two multimatricies of shapes $\shape{A} = \vec{a} \oplus \vec{c}$ and
+$\shape{B} = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting from,
+\[ A \mmult{\shape{\vec{c}}} B = C \]
 
 Now, let $\vec{x}$, $\vec{y}$, and $\vec{z}$ be any vectors such that
-$|\Dim(\vec{a})| = |\Dim(\vec{x})|$,
-$|\Dim(\vec{b})| = |\Dim(\vec{y})|$,
+$\shape{\Dim(\vec{a})} = \shape{\Dim(\vec{x})}$,
+$\shape{\Dim(\vec{b})} = \shape{\Dim(\vec{y})}$,
 and 
-$|\Dim(\vec{c})| = |\Dim(\vec{z})|$.
+$\shape{\Dim(\vec{c})} = \shape{\Dim(\vec{z})}$.
 And let multimatricies $X$, $Y$, and $Z$ be defined such that,
 \[\forall i : 0 \le i < \size(A) \]
 \[ X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i)] = A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i)] \]
@@ -1485,60 +1487,60 @@ and,
 Then for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
 
 \begin{align*}
-  (A \mmult{|\vec{c}|} B)[\bar{a} \oplus \bar{b}]
+  (A \mmult{\shape{\vec{c}}} B)[\bar{a} \oplus \bar{b}]
   &= C[\bar{a} \oplus \bar{b}] \\
   &=
   \sum_{\forall \bar{c} \in \Dim(\vec{c})} A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}] \\
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{c})|} A[\bar{a} \oplus \Idx[\vec{c}]^{-1}(i_c)] B[\Idx[\vec{c}]^{-1}(i_c) \oplus \bar{b}]
+  \sum_{0 \le i_c < \shape{\Dim(\vec{c})}} A[\bar{a} \oplus \Idx[\vec{c}]^{-1}(i_c)] B[\Idx[\vec{c}]^{-1}(i_c) \oplus \bar{b}]
 \end{align*}
 
 Now let $i_a = \Idx[\vec{a}](\bar{a})$ and $i_b = \Idx[\vec{b}](\bar{b})$ and,
 \begin{align*}
-  C[\Idx[\vec{a}  \oplus \vec{b}]^{-1}(i_a + |\Dim(\vec{a})| i_b)]
+  C[\Idx[\vec{a}  \oplus \vec{b}]^{-1}(i_a + \shape{\Dim(\vec{a})} i_b)]
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{c})|} A[\Idx[\vec{a}]^{-1}(i_a) \oplus \Idx[\vec{c}]^{-1}(i_c)] B[\Idx[\vec{c}]^{-1}(i_c) \oplus \Idx[\vec{b}]^{-1}(i_b)] \\
+  \sum_{0 \le i_c < \shape{\Dim(\vec{c})}} A[\Idx[\vec{a}]^{-1}(i_a) \oplus \Idx[\vec{c}]^{-1}(i_c)] B[\Idx[\vec{c}]^{-1}(i_c) \oplus \Idx[\vec{b}]^{-1}(i_b)] \\
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{c})|} A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i_a + |\Dim(\vec{a})|i_c)]
-                                     B[\Idx[\vec{c} \oplus \vec{b}]^{-1}(i_c + |\Dim(\vec{c})|i_b)] \\
+  \sum_{0 \le i_c < \shape{\Dim(\vec{c})}} A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i_a + \shape{\Dim(\vec{a})}i_c)]
+                                     B[\Idx[\vec{c} \oplus \vec{b}]^{-1}(i_c + \shape{\Dim(\vec{c})}i_b)] \\
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{c})|} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + |\Dim(\vec{a})|i_c)]
-                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + |\Dim(\vec{c})|i_b)] \\
-  Z[\Idx[\vec{x}  \oplus \vec{y}]^{-1}(i_a + |\Dim(\vec{a})| i_b)]
+  \sum_{0 \le i_c < \shape{\Dim(\vec{c})}} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + \shape{\Dim(\vec{a})}i_c)]
+                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + \shape{\Dim(\vec{c})}i_b)] \\
+  Z[\Idx[\vec{x}  \oplus \vec{y}]^{-1}(i_a + \shape{\Dim(\vec{a})} i_b)]
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{c})|} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + |\Dim(\vec{a})|i_c)]
-                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + |\Dim(\vec{c})|i_b)] \\
-  Z[\Idx[\vec{x}  \oplus \vec{y}]^{-1}(i_a + |\Dim(\vec{x})| i_b)]
+  \sum_{0 \le i_c < \shape{\Dim(\vec{c})}} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + \shape{\Dim(\vec{a})}i_c)]
+                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + \shape{\Dim(\vec{c})}i_b)] \\
+  Z[\Idx[\vec{x}  \oplus \vec{y}]^{-1}(i_a + \shape{\Dim(\vec{x})} i_b)]
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{z})|} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + |\Dim(\vec{x})|i_c)]
-                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + |\Dim(\vec{z})|i_b)] \\
+  \sum_{0 \le i_c < \shape{\Dim(\vec{z})}} X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i_a + \shape{\Dim(\vec{x})}i_c)]
+                                     Y[\Idx[\vec{z} \oplus \vec{y}]^{-1}(i_c + \shape{\Dim(\vec{z})}i_b)] \\
   Z[\Idx[\vec{x}]^{-1}(i_a) \oplus \Idx[\vec{y}]^{-1}(i_b)]
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{z})|} X[\Idx[\vec{x}]^{-1}(i_a) \oplus \Idx[\vec{z}]^{-1}(i_c)]
+  \sum_{0 \le i_c < \shape{\Dim(\vec{z})}} X[\Idx[\vec{x}]^{-1}(i_a) \oplus \Idx[\vec{z}]^{-1}(i_c)]
                                      Y[\Idx[\vec{z}]^{-1}(i_c) \oplus \Idx[\vec{y}]^{-1}(i_b)]
 \end{align*}
 Then if you let $\bar{x} = \Idx[\vec{x}](i_a)$ and $\bar{y} = \Idx[\vec{y}](i_b)$,
 \begin{align*}
   Z[\bar{x} \oplus \bar{y}]
   &=
-  \sum_{0 \le i_c < |\Dim(\vec{z})|} X[\bar{x} \oplus \Idx[\vec{z}]^{-1}(i_c)]
+  \sum_{0 \le i_c < \shape{\Dim(\vec{z})}} X[\bar{x} \oplus \Idx[\vec{z}]^{-1}(i_c)]
                                      Y[\Idx[\vec{z}]^{-1}(i_c) \oplus \bar{y}] \\
   &=
   \sum_{\forall \bar{z} \in \Dim(\vec{z})} X[\bar{x} \oplus \bar{z}]
                                      Y[\bar{z} \oplus \bar{y}] \\
-  &= X \mmult{|\vec{z}|} Y
+  &= X \mmult{\shape{\vec{z}}} Y
 \end{align*}
 \end{proof}
 \end{landscape}
 
 Therefore for any $\RMult(m,X)$ you can potentially find an inverse with
-multiplication width $n \le ||X||-m$ by simply reshaping the problem into
+multiplication width $n \le \shape{\shape{X}}-m$ by simply reshaping the problem into
 one using standard two dimensional matricies wich already has thoroughly
 explored methods for solving.
 For example, to find an $\RMult(n,Y)$ which is the inverse of $\RMult(m,X)$
 you'd reshape $X \mmult{n} Y = \Ident^2(\vec{m})$ into $A \mmult{1} B = \Ident^2(\left<\size(\Dim(\vec{m}))\right>)$
-where $|A| = \left<\size(\Dim(\vec{m} \oplus \vec{x_l})), \size(\Dim(\vec{x_r}))\right>$
-and   $|B| = \left<\size(\Dim(\vec{x_r})),  \size(\Dim(\vec{y}))\right>$.
+where $\shape{A} = \left<\size(\Dim(\vec{m} \oplus \vec{x_l})), \size(\Dim(\vec{x_r}))\right>$
+and   $\shape{B} = \left<\size(\Dim(\vec{x_r})),  \size(\Dim(\vec{y}))\right>$.
 Then solve for $B$ and return the problem to the original shape to get $Y$.
 
 %todo: give example
@@ -1549,7 +1551,7 @@ What the hell is a `Hadamard product'? The Hadamard product \cite{wiki:hadamard}
 of two matricies is how one would actually expect matrix multiplication to work.
 
 In short, if two matricies, $A$ and $B$ have the same shape,
-\[ |A| = |B| = \left<r,c\right> \]
+\[ \shape{A} = \shape{B} = \left<r,c\right> \]
 Then their Hadamard product, $A \bullet B$, is the same shape and each element
 is just the product of the corresponding elements of $A$ and $B$. That is,
 \[ (A \bullet B)[r,c] = A[r,c] B[r,c] \]
@@ -1563,11 +1565,11 @@ with multimatrix multiplication.
 
 \begin{definition}[Multimatrix Hadamard Product]
 \label{multi_had_prod}
-Let $A$ and $B$ be multimatricies such that $|A| = \vec{a} \oplus \vec{c}$
-and $|B| = \vec{c} \oplus \vec{b}$. Also let $c = |\vec{c}|$.
+Let $A$ and $B$ be multimatricies such that $\shape{A} = \vec{a} \oplus \vec{c}$
+and $\shape{B} = \vec{c} \oplus \vec{b}$. Also let $c = \shape{\vec{c}}$.
 Then, the multimatrix Hadamard product, $A \dmult{c} B$, is a multimatrix
 such that,
-\[ |A \dmult{c} B| = \vec{a} \oplus \vec{c} \oplus \vec{b} \]
+\[ \shape{A \dmult{c} B} = \vec{a} \oplus \vec{c} \oplus \vec{b} \]
 And for any $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$,
 and $\bar{c} \in \Dim(\vec{c})$,
 \[
@@ -1582,8 +1584,8 @@ TODO: exposition
 \[ A \dmult{0} B = A \mmult{0} B \]
 \end{theorem}
 \begin{proof}
-Let $|A| = \vec{a}$ and $|B| = \vec{b}$ then,
-\[ |A \dmult{0} B| = \vec{a} \oplus \vec{b} = |A \mmult{0} B| \]
+Let $\shape{A} = \vec{a}$ and $\shape{B} = \vec{b}$ then,
+\[ \shape{A \dmult{0} B} = \vec{a} \oplus \vec{b} = \shape{A \mmult{0} B} \]
 And for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
 \[ (A \dmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] = (A \mmult{0} B)[\bar{a} \oplus \bar{b}] \]
 \end{proof}
@@ -1591,9 +1593,9 @@ And for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
 TODO: exposition
 
 \begin{theorem}[Hadamard Product Associativity]
-Let $A$, $B$, and $C$ be multimatrixes such that $|A| = \vec{a} \oplus \vec{m}$,
-$|B| = \vec{m} \oplus \vec{b} \oplus \vec{n}$ and $|C| = \vec{n} \oplus \vec{c}$,
-where $|\vec{m}| = m$ and $|\vec{n}| = n$.
+Let $A$, $B$, and $C$ be multimatrixes such that $\shape{A} = \vec{a} \oplus \vec{m}$,
+$\shape{B} = \vec{m} \oplus \vec{b} \oplus \vec{n}$ and $\shape{C} = \vec{n} \oplus \vec{c}$,
+where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$.
 Then $(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
 \end{theorem}
 \begin{proof}
@@ -1612,25 +1614,25 @@ TODO: exposition
 
 \begin{theorem}[Equivalent Hadamard Product and Multiplication Chains]
 When $X_1 \ldots X_{m-1}$ are all in $\mathbb{R}^{\vec{x}}$ and
-$|X_m| = \vec{x} \oplus \vec{r}$ for any $\vec{r}$,
+$\shape{X_m} = \vec{x} \oplus \vec{r}$ for any $\vec{r}$,
 \[
   (((\Ident^n(\vec{x})
-  \mmult{|\vec{x}|} X_1) \mmult{|\vec{x}|} X_2) \mmult{|\vec{x}|} X_3)
+  \mmult{\shape{\vec{x}}} X_1) \mmult{\shape{\vec{x}}} X_2) \mmult{\shape{\vec{x}}} X_3)
   \ldots X_m
   =
   \Ident^{n-m}(\vec{x})
-  \dmult{|\vec{x}|} X_1 \dmult{|\vec{x}|} X_2 \dmult{|\vec{x}|} X_3
+  \dmult{\shape{\vec{x}}} X_1 \dmult{\shape{\vec{x}}} X_2 \dmult{\shape{\vec{x}}} X_3
   \ldots X_m
 \]
 And when $X_2 \ldots X_m$ are all in $\mathbb{R}^{\vec{x}}$ and
-$|X_1| = \vec{l} \oplus \vec{x}$ for any $\vec{l}$,
+$\shape{X_1} = \vec{l} \oplus \vec{x}$ for any $\vec{l}$,
 \[
-  X_1 \mmult{|\vec{x}|} (X_2 \mmult{|\vec{x}|} (X_3
-  \ldots (X_m \mmult{|\vec{x}|} 
+  X_1 \mmult{\shape{\vec{x}}} (X_2 \mmult{\shape{\vec{x}}} (X_3
+  \ldots (X_m \mmult{\shape{\vec{x}}} 
   \Ident^n(\vec{x}))))
   =
-  X_1 \dmult{|\vec{x}|} X_2 \dmult{|\vec{x}|} X_3
-  \ldots X_m \dmult{|\vec{x}|} 
+  X_1 \dmult{\shape{\vec{x}}} X_2 \dmult{\shape{\vec{x}}} X_3
+  \ldots X_m \dmult{\shape{\vec{x}}} 
   \Ident^{n-m}(\vec{x})
 \]
 \end{theorem}
@@ -1641,24 +1643,24 @@ TODO
 TODO: exposition
 
 \begin{theorem}[Communicativity of Hadamard Products]
-If $A$ and $B$ are multimatrices of the same shape, $|A| = |B| = \vec{x}$,
-then $A \dmult{|\vec{x}|} B = B \dmult{|\vec{x}|} A$.
+If $A$ and $B$ are multimatrices of the same shape, $\shape{A} = \shape{B} = \vec{x}$,
+then $A \dmult{\shape{\vec{x}}} B = B \dmult{\shape{\vec{x}}} A$.
 \end{theorem}
 \begin{proof}
 For any $\bar{x} \in \Dim(\vec{x})$,
 \begin{align*}
-(A \dmult{|\vec{x}|} B)[\bar{x}]
+(A \dmult{\shape{\vec{x}}} B)[\bar{x}]
   &= A[\bar{x}] B[\bar{x}] \\
   &= B[\bar{x}] A[\bar{x}] \\
-  &= (B \dmult{|\vec{x}|} A)[\bar{x}]
+  &= (B \dmult{\shape{\vec{x}}} A)[\bar{x}]
 \end{align*}
 \end{proof}
 
 \section{Exercises}
 
 \begin{exercise}
-Let $A$, $B$, and $C$ be multimatricies such that $|A| = \left<1,2,3\right>$,
-$|B| = \left<3,1,2\right>$ and $|C| = \left<3,2,1\right>$. For each of these
+Let $A$, $B$, and $C$ be multimatricies such that $\shape{A} = \left<1,2,3\right>$,
+$\shape{B} = \left<3,1,2\right>$ and $\shape{C} = \left<3,2,1\right>$. For each of these
 multiplications determine if it is valid, and if so, what the resulting
 shape would be:
 \begin{enumerate}
@@ -1674,31 +1676,31 @@ In which of these cases does $A \mmult{m} (B \mmult{n} C) = (A \mmult{m} B) \mmu
 \begin{enumerate}
 \item When,
 	\begin{itemize}
-		\item $|A| = \left<3, 7, 9\right>$
-		\item $|B| = \left<9, 5\right>$
-		\item $|C| = \left<5, 7, 3\right>$
+		\item $\shape{A} = \left<3, 7, 9\right>$
+		\item $\shape{B} = \left<9, 5\right>$
+		\item $\shape{C} = \left<5, 7, 3\right>$
 		\item and $m = n = 1$
 	\end{itemize}
 \item When,
 	\begin{itemize}
-		\item $|A| = \left<6, 6, 6\right>$
-		\item $|B| = \left<6, 6, 6\right>$
-		\item $|C| = \left<6, 6, 6\right>$
+		\item $\shape{A} = \left<6, 6, 6\right>$
+		\item $\shape{B} = \left<6, 6, 6\right>$
+		\item $\shape{C} = \left<6, 6, 6\right>$
 		\item and $m = n = 2$
 	\end{itemize}
 \item When,
 	\begin{itemize}
-		\item $|A| = \left<3, 5, 3\right>$
-		\item $|B| = \left<5, 3, 11\right>$
-		\item $|C| = \left<11, 2, 7\right>$
+		\item $\shape{A} = \left<3, 5, 3\right>$
+		\item $\shape{B} = \left<5, 3, 11\right>$
+		\item $\shape{C} = \left<11, 2, 7\right>$
 		\item $m = 2$
 		\item and $n = 1$
 	\end{itemize}
 \item When,
 	\begin{itemize}
-		\item $|A| = \left<3, 5, 3\right>$
-		\item $|B| = \left<5, 3, 3, 5\right>$
-		\item $|C| = \left<3, 3, 5, 2\right>$
+		\item $\shape{A} = \left<3, 5, 3\right>$
+		\item $\shape{B} = \left<5, 3, 3, 5\right>$
+		\item $\shape{C} = \left<3, 3, 5, 2\right>$
 		\item $m = 2$
 		\item and $n = 3$
 	\end{itemize}
@@ -1706,24 +1708,24 @@ In which of these cases does $A \mmult{m} (B \mmult{n} C) = (A \mmult{m} B) \mmu
 \end{exercise}
 
 \begin{exercise}
-Let $|X| = \vec{x}$. Simplify the following where possible:
+Let $\shape{X} = \vec{x}$. Simplify the following where possible:
 \begin{enumerate}
-\item $\Ident^5(\vec{x}) \mmult{3 |\vec{x}|} \Ident^3(\vec{x})$
-\item $\Ident^2(\vec{x}) \mmult{|\vec{x}|} X$
-\item $\Ident^3(\vec{x}) \mmult{2|\vec{x}|} X$
-\item $\Ident^2(\vec{x}) \mmult{|\vec{x}|} \left(X \mmult{|\vec{x}|} \Ident^3(|\vec{x}|)
-				\right) \mmult{2|\vec{x}|} \Ident^3(|\vec{x}|)$
+\item $\Ident^5(\vec{x}) \mmult{3 \shape{\vec{x}}} \Ident^3(\vec{x})$
+\item $\Ident^2(\vec{x}) \mmult{\shape{\vec{x}}} X$
+\item $\Ident^3(\vec{x}) \mmult{2\shape{\vec{x}}} X$
+\item $\Ident^2(\vec{x}) \mmult{\shape{\vec{x}}} \left(X \mmult{\shape{\vec{x}}} \Ident^3(\shape{\vec{x}})
+				\right) \mmult{2\shape{\vec{x}}} \Ident^3(\shape{\vec{x}})$
 \end{enumerate}
 \end{exercise}
 
 \begin{exercise}
-Let $M$ be some multimatrix such that $|M| = \left<5,2,3\right>$. Then what is
+Let $M$ be some multimatrix such that $\shape{M} = \left<5,2,3\right>$. Then what is
 $dM/dM$?
 \end{exercise}
 
 \begin{exercise}
 Let $Y = \tan(X)$ be the elementwise application of the scalar tangent function to
-the elements of $X$, that is, for all $\bar{v} \in \Dim(|X|)$
+the elements of $X$, that is, for all $\bar{v} \in \Dim(\shape{X})$
 \[ Y[\bar{v}] = \tan(X[\bar{v}]) \]
 What is $dY/dX$?
 \end{exercise}
@@ -1764,7 +1766,7 @@ $S[\left<\right>] = s$. Then, for any multimatrix $A$,
 \[ sA = As = S \mmult{0} A = A \mmult{0} S \]
 \end{theorem}
 \begin{proof}
-Let $|A| = \vec{a}$. Then for all $\bar{a} \in \Dim(\vec{a})$,
+Let $\shape{A} = \vec{a}$. Then for all $\bar{a} \in \Dim(\vec{a})$,
 \begin{align*}
 	(sA)[\bar{a}]
 	&= (s)A[\bar{a}] \\
@@ -1898,7 +1900,7 @@ The following should be obvious, condesendingly so,
 
 \begin{theorem}[Equivalent Addition for Subtraction]
 \label{eq_add_sub_thm}
-For any multimatricies $A$ and $B$ where $|A| = |B|$,
+For any multimatricies $A$ and $B$ where $\shape{A} = \shape{B}$,
 \[ A - B = A + (-1)B \]
 \end{theorem}
 \begin{proof}
@@ -1940,14 +1942,14 @@ distributed over it's addition.
 
 \begin{landscape}
 \begin{theorem}[Multimatrix on Multimatrix Distributive Property]
-If $|A| = \vec{a} \oplus \vec{n}$ and $|B|=|C|=\vec{n} \oplus \vec{r}$ then,
+If $\shape{A} = \vec{a} \oplus \vec{n}$ and $\shape{B}=\shape{C}=\vec{n} \oplus \vec{r}$ then,
 \[ A \mmult{n} (B + C) = A \mmult{n} B + A \mmult{n} C \]
-Similarly, if $|C| = \vec{n} \oplus \vec{c}$ and $|A|=|B|=\vec{l} \oplus \vec{n}$ then,
+Similarly, if $\shape{C} = \vec{n} \oplus \vec{c}$ and $\shape{A}=\shape{B}=\vec{l} \oplus \vec{n}$ then,
 \[ (A + B) \mmult{n} C = A \mmult{n} C + B \mmult{n} C \]
 \end{theorem}
 \begin{proof}
 \begin{ppart}
-Let $|A| = \vec{a} \oplus \vec{n}$ and $|B|=|C|=\vec{n} \oplus \vec{r}$.
+Let $\shape{A} = \vec{a} \oplus \vec{n}$ and $\shape{B}=\shape{C}=\vec{n} \oplus \vec{r}$.
 So, $\forall \bar{a} \in \Dim(\vec{a}), \bar{r} \in \Dim(\vec{r}) :$
 \begin{align*}
  \left( A \mmult{n} (B + C) \right)[\bar{a} \oplus \bar{r}]
@@ -1969,7 +1971,7 @@ So, $\forall \bar{a} \in \Dim(\vec{a}), \bar{r} \in \Dim(\vec{r}) :$
 So $A \mmult{n} (B + C) = A \mmult{n} B + A \mmult{n} C$
 \end{ppart}
 \begin{ppart}
-Let $|C| = \vec{n} \oplus \vec{c}$ and $|A|=|B|=\vec{l} \oplus \vec{n}$.
+Let $\shape{C} = \vec{n} \oplus \vec{c}$ and $\shape{A}=\shape{B}=\vec{l} \oplus \vec{n}$.
 So, $\forall \bar{c} \in \Dim(\vec{c}), \bar{l} \in \Dim(\vec{l}) :$
 \begin{align*}
  \left( (A + B) \mmult{n} C \right)[\bar{l} \oplus \bar{c}]
@@ -2019,8 +2021,8 @@ the cut happens in the shape vector.
 
 \begin{definition}[Multimatrix Transposition]
 \label{tran_def}
-Let $|X| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = l$ and $|\vec{r}| = r$
-\[ |\Tran(X, l)| = \vec{r} \oplus \vec{l} \]
+Let $\shape{X} = \vec{l} \oplus \vec{r}$ where $\shape{\vec{l}} = l$ and $\shape{\vec{r}} = r$
+\[ \shape{\Tran(X, l)} = \vec{r} \oplus \vec{l} \]
 And,
 \[ \forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : \]
 \[ \Tran(X, l)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
@@ -2031,12 +2033,12 @@ Here's an example - get out your crayons and follow along.
 
 \begin{example}
 Let's construct some multimatrix, $M$, with a shape:
-\[ |M| = \left<3,2,7,5,9\right> \]
+\[ \shape{M} = \left<3,2,7,5,9\right> \]
 Then lets take the first transpose of that
 multimatrix:
-\[ |\Tran(M, 1)| = \left<2,7,5,9,3\right> \]
+\[ \shape{\Tran(M, 1)} = \left<2,7,5,9,3\right> \]
 And... how about the third:
-\[ |\Tran(M, 3)| = \left<5,9,3,2,7\right> \]
+\[ \shape{\Tran(M, 3)} = \left<5,9,3,2,7\right> \]
 You can see, it's as though I cut off the front of the shape vector and transfered
 it to the end of the vector.
 
@@ -2056,17 +2058,17 @@ it just requires a bit of modular arithmetic.
 \begin{definition}[Multimatrix Transpose Extension]
 \label{tran_ext}
 For any multimatrix, the following transposes are equivalent,
-\[ \Tran(X, n) = \Tran(X, \remainder(n, ||X||)) \]
-Where $\remainder(n, ||X||)$ is the remainder of $n$ divided by $||X||$.
-That is, a value $0 \le \remainder(n, ||X||) < ||X||$ such that there exists an
-integer $k$ where, $n = k||X|| + \remainder(n, ||X||)$.
+\[ \Tran(X, n) = \Tran(X, \remainder(n, \shape{\shape{X}})) \]
+Where $\remainder(n, \shape{\shape{X}})$ is the remainder of $n$ divided by $\shape{\shape{X}}$.
+That is, a value $0 \le \remainder(n, \shape{\shape{X}}) < \shape{\shape{X}}$ such that there exists an
+integer $k$ where, $n = k\shape{\shape{X}} + \remainder(n, \shape{\shape{X}})$.
 \end{definition}
 
 This extension is consisent with the prevous definition because, for any
 index of transpose, $l$, that would be covered by the original definition,
-$0 \le l \le ||X||$, you can see that, in all but one case $\remainder(l, ||X||) = l$.
-The exception, $l = ||X||$ is covered by showing that
-$\remainder(||X||, ||X||) = 0$ and $\Tran(X, 0) = \Tran(X, ||X||)$. 
+$0 \le l \le \shape{\shape{X}}$, you can see that, in all but one case $\remainder(l, \shape{\shape{X}}) = l$.
+The exception, $l = \shape{\shape{X}}$ is covered by showing that
+$\remainder(\shape{\shape{X}}, \shape{\shape{X}}) = 0$ and $\Tran(X, 0) = \Tran(X, \shape{\shape{X}})$. 
 
 Thus, we (by which I mean \textit{me} since \textit{you} certainly haven't done any
 of the work) have shown a natural equivalent class \cite{book:abstract} of transpose
@@ -2098,28 +2100,28 @@ with shapes of length $n$ form a group under composition.
 Let's look at the composition of some two transposes on a multimatrix.
 So, let $A$ be a multimatrix with shape of length $n$. Now let $x$ and $y$
 be indicies of transpositions. Then what is $\Tran(\Tran(A, x), y)$?
-To apply the the first transpose we need to break $|A|$ into two vectors,
-so let $|A| = \vec{l} \oplus \vec{r}$ where $|\vec{l}| = x$.
+To apply the the first transpose we need to break $\shape{A}$ into two vectors,
+so let $\shape{A} = \vec{l} \oplus \vec{r}$ where $\shape{\vec{l}} = x$.
 
 Then,
-\[ |\Tran(A, x)| = \vec{r} \oplus \vec{l} \]
+\[ \shape{\Tran(A, x)} = \vec{r} \oplus \vec{l} \]
 And for all
 $\bar{l} \in \Dim(\vec{l})$ and $\bar{r} \in \Dim(\vec{r})$,
 \[ \Tran(A, x)[\bar{r} \oplus \bar{l}] = A[\bar{l} \oplus \bar{r}] \]
 
 Now to apply a transposition with index of transposition $y$ to $\Tran(A,x)$
-we need to break up $|\Tran(A,x)|$ into two vector, such as
-$|\Tran(A,x)| = \vec{l}' \oplus \vec{r}'$.
+we need to break up $\shape{\Tran(A,x)}$ into two vector, such as
+$\shape{\Tran(A,x)} = \vec{l}' \oplus \vec{r}'$.
 
-Since we've already shown that $|\Tran(A,x)| = \vec{r} \oplus \vec{l}$
+Since we've already shown that $\shape{\Tran(A,x)} = \vec{r} \oplus \vec{l}$
 we end up with two conceptual splits of that shape vector that need to
 be reconciled.
 
-\begin{case} $|\vec{l}'| \le |\vec{r}|$
+\begin{case} $\shape{\vec{l}'} \le \shape{\vec{r}}$
 
-Then we can divide $|\Tran(A,x)|$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
+Then we can divide $\shape{\Tran(A,x)}$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
 such that
-\[ |\Tran(A,x)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\Tran(A,x)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
 \[ \vec{l}' = \vec{b} \]
 \[ \vec{r}' = \vec{c} \oplus \vec{a} \]
 \[ \vec{r} = \vec{b} \oplus \vec{c} \]
@@ -2129,12 +2131,12 @@ vector because of the two conceptual splits from the two transpositions to see w
 logic is valid.
 
 So we can then say,
-\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{A} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 
 And since,
-\[ |\Tran(\Tran(A, x), y)| = \vec{r}' \oplus \vec{l}' \]
+\[ \shape{\Tran(\Tran(A, x), y)} = \vec{r}' \oplus \vec{l}' \]
 It follows that,
-\[ |\Tran(\Tran(A, x), y)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\Tran(\Tran(A, x), y)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
 
 Now, let $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and
 $\bar{c} \in \Dim(\vec{c})$. Notice that because of Theorem 
@@ -2151,14 +2153,14 @@ Continuing our definition of transposition,
 \end{align*}
 
 See now that this composit operation is also a transposition, $\Tran(A, z)$ where,
-$z = |\vec{a} \oplus \vec{b}|$.
+$z = \shape{\vec{a} \oplus \vec{b}}$.
 So by definition,
 \begin{align*}
-  |\Tran(A, z)|
+  \shape{\Tran(A, z)}
   &=
   \vec{c} \oplus \vec{b} \oplus \vec{a} \\
   &=
-  |\Tran(\Tran(A, x), y)|  
+  \shape{\Tran(\Tran(A, x), y)}  
 \end{align*}
 And,
 \begin{align*}
@@ -2170,22 +2172,22 @@ And,
 \end{align*}
 \end{case}
 
-\begin{case} $|\vec{l}'| > |\vec{r}|$
-Then we can divide $|\Tran(A,x)|$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
+\begin{case} $\shape{\vec{l}'} > \shape{\vec{r}}$
+Then we can divide $\shape{\Tran(A,x)}$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
 such that
-\[ |\Tran(A,x)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\Tran(A,x)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
 \[ \vec{l}' = \vec{c} \oplus \vec{a} \]
 \[ \vec{r}' = \vec{b} \]
 \[ \vec{r} = \vec{c} \]
 \[ \vec{l} = \vec{a} \oplus \vec{b} \]
 
 So we can then say,
-\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{A} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 
 And since,
-\[ |\Tran(\Tran(A, x), y)| = \vec{r}' \oplus \vec{l}' \]
+\[ \shape{\Tran(\Tran(A, x), y)} = \vec{r}' \oplus \vec{l}' \]
 It follows that,
-\[ |\Tran(\Tran(A, x), y)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\Tran(\Tran(A, x), y)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
 
 Now, let $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and
 $\bar{c} \in \Dim(\vec{c})$. Notice that because of Theorem 
@@ -2202,14 +2204,14 @@ Continuing our definition of transposition,
 \end{align*}
 
 See now that this composit operation is also a transposition, $\Tran(A, z)$ where,
-$z = |\vec{a}|$.
+$z = \shape{\vec{a}}$.
 So by definition,
 \begin{align*}
-  |\Tran(A, z)|
+  \shape{\Tran(A, z)}
   &=
   \vec{b} \oplus \vec{c} \oplus \vec{a} \\
   &=
-  |\Tran(\Tran(A, x), y)|  
+  \shape{\Tran(\Tran(A, x), y)}  
 \end{align*}
 And,
 \begin{align*}
@@ -2243,41 +2245,41 @@ Ok, the hard part is showing that it preserves the group operations.
 Let's go back to our example in the first part of this proof. Let $A$ be
 any multimatrix with shape length $n$. Then let there be two transpositons
 $\Tran_x$ and $\Tran_y$ which we'll apply in series. First remember that
-to define $\Tran_x$ we needed to divide $|A|$ into $|A| = \vec{l} \oplus \vec{r}$
-where $|\vec{l}| = x$. Then we'd say that
-\[ |\Tran(A, x)| = \vec{r} \oplus \vec{l} \]
-Then to further apply $\Tran(\Tran(A, x), y)$ we need to divide $|\Tran(A,x)|$
+to define $\Tran_x$ we needed to divide $\shape{A}$ into $\shape{A} = \vec{l} \oplus \vec{r}$
+where $\shape{\vec{l}} = x$. Then we'd say that
+\[ \shape{\Tran(A, x)} = \vec{r} \oplus \vec{l} \]
+Then to further apply $\Tran(\Tran(A, x), y)$ we need to divide $\shape{\Tran(A,x)}$
 into,
-\[ |\Tran(A, x)| = \vec{l}' \oplus \vec{r}' \]
-Where $|\vec{l}'| = y$.
+\[ \shape{\Tran(A, x)} = \vec{l}' \oplus \vec{r}' \]
+Where $\shape{\vec{l}'} = y$.
 That leads to two cases,
 
 \setcounter{case}{0}
-\begin{case} $|\vec{l}'| \le |\vec{r}|$
+\begin{case} $\shape{\vec{l}'} \le \shape{\vec{r}}$
 
-And in this case we showed that we needed to split up $|A|$ into,
-\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+And in this case we showed that we needed to split up $\shape{A}$ into,
+\[ \shape{A} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 \[ \vec{l}' = \vec{b} \]
 \[ \vec{r}' = \vec{c} \oplus \vec{a} \]
 \[ \vec{r} = \vec{b} \oplus \vec{c} \]
 \[ \vec{l} = \vec{a} \]
 
 So that,
-\[ |\Tran(A, x)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
-\[ |\Tran(\Tran(A, x), y)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\Tran(A, x)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\Tran(\Tran(A, x), y)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
 And note that,
-\[ x = |\vec{a}| \]
-\[ y = |\vec{b}| \]
+\[ x = \shape{\vec{a}} \]
+\[ y = \shape{\vec{b}} \]
 
 And we showed that the composit $\Tran_z = \Tran_y \circ \Tran_x$ was such
 that,
-\[ z = |\vec{a} \oplus \vec{b}| \]
+\[ z = \shape{\vec{a} \oplus \vec{b}} \]
 
 Consider that $\phi(\Tran_z) = z$, and so,
 \begin{align*}
   z
-  &= |\vec{a} \oplus \vec{b}| \\
-  &= |\vec{a}| + |\vec{b}| \\
+  &= \shape{\vec{a} \oplus \vec{b}} \\
+  &= \shape{\vec{a}} + \shape{\vec{b}} \\
   &= x + y \\
   &= y + x \\
   z &\equiv y + x \mod n \\
@@ -2287,35 +2289,35 @@ Consider that $\phi(\Tran_z) = z$, and so,
 So in this case the isomorphism works.
 \end{case}
 
-\begin{case} $|\vec{l}'| > |\vec{r}|$
+\begin{case} $\shape{\vec{l}'} > \shape{\vec{r}}$
 
-And in this case we showed that we needed to split up $|A|$ into,
-\[ |A| = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+And in this case we showed that we needed to split up $\shape{A}$ into,
+\[ \shape{A} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 \[ \vec{l}' = \vec{c} \oplus \vec{a} \]
 \[ \vec{r}' = \vec{b} \]
 \[ \vec{r} = \vec{c} \]
 \[ \vec{l} = \vec{a} \oplus \vec{b} \]
 
 So that,
-\[ |\Tran(A, x)| = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
-\[ |\Tran(\Tran(A, x), y)| = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\Tran(A, x)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\Tran(\Tran(A, x), y)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
 And note that,
-\[ x = |\vec{a} \oplus \vec{b}| \]
-\[ y = |\vec{c} \oplus \vec{a}| \]
+\[ x = \shape{\vec{a} \oplus \vec{b}} \]
+\[ y = \shape{\vec{c} \oplus \vec{a}} \]
 
 And we showed that the composit $\Tran_z = \Tran_y \circ \Tran_x$ was such
 that,
-\[ z = |\vec{a}| \]
+\[ z = \shape{\vec{a}} \]
 
 Consider that $\phi(\Tran_z) = z$, and so,
 \begin{align*}
   z
-  &= |\vec{a}| \\
-  &\equiv |\vec{a}| + n \mod n \\
-  &\equiv |\vec{a}| + |\vec{a} \oplus \vec{b} \oplus \vec{c}| \mod n \\
-  &\equiv |\vec{a} \oplus \vec{a} \oplus \vec{b} \oplus \vec{c}| \mod n \\
-  &\equiv |\vec{c} \oplus \vec{a} \oplus \vec{a} \oplus \vec{b}| \mod n \\
-  &\equiv |\vec{c} \oplus \vec{a}| + |\vec{a} \oplus \vec{b}| \mod n \\
+  &= \shape{\vec{a}} \\
+  &\equiv \shape{\vec{a}} + n \mod n \\
+  &\equiv \shape{\vec{a}} + \shape{\vec{a} \oplus \vec{b} \oplus \vec{c}} \mod n \\
+  &\equiv \shape{\vec{a} \oplus \vec{a} \oplus \vec{b} \oplus \vec{c}} \mod n \\
+  &\equiv \shape{\vec{c} \oplus \vec{a} \oplus \vec{a} \oplus \vec{b}} \mod n \\
+  &\equiv \shape{\vec{c} \oplus \vec{a}} + \shape{\vec{a} \oplus \vec{b}} \mod n \\
   &\equiv y + x \mod n \\
   \phi(\Tran_z) &= \phi(\Tran_y) + \phi(\Tran_x) \\
   \phi(\Tran_y \circ \Tran_x) &= \phi(\Tran_y) + \phi(\Tran_x)
@@ -2341,16 +2343,16 @@ in other words), it is always true that
 Let's take a look at a concrete example. Say we have a
 multimatrix $A$ who's shape is $\left<11, 3, 7, 5\right>$. 
 Then see that,
-\[ |\Tran(A, 2)| = \left<7, 5, 11, 3\right> \]
+\[ \shape{\Tran(A, 2)} = \left<7, 5, 11, 3\right> \]
 And applying another transpose,
-\[ |\Tran(\Tran(A, 2), 3)| = \left<3, 7, 5, 11\right> \]
+\[ \shape{\Tran(\Tran(A, 2), 3)} = \left<3, 7, 5, 11\right> \]
 Notice that our corollary says that this double transpose should be
 equal to the transpose $\Tran(A, \remainder(2+3, 4))$ which would
 be $\Tran(A, 1)$ and indeed it is:
 \begin{align*}
-  |\Tran(A, 1)|
+  \shape{\Tran(A, 1)}
   &= \left<3, 7, 5, 11\right> \\
-  &= |\Tran(\Tran(A, 2), 3)|
+  &= \shape{\Tran(\Tran(A, 2), 3)}
 \end{align*}
 \end{example}
 
@@ -2358,7 +2360,7 @@ Another useful corollary from Theorem \ref{tran_int_iso} shows you how to
 undo transposition operations with other transposition operations.
 
 \begin{corollary}[Inverse Transpose]
-Let $A$ be a multimatrix such that $||A|| = n$. And let
+Let $A$ be a multimatrix such that $\shape{\shape{A}} = n$. And let
 $x$ be some integer. Then, the inverse of $\Tran_x$ is
 $\Tran_{-x}$. That is,
 \[ \Tran(\Tran(A, x), -x) = X \]
@@ -2367,16 +2369,16 @@ $\Tran_{-x}$. That is,
 \begin{example}
 Say you have a multimatrix, $A$, of shape $\left<2,7,1,8,3\right>$.
 Let's apply a transpose to it, $\Tran_3$, and we'll get the shape,
-\[ |\Tran(A, 3)| = \left<8,3,2,7,1\right> \]
+\[ \shape{\Tran(A, 3)} = \left<8,3,2,7,1\right> \]
 Now, to get back to $A$ we can apply another transpose $\Tran_{-3}$ according
 to the above corollary.
 Our extended definition of transposition (Def. \ref{tran_ext})
 tells us that this is equal to $\Tran_{\remainder(-3, 5)} = \Tran_{2}$.
 So the inverse of $\Tran_3$ is $\Tran_2$, which we can see here:
 \begin{align*}
-  |\Tran(\Tran(A, 3), 2)|
+  \shape{\Tran(\Tran(A, 3), 2)}
   &= \left<2,7,1,8,3\right> \\
-  &= |A|
+  &= \shape{A}
 \end{align*}
 \end{example}
 
@@ -2384,12 +2386,12 @@ Now that you understand the basics of transposition, let's take a look
 at some theorems involving it.
 
 %TODO: I think this is even more general.
-% I think that if k = |\vec{a}| mod |\vec{a} \oplus \vec{b}| then
+% I think that if k = \shape{\vec{a}} mod \shape{\vec{a} \oplus \vec{b}} then
 % \Tran(\Ident^n(\vec{a} \oplus \vec{b}), k) = \Ident^n(\vec{b} \oplus \vec{a})
 \begin{theorem}[Identity Transpose]
 Let $n$ be a positive integer and let $\vec{x}$ be a positive length
 shape vector. Then for any integer $k$,
-\[ \Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x}) \]
+\[ \Tran(\Ident^n(\vec{x}), k\shape{\vec{x}}) = \Ident^n(\vec{x}) \]
 \end{theorem}
 \begin{proof}
 Consider that for some ordered set of indicies
@@ -2418,14 +2420,14 @@ Since for the permutation
 $X' = \left\{\bar{x}_{k+1}, \bar{x}_{k+2} \ldots \bar{x}_{n},
 \bar{x}_1, \bar{x}_2 \ldots \bar{x}_k\right\}$
 \begin{align*}
-  \Tran(\Ident^n(\vec{x}), k|\vec{x}|)\left[\bigoplus X'\right]
+  \Tran(\Ident^n(\vec{x}), k\shape{\vec{x}})\left[\bigoplus X'\right]
 	&=
   \Ident^n(\vec{x})\left[\bigoplus X\right]\\
 	&=
   \Ident^n(\vec{x})\left[\bigoplus X'\right]
 \end{align*}
 Therefore
-$\Tran(\Ident^n(\vec{x}), k|\vec{x}|) = \Ident^n(\vec{x})$
+$\Tran(\Ident^n(\vec{x}), k\shape{\vec{x}}) = \Ident^n(\vec{x})$
 \end{proof}
 
 The above theorem is useful whenever you come accross a transpose of a
@@ -2436,19 +2438,19 @@ multimatrix multiplications is this one,
 
 \begin{theorem}[Transposition of Multimatrix Multiplication]
 \label{mm_tran_mult}
-Let $|A| = \vec{a} \oplus \vec{c}$ and $|B| = \vec{c} \oplus \vec{b}$ then
+Let $\shape{A} = \vec{a} \oplus \vec{c}$ and $\shape{B} = \vec{c} \oplus \vec{b}$ then
 \[
- \Tran(A \mmult{|\vec{c}|} B, |\vec{a}|)
- =  \Tran(B, |\vec{c}|) \mmult{|\vec{c}|} \Tran(A, |\vec{a}|)
+ \Tran(A \mmult{\shape{\vec{c}}} B, \shape{\vec{a}})
+ =  \Tran(B, \shape{\vec{c}}) \mmult{\shape{\vec{c}}} \Tran(A, \shape{\vec{a}})
 \]
 \end{theorem}
 \begin{proof}
 Let $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$.
 Then,
 \begin{align*}
-	\Tran(A \mmult{|\vec{c}|} B, |\vec{a}|)[\bar{b} \oplus \bar{a}]
+	\Tran(A \mmult{\shape{\vec{c}}} B, \shape{\vec{a}})[\bar{b} \oplus \bar{a}]
 	&=
-	\left(A \mmult{|\vec{c}|} B \right)[\bar{a} \oplus \bar{b}] \\
+	\left(A \mmult{\shape{\vec{c}}} B \right)[\bar{a} \oplus \bar{b}] \\
 	&=
 	\sum_{\forall \bar{c} \in \Dim(\vec{c})}
 	A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}] \\
@@ -2457,10 +2459,10 @@ Then,
 	B[\bar{c} \oplus \bar{b}] A[\bar{a} \oplus \bar{c}] \\
 	&=
 	\sum_{\forall \bar{c} \in \Dim(\vec{c})}
-	\Tran(B, |\vec{c}|)[\bar{b} \oplus \bar{c}]
-	\Tran(A, |\vec{a}|)[\bar{c} \oplus \bar{a}] \\
+	\Tran(B, \shape{\vec{c}})[\bar{b} \oplus \bar{c}]
+	\Tran(A, \shape{\vec{a}})[\bar{c} \oplus \bar{a}] \\
 	&=
-	\left(\Tran(B, |\vec{c}|) \mmult{|\vec{c}|} \Tran(A, |\vec{a}|) \right)
+	\left(\Tran(B, \shape{\vec{c}}) \mmult{\shape{\vec{c}}} \Tran(A, \shape{\vec{a}}) \right)
 	[\bar{b} \oplus \bar{a}]
 \end{align*}
 \end{proof}
@@ -2473,7 +2475,7 @@ a multimatrix on which $\Tran(A, x)$ is defined. Then,
 \[ s\Tran(A, x) = \Tran(sA, x) \]
 \end{theorem}
 \begin{proof}
-Let $|A| = \vec{x} \oplus \vec{a}$ where $|\vec{x}| = x$. Then
+Let $\shape{A} = \vec{x} \oplus \vec{a}$ where $\shape{\vec{x}} = x$. Then
 let $\bar{x} \in \Dim(\vec{x})$ and $\bar{a} \in \Dim(\vec{a})$. So,
 \begin{align*}
   (s\Tran(A, x))[\bar{a} \oplus \bar{x}]
@@ -2490,7 +2492,7 @@ TODO: exposition here
 \begin{theorem}[Communicativity of Addition and Transposition]
 \label{com_add_tran_thm}
 Let $x$ be in $\mathbb{N} \cup \{0\}$ and let $A$ and $B$ be
-multimatricies such that $|A| = |B|$ and $\Tran(A, x)$ is defined.
+multimatricies such that $\shape{A} = \shape{B}$ and $\Tran(A, x)$ is defined.
 Then,
 \[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
 \end{theorem}
@@ -2513,13 +2515,13 @@ Prove Theorem \ref{com_add_tran_thm} which is that,
 \end{exercise}
 
 \begin{exercise}
-Let $A$ be a multimatrix such that $|A| = <1,2,3,4,5>$,
+Let $A$ be a multimatrix such that $\shape{A} = <1,2,3,4,5>$,
 Find the shape of the following trasnposes:
 \begin{enumerate}
-\item $|\Tran(A, 3)| = ?$
-\item $|\Tran(A, 4)| = ?$
-\item $|\Tran(A, 5)| = ?$
-\item $|\Tran(A, 0)| = ?$
+\item $\shape{\Tran(A, 3)} = ?$
+\item $\shape{\Tran(A, 4)} = ?$
+\item $\shape{\Tran(A, 5)} = ?$
+\item $\shape{\Tran(A, 0)} = ?$
 \end{enumerate}
 \end{exercise}
 
@@ -2544,34 +2546,34 @@ naturally bear all responsibility for any errors contained herein...''
 
 \begin{theorem}[Transpose Derivative]
 \label{tran_derivative}
-$|X| = \vec{l} \oplus \vec{r}$
+$\shape{X} = \vec{l} \oplus \vec{r}$
 \[
- \frac{d\Tran(X, |\vec{l}|)}{dX} =
- \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), |\vec{r}|)
+ \frac{d\Tran(X, \shape{\vec{l}})}{dX} =
+ \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), \shape{\vec{r}})
 \]
 \end{theorem}
 \begin{proof}
 \begin{align*}
- \frac{d\Tran(X, |\vec{l}|)}{dX}
+ \frac{d\Tran(X, \shape{\vec{l}})}{dX}
  [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
  &= \delta_{\bar{r_1}\bar{r_2}} \delta_{\bar{l_1}\bar{l_2}} \\
  &= \delta_{\bar{r_2}\bar{r_1}} \delta_{\bar{l_1}\bar{l_2}} \\
  &=
-  \Ident^2(|\vec{r}|)[\bar{r_2}\oplus\bar{r_1}]
-  \Ident^2(|\vec{l}|)[\bar{l_1}\oplus\bar{l_2}] \\
+  \Ident^2(\shape{\vec{r}})[\bar{r_2}\oplus\bar{r_1}]
+  \Ident^2(\shape{\vec{l}})[\bar{l_1}\oplus\bar{l_2}] \\
  &=
    \left(
-    \Ident^2(|\vec{r}|)
+    \Ident^2(\shape{\vec{r}})
     \mmult{0}
-    \Ident^2(|\vec{l}|)
+    \Ident^2(\shape{\vec{l}})
   \right)
   [\bar{r_2}\oplus\bar{r_1}\oplus\bar{l_1}\oplus\bar{l_2}] \\
  &=
   \Tran(
-    \Ident^2(|\vec{r}|)
+    \Ident^2(\shape{\vec{r}})
     \mmult{0}
-    \Ident^2(|\vec{l}|)
-  , |\vec{r}|) 
+    \Ident^2(\shape{\vec{l}})
+  , \shape{\vec{r}}) 
  [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
 \end{align*}
 \end{proof}
@@ -2580,11 +2582,11 @@ $|X| = \vec{l} \oplus \vec{r}$
 \label{right_mult_derivative}
 Let $A$ and $X$ be multimatricies such that $A \mmult{n} X$ is
 defined. Then,
-\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
+\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(\shape{X}) \]
 \end{theorem}
 \begin{proof}
-Let $|A| = \vec{a} \oplus \vec{n}$ and $|X| = \vec{n} \oplus \vec{x}$
-where $|\vec{n}| = n$ which is equivalent to saying $A \mmult{n} X$ is defined.
+Let $\shape{A} = \vec{a} \oplus \vec{n}$ and $\shape{X} = \vec{n} \oplus \vec{x}$
+where $\shape{\vec{n}} = n$ which is equivalent to saying $A \mmult{n} X$ is defined.
 Also let $\bar{a} \in \Dim(\vec{a})$, $\bar{n} \in \Dim(\vec{n})$,
 $\bar{x}_1 \in \Dim(\vec{x})$ and $\bar{x}_2 \in \Dim(\vec{x})$.
 Then, starting with the definition of the derivative,
@@ -2642,11 +2644,11 @@ Then, starting with the definition of the derivative,
 \end{align*}
 Then, note that,
 \begin{align*}
-  A \mmult{n} \Ident^2(|X|)[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
+  A \mmult{n} \Ident^2(\shape{X})[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
   &=
   \sum_{\forall \bar{m} \in \Dim(\vec{n})}
   A[\bar{a} \oplus \bar{m}]
-  \Ident^2(|X|)[\bar{m} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2] \\
+  \Ident^2(\shape{X})[\bar{m} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2] \\
   &=
   \sum_{\forall \bar{m} \in \Dim(\vec{n})}
   A[\bar{a} \oplus \bar{m}]
@@ -2675,25 +2677,25 @@ So,
 \[
   \frac{d(A\mmult{n}X)}{dX}[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
   =
-  A \mmult{n} \Ident^2(|X|)[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
+  A \mmult{n} \Ident^2(\shape{X})[\bar{a} \oplus \bar{x}_1 \oplus \bar{n} \oplus \bar{x}_2]
 \]
 For all $\bar{a}$, $\bar{x}_1$, $\bar{n}$ and $\bar{x}_2$. Therefore,
 \[
   \frac{d(A\mmult{n}X)}{dX}
   =
-  A \mmult{n} \Ident^2(|X|)
+  A \mmult{n} \Ident^2(\shape{X})
 \]
 \end{proof}
 
 \begin{landscape}
 \begin{theorem}[Left Multiplicative Derivative]
 \label{left_mult_derivative}
-If $|X| = \vec{x} \oplus \vec{n}$ and $|A| = \vec{n} \oplus \vec{a}$
-and $n = |\vec{n}|$ and $a = |\vec{a}|$ then,
-\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n) \]
+If $\shape{X} = \vec{x} \oplus \vec{n}$ and $\shape{A} = \vec{n} \oplus \vec{a}$
+and $n = \shape{\vec{n}}$ and $a = \shape{\vec{a}}$ then,
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n) \]
 \end{theorem}
 \begin{proof}
-Let $|X| = \vec{x} \oplus \vec{n}$ and $|A| = \vec{n} \oplus \vec{a}$. Then,
+Let $\shape{X} = \vec{x} \oplus \vec{n}$ and $\shape{A} = \vec{n} \oplus \vec{a}$. Then,
 for all
 $\bar{x}_1, \bar{x}_2 \in \Dim(\vec{x}), \bar{a}_1 \in \Dim(\vec{a}),
 \bar{n}_1 \in \Dim(\vec{n}):$
@@ -2729,11 +2731,11 @@ $\bar{x}_1, \bar{x}_2 \in \Dim(\vec{x}), \bar{a}_1 \in \Dim(\vec{a}),
 \end{align*}
 We can also show that,
 \begin{align*}
-	\left(\Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n)\right)
+	\left(\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n)\right)
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 	&=
 	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a}_1)}
-	\Ident^2(|X \mmult{n} A|)[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{a}_2]
+	\Ident^2(\shape{X \mmult{n} A})[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{a}_2]
 	\Tran(A, n)[\bar{a}_2 \oplus \bar{n}_1] \\
 	&=
 	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a})}
@@ -2752,14 +2754,14 @@ Then since,
 	\frac{d(X \mmult{n} A)}{dX}
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 	=
-	\left(\Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n)\right)
+	\left(\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n)\right)
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 \]
 we have shown that,
 \[
 	\frac{d(X \mmult{n} A)}{dX}
 	=
-	\Ident^2(|X \mmult{n} A|) \mmult{a} \Tran(A, n)
+	\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n)
 \]
 \end{proof}
 \end{landscape}
@@ -2770,7 +2772,7 @@ we have shown that,
 \[ \frac{d(F(X) + G(X))}{dX} = \frac{dF(X)}{dX} + \frac{dG(X)}{dX} \]
 \end{theorem}
 \begin{proof}
-Let $|F(X)| = |G(X)| = \vec{f}$ and $|X| = \vec{x}$. Then,
+Let $\shape{F(X)} = \shape{G(X)} = \vec{f}$ and $\shape{X} = \vec{x}$. Then,
 $\forall \bar{f} \in \Dim(\vec{f}), \bar{x} \in \Dim(\vec{x}):$
 \begin{align*}
 	\frac{d(F(X) + G(X))}{dX}[\bar{f} \oplus \bar{x}]
@@ -2798,7 +2800,7 @@ the additional ink, I think,
 \[ \frac{d(sF(X))}{dX} = s\frac{dF(X)}{dX} \]
 \end{theorem}
 \begin{proof}
-Let $|F(X)| = \vec{f}$ and $|X| = \vec{x}$. Then
+Let $\shape{F(X)} = \vec{f}$ and $\shape{X} = \vec{x}$. Then
 $\forall \bar{f} \in \Dim(\vec{f}), \bar{x} \in \Dim(\vec{x}):$
 \begin{align*}
 	\frac{d(sF(X))}{dX}[\bar{f} \oplus \bar{x}]
@@ -2817,16 +2819,16 @@ Therefore $d(sF(X))/dX = s(dF(X)/dX)$
 \begin{landscape}
 \begin{theorem}[Multiplication Rule]
 \label{multiplication_rule}
-Let $|F| = \vec{f} \oplus \vec{c}$, $|G| = \vec{c} \oplus \vec{g}$,
-and $|X| = \vec{x}$. Then,
+Let $\shape{F} = \vec{f} \oplus \vec{c}$, $\shape{G} = \vec{c} \oplus \vec{g}$,
+and $\shape{X} = \vec{x}$. Then,
 \begin{align*}
- \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX} =
- F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} +
+ \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX} =
+ F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} +
  \Tran\left(
-   \Tran(G(X), |\vec{c}|)
-     \mmult{|\vec{c}|}
-   \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right),
-   |\vec{g} \oplus \vec{x}|
+   \Tran(G(X), \shape{\vec{c}})
+     \mmult{\shape{\vec{c}}}
+   \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right),
+   \shape{\vec{g} \oplus \vec{x}}
  \right)
 \end{align*}
 \end{theorem}
@@ -2839,10 +2841,10 @@ and $|X| = \vec{x}$. Then,
  :
 \]
 \begin{align*}
- \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX}
+ \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
  &= \frac{
-       \partial \left(F(X) \mmult{|\vec{c}|} G(X)\right)[\bar{f} \oplus \bar{g}]
+       \partial \left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)[\bar{f} \oplus \bar{g}]
     }{
        \partial X[\bar{x}]
     } \\
@@ -2893,7 +2895,7 @@ Which each become,
     F(X)[\bar{f} \oplus \bar{c}]
     \frac{dG(X)}{dX}[\bar{c} \oplus \bar{g} \oplus \bar{x}] \\
  &=
-   \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+   \left( F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} \right)
    [\bar{f} \oplus \bar{g} \oplus \bar{x}]
 \end{align*}
 \begin{align*}
@@ -2908,48 +2910,48 @@ Which each become,
     G(X)[\bar{c} \oplus \bar{g}] \\
  &=
   \sum_{\forall \bar{c}}
-    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
       [\bar{c} \oplus \bar{x} \oplus \bar{f}]
-    \Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}] \\
+    \Tran(G(X), \shape{\vec{c}})[\bar{g} \oplus \bar{c}] \\
  &=
   \sum_{\forall \bar{c}}
-    \Tran(G(X), |\vec{c}|)[\bar{g} \oplus \bar{c}]
-    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+    \Tran(G(X), \shape{\vec{c}})[\bar{g} \oplus \bar{c}]
+    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
       [\bar{c} \oplus \bar{x} \oplus \bar{f}] \\
  &=
   \left(
-    \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
+    \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
+    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
   \right)[\bar{g} \oplus \bar{x} \oplus \bar{f}] \\
  &= 
   \Tran\left(
-    \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-    , |\vec{g} \oplus \vec{x}|
+    \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
+    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
+    , \shape{\vec{g} \oplus \vec{x}}
   \right)[\bar{f} \oplus \bar{g} \oplus \bar{x}]
 \end{align*}
 Therefore 
 \begin{alignat*}{3}
- \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX}
+ \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
   &=&&
-  \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right)
+  \left( F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} \right)
   [\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
   &&&+
   \Tran\left(
-    \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-    \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-    , |\vec{g} \oplus \vec{x}|
+    \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
+    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
+    , \shape{\vec{g} \oplus \vec{x}}
   \right)[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
   &=&&
   \left\{
     \begin{array}{l}
-      \left( F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} \right) \\
+      \left( F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} \right) \\
       +
       \Tran\left(
-        \Tran(G(X), |\vec{c}|) \mmult{|\vec{c}|}
-        \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right)
-        , |\vec{g} \oplus \vec{x}|
+        \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
+        \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
+        , \shape{\vec{g} \oplus \vec{x}}
       \right)
     \end{array}
   \right\}
@@ -2960,37 +2962,37 @@ Therefore
 
 \begin{theorem}[Hadamard Multiplication Rule]
 Let $F(X)$ and $G(X)$ be functions of $X$ where
-$|F(X)| = \vec{a} \oplus \vec{c}$ and $|G(X)| = \vec{c} \oplus \vec{b}$
+$\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$
 then,
 \[
-  \frac{d(F(X) \dmult{|\vec{c}|} G(X))}{dX} =
-    F(X) \dmult{|\vec{c}|} \frac{dG}{dX} +
-    \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right)
+  \frac{d(F(X) \dmult{\shape{\vec{c}}} G(X))}{dX} =
+    F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX} +
+    \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right)
 \]
 \end{theorem}
 \begin{landscape}
 \begin{proof}
-For $\vec{x} = |X|$ and for $\bar{a} \in \Dim(\vec{a})$ etc,
+For $\vec{x} = \shape{X}$ and for $\bar{a} \in \Dim(\vec{a})$ etc,
 \begin{align*}
-\frac{d(F(X) \dmult{|\vec{c}|} G(X))}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
-  &= \frac{\partial (F(X) \dmult{|\vec{c}|} G(X))[\bar{a} \oplus \bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
+\frac{d(F(X) \dmult{\shape{\vec{c}}} G(X))}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+  &= \frac{\partial (F(X) \dmult{\shape{\vec{c}}} G(X))[\bar{a} \oplus \bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
   &= \frac{\partial (F(X)[\bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{a}])}{\partial X[\bar{x}]} \\
   &= \frac{\partial F(X)[\bar{a} \oplus \bar{c}]}{\partial X[\bar{x}]} G(X)[\bar{c} \oplus \bar{b}]
     + F(X)[\bar{a} \oplus \bar{c}] \frac{\partial G(X)[\bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
   &= \frac{dF}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{x}] G(X)[\bar{c} \oplus \bar{b}]
     + F(X)[\bar{a} \oplus \bar{c}] \frac{dG}{dX}[\bar{c} \oplus \bar{b} \oplus \bar{x}] \\
   &= \frac{dF}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{x}] G(X)[\bar{c} \oplus \bar{b}]
-    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \Tran\left(\frac{dF}{dX}, ||F||\right)[\bar{x} \oplus \bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{b}]
-    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X)\right) [\bar{x} \oplus \bar{a} \oplus \bar{c} \oplus \bar{b}]
-    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
-    + \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \left(F(X) \dmult{|\vec{c}|} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
-    + \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \left\{ F(X) \dmult{|\vec{c}|} \frac{dG}{dX}
-    + \Tran\left(\Tran\left(\frac{dF}{dX}, ||F||\right) \dmult{|\vec{c}|} G(X), ||X||\right) \right\}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right)[\bar{x} \oplus \bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X)\right) [\bar{x} \oplus \bar{a} \oplus \bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left\{ F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}
+    + \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right) \right\}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
 \end{align*}
 \end{proof}
 \end{landscape}
@@ -3001,7 +3003,7 @@ Let $F(G)$ be a function $\mathbb{R}^{\vec{g}} \rightarrow \mathbb{R}^{\vec{f}}$
 and $G(X)$ be a function $\mathbb{R}^{\vec{x}} \rightarrow \mathbb{R}^{\vec{g}}$.
 Then,
 \[
-\frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
+\frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{\shape{\vec{g}}} \frac{dG}{dX}
 \]
 \end{theorem}
 \begin{proof}
@@ -3046,7 +3048,7 @@ Therefore,
 Which, taking a look at the definition of multidimensional matrix multiplication
 (\ref{mm_mult}), tells us that,
 \[
-\frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{|\vec{g}|} \frac{dG}{dX}
+\frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{\shape{\vec{g}}} \frac{dG}{dX}
 \]
 \end{proof}
 
@@ -3064,10 +3066,10 @@ such that \[ \Sum(X) = \sum_{\forall \bar{x} \in \Dim(\vec{x})} X[\bar{x}] \]
 
 \begin{theorem}[Derivative of Sum]
 Let $X$ be any multimatrix, then,
-\[\frac{d\Sum(X)}{dX} = 1^{|X|}\]
+\[\frac{d\Sum(X)}{dX} = 1^{\shape{X}}\]
 \end{theorem}
 \begin{proof}
-Let $|X| = \vec{x}$ and $\bar{x} = \Dim(\vec{x})$. Then,
+Let $\shape{X} = \vec{x}$ and $\bar{x} = \Dim(\vec{x})$. Then,
 \begin{align*}
   \frac{d\Sum(X)}{dX}[\bar{x}]
   &= \frac{\partial \Sum(X)}{\partial X[\bar{x}]} \\
@@ -3097,7 +3099,7 @@ Let $|X| = \vec{x}$ and $\bar{x} = \Dim(\vec{x})$. Then,
   &= 1^{\vec{x}}[\bar{x}]
 \end{align*}
 So,
-\[\frac{d\Sum(X)}{dX} = 1^{|X|}\]
+\[\frac{d\Sum(X)}{dX} = 1^{\shape{X}}\]
 \end{proof}
 
 \begin{definition}[Sum of Squares]
@@ -3111,10 +3113,10 @@ Let $X$ be any multimatrix then,
 \[ \frac{d \SoS(X)}{dX} = 2X \]
 \end{theorem}
 \begin{proof}
-Let $|X| = \vec{x}$. Notice that $\SoS(X) = X \mmult{|\vec{x}|} X$ since,
-$|X \mmult{|\vec{x}|} X| = \left<\right>$ and,
+Let $\shape{X} = \vec{x}$. Notice that $\SoS(X) = X \mmult{\shape{\vec{x}}} X$ since,
+$\shape{X \mmult{\shape{\vec{x}}} X} = \left<\right>$ and,
 \[
-  \left(X \mmult{|\vec{x}|} X\right)[\left<\right> \oplus \left<\right>]
+  \left(X \mmult{\shape{\vec{x}}} X\right)[\left<\right> \oplus \left<\right>]
   =
   \sum_{\forall \bar{x} \in \Dim(\vec{x})}
     X[\left<\right> \oplus \bar{x}]
@@ -3122,36 +3124,36 @@ $|X \mmult{|\vec{x}|} X| = \left<\right>$ and,
 \]
 Then, by the multiplication rule (Thm. \ref{multiplication_rule}),
 \begin{align*}
-  \frac{d\left(X \mmult{|\vec{x}|} X\right)}{dX}
+  \frac{d\left(X \mmult{\shape{\vec{x}}} X\right)}{dX}
   &=
-  X \mmult{|\vec{x}|} \frac{dX}{dX} +
+  X \mmult{\shape{\vec{x}}} \frac{dX}{dX} +
   \Tran\left(
-    \Tran(X, |\vec{x}|)
-      \mmult{|\vec{x}|}
-    \Tran\left(\frac{dX}{dX}, |\vec{x}|\right),
-    |\vec{x} \oplus \vec{x}|
+    \Tran(X, \shape{\vec{x}})
+      \mmult{\shape{\vec{x}}}
+    \Tran\left(\frac{dX}{dX}, \shape{\vec{x}}\right),
+    \shape{\vec{x} \oplus \vec{x}}
   \right) \\
   &=
-  X \mmult{|\vec{x}|} \Ident^2(|X|) +
+  X \mmult{\shape{\vec{x}}} \Ident^2(\shape{X}) +
   \Tran\left(
     X
-      \mmult{|\vec{x}|}
-    \Tran\left(\Ident^2(|X|), |\vec{x}|\right),
-    |\vec{x} \oplus \vec{x}|
+      \mmult{\shape{\vec{x}}}
+    \Tran\left(\Ident^2(\shape{X}), \shape{\vec{x}}\right),
+    \shape{\vec{x} \oplus \vec{x}}
   \right) \\
   &=
   X +
   \Tran\left(
     X
-      \mmult{|\vec{x}|}
-    \Ident^2(|X|),
-    |\vec{x} \oplus \vec{x}|
+      \mmult{\shape{\vec{x}}}
+    \Ident^2(\shape{X}),
+    \shape{\vec{x} \oplus \vec{x}}
   \right) \\
   &=
   X +
   \Tran\left(
     X,
-    |\vec{x} \oplus \vec{x}|
+    \shape{\vec{x} \oplus \vec{x}}
   \right) \\
   &= X + X \\
   &= 2X
@@ -3177,11 +3179,11 @@ such that $\forall \bar{x} \in \Dim(\vec{x}):$
 \begin{align*}
 	\frac{d\Softmax(X)}{dX}
 	&=
-	\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+	\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
   -\Softmax(X) \mmult{0} \Softmax(X) \\
 	&=
-	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
-	\mmult{||X||} \Softmax(X)
+	\left(\Ident^3(\shape{X}) - \Softmax(X) \mmult{0} \Ident^2(\shape{X}) \right)
+	\mmult{\shape{\shape{X}}} \Softmax(X)
 \end{align*}
 \end{theorem}
 \begin{proof}
@@ -3206,9 +3208,9 @@ Next,
 		\mmult{0}
 		\Tran\left(
 			\frac{d \exp(X)}{dX}
-			,|\vec{x}|
+			,\shape{\vec{x}}
 		\right)
-		,|\left<\right> \oplus \vec{x}|
+		,\shape{\left<\right> \oplus \vec{x}}
 	\right) \\
 	&=&&
 	\exp(X) \mmult{0} \frac{d \left( \Sum(\exp(X)) \right)^{-1}}{dX}
@@ -3218,9 +3220,9 @@ Next,
 		\mmult{0}
 		\Tran\left(
 			\frac{d \exp(X)}{dX}
-			,|\vec{x}|
+			,\shape{\vec{x}}
 		\right)
-		,|\vec{x}|
+		,\shape{\vec{x}}
 	\right) \\
 	&=&&
 	\exp(X) \mmult{0} \left(
@@ -3233,19 +3235,19 @@ Next,
 		\left( \Sum(\exp(X)) \right)^{-1}
 		\mmult{0}
 		\Tran\left(
-			\Ident^3(|X|) \mmult{||X||} \exp(X)
-			,|\vec{x}|
+			\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \exp(X)
+			,\shape{\vec{x}}
 		\right)
-		,|\vec{x}|
+		,\shape{\vec{x}}
 	\right) \\
 	&=&&
 	\exp(X) \mmult{0} \left(
 		-\left( \Sum(\exp(X)) \right)^{-2}
 		\mmult{0}
-		1^{|X|}
-		\mmult{||X||}
-		\Ident^3(|X|)
-		\mmult{||X||}
+		1^{\shape{X}}
+		\mmult{\shape{\shape{X}}}
+		\Ident^3(\shape{X})
+		\mmult{\shape{\shape{X}}}
 		\exp(X)
 	\right)
 	\nonumber\\&&&+
@@ -3253,56 +3255,56 @@ Next,
 		\Tran\left(
 			\left( \Sum(\exp(X)) \right)^{-1}
 			\mmult{0}
-			\Ident^3(|X|) \mmult{||X||} \exp(X)
-		,|\vec{x}|
+			\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \exp(X)
+		,\shape{\vec{x}}
 		\right)
-		,|\vec{x}|
+		,\shape{\vec{x}}
 	\right) \\
 	&=&&
 	-\Softmax(X) \mmult{0} \left(
 		\left( \Sum(\exp(X)) \right)^{-1}
 		\mmult{0}
-		\Ident^2(|X|)
-		\mmult{||X||}
+		\Ident^2(\shape{X})
+		\mmult{\shape{\shape{X}}}
 		\exp(X)
 	\right)
 	\nonumber\\&&&+
 	\Tran\left(
 		\Tran\left(
-			\Ident^3(|X|) \mmult{||X||} \Softmax(X)
-		,|\vec{x}|
+			\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
+		,\shape{\vec{x}}
 		\right)
-	,|\vec{x}|
+	,\shape{\vec{x}}
 	\right) \\
 	&=&&
 	-\Softmax(X) \mmult{0} \Softmax(X)
 	+
 	\Tran\left(
-		\Ident^3(|X|) \mmult{||X||} \Softmax(X)
-		,2|\vec{x}|
+		\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
+		,2\shape{\vec{x}}
 	\right) \\
 	&=&&
-	\Ident^3(|X|) \mmult{||X||} \Softmax(X)
+	\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
   -\Softmax(X) \mmult{0} \Softmax(X) \\
 	&=&&
-	\Ident^3(|X|) \mmult{||X||} \Softmax(X)
-	-\Softmax(X) \mmult{0} \Ident^2(|X|) \mmult{||X||} \Softmax(X) \\
+	\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
+	-\Softmax(X) \mmult{0} \Ident^2(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X) \\
 	&=&&
-	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
-	\mmult{||X||} \Softmax(X)
+	\left(\Ident^3(\shape{X}) - \Softmax(X) \mmult{0} \Ident^2(\shape{X}) \right)
+	\mmult{\shape{\shape{X}}} \Softmax(X)
 \end{alignat*}
 Let's just verify that against the Wikipedia \cite{wiki:softmax} result:
 \begin{align*}
 	\frac{\partial \Softmax(X)[\bar{x}_1]}{\partial X[\bar{x}_2]}
 	&=
 	\left\{
-		\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
-		\mmult{||X||} \Softmax(X)
+		\left(\Ident^3(\shape{X}) - \Softmax(X) \mmult{0} \Ident^2(\shape{X}) \right)
+		\mmult{\shape{\shape{X}}} \Softmax(X)
 	\right\}
 	[\bar{x}_1 \oplus \bar{x}_2] \\
 	&=
 	\sum_{\forall \bar{x}_3}
-	\left(\Ident^3(|X|) - \Softmax(X) \mmult{0} \Ident^2(|X|) \right)
+	\left(\Ident^3(\shape{X}) - \Softmax(X) \mmult{0} \Ident^2(\shape{X}) \right)
 	[\bar{x}_1 \oplus \bar{x}_2 \oplus \bar{x}_3]
 	\Softmax(X)[\bar{x}_3] \\
 	&=
@@ -3356,29 +3358,109 @@ weights.
 Let $L_{i-1}$ be the activations of the the previous layer and $L_i$ the activations
 of the current layer. Each of these can be modeled as a multimatrix. As an the weighted
 connections between them, $W_i$. Finally, there is an activation function
-$a(X) : \mathbb{R}^{|X|} \to \mathbb{R}^{|X|}$ which is an elementwise function,
+$a(X) : \mathbb{R}^{\shape{X}} \to \mathbb{R}^{\shape{X}}$ which is an elementwise function,
 often the sigmoid function, or ReLU, or some variant thereof. It's unimportant for this
 definition.
 
-\[ L_i = a(L_{i-1} \mmult{||L_{i-1}||} W_i) \]
+\[ L_i = a(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \]
 \end{definition}
 
+\begin{landscape}
 \begin{theorem}[Derivative of FFNN Layer]
-\[ \frac{dL_i}{dW_j} = ? \]
+\[
+  \frac{dL_i}{dW_j}
+	= \left\{
+  \begin{array}{ll}
+		0 & \mbox{if } i < j \\
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right)
+	  & \mbox{if } i = j \\
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \Tran(W_i, \shape{\shape{L_{i-1}}})
+    \mmult{\shape{\shape{L_{i-1}}}}
+    \frac{d L_{i-1}}{dW_j}
+		& \mbox{if } i > j
+  \end{array}
+  \right.
+\]
 \end{theorem}
 \begin{proof}
 \begin{ppart} When $i < j$,
 $L_i$ does not depend on $W_j$, so 
-$\forall \bar{x} \in \Dim(|L_i|), \bar{y} \in \Dim(|W_j|)$
+$\forall \bar{x} \in \Dim(\shape{L_i}), \bar{y} \in \Dim(\shape{W_j})$
 $\frac{dL_i}{dW_j} = 0$
 \end{ppart}
 \begin{ppart} $i = j$
-TODO
+Then note that $\frac{dL_{i-1}}{dW_j} = 0$ because $L_{i-1}$ does not
+depend on $W_j$. So we can just use the chain rule and the right multiplicative rule to find that,
+\[
+  \frac{dL_i}{dW_{j=i}} =
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right)
+\]
 \end{ppart}
 \begin{ppart} $i > j$
-TODO
+In this case, $L_{i-1}$ depends on $W_j$ but $W_i$ does not. So we can use the chain rule and the
+left multiplicative rule to find that,
+\begin{align*}
+  \frac{dL_i}{dW_{j<i}}
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \frac{d (L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)}{dW_j} \\
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(
+      \frac{d (L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)}{dL_{i-1}}
+      \mmult{\shape{\shape{L_{i-1}}}}
+      \frac{dL_{i-1}}{dW_j}
+    \right) \\
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(
+      \left(
+        \Ident^2(\shape{L_{i}})
+        \mmult{\shape{\shape{W_i}}-\shape{\shape{L_{i-1}}}}
+        \Tran(W_i, \shape{\shape{L_{i-1}}})
+      \right)
+      \mmult{\shape{\shape{L_{i-1}}}}
+      \frac{d L_{i-1}}{dW_j}
+    \right) \\
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(
+      \left(
+        \Ident^2(\shape{L_{i}})
+        \mmult{\shape{\shape{L_i}}}
+        \Tran(W_i, \shape{\shape{L_{i-1}}})
+      \right)
+      \mmult{\shape{\shape{L_{i-1}}}}
+      \frac{d L_{i-1}}{dW_j}
+    \right) \\
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(
+      \Tran(W_i, \shape{\shape{L_{i-1}}})
+      \mmult{\shape{\shape{L_{i-1}}}}
+      \frac{d L_{i-1}}{dW_j}
+    \right) \\
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \Tran(W_i, \shape{\shape{L_{i-1}}})
+    \mmult{\shape{\shape{L_{i-1}}}}
+    \frac{d L_{i-1}}{dW_j}
+\end{align*}
 \end{ppart}
 \end{proof}
+\end{landscape}
 
 \chapter{Integration}
 
@@ -3389,7 +3471,7 @@ be defined,
  \int_A^B F(X) dX = \lim_{n \to \infty}
  \sum_{i=1}^n
   F\left(A+\frac{i}{n}(B-A)\right)
-  \mmult{||X||}
+  \mmult{\shape{\shape{X}}}
   \left(\frac{B-A}{n}\right)
 \]
 
@@ -3397,8 +3479,8 @@ Which, I have very little idea what that means geometriclly but
 if you let $G(X) = \int_A^X F(Y) dY$ you seem to end up with $dG/dX = F(X)$.
 
 Maybe... well look at it this way. $F(X)$ is a function which produces some,
-afine-like transformation multimatrix for multimatricies of shape $|X|$,
-since it must have a right hand shape of $\ldots \oplus |X|$. This integration
+afine-like transformation multimatrix for multimatricies of shape $\shape{X}$,
+since it must have a right hand shape of $\ldots \oplus \shape{X}$. This integration
 occures over a linear path of $X$ as it moves from $A$ to $B$ applying that
 transformation and adding up the results of the transformed multimatricies with
 a weight proportional to the step size... and in the direction of the step.
@@ -3418,7 +3500,7 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
     \lim_{n \to \infty}
      \sum_{i=1}^n
       F\left(A+\frac{i}{n}(X-A)\right)
-      \mmult{||Y||}
+      \mmult{\shape{\shape{Y}}}
       \left(\frac{X-A}{n}\right)
 \end{align*}
 \begin{alignat*}{3}
@@ -3429,7 +3511,7 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
       \lim_{n \to \infty}
       \sum_{i=1}^n
         F\left(A+\frac{i}{n}(X-A)\right)
-        \mmult{||Y||}
+        \mmult{\shape{\shape{Y}}}
         \left(\frac{X-A}{n}\right)
       \right\}
     }{dX} \\
@@ -3439,7 +3521,7 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
       d \left\{
       \sum_{i=1}^n
         F\left(A+\frac{i}{n}(X-A)\right)
-        \mmult{||Y||}
+        \mmult{\shape{\shape{Y}}}
         \left(\frac{X-A}{n}\right)
       \right\}
     }{dX} \\
@@ -3449,7 +3531,7 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
       \frac{
         d \left\{
           F\left(A+\frac{i}{n}(X-A)\right)
-          \mmult{||Y||}
+          \mmult{\shape{\shape{Y}}}
           \left(\frac{X-A}{n}\right)
         \right\}
       }{dX} \\
@@ -3457,32 +3539,32 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
     \lim_{n \to \infty}
       \sum_{i=1}^n
         F\left(A+\frac{i}{n}(X-A)\right)
-          \mmult{||Y||}
+          \mmult{\shape{\shape{Y}}}
           \frac{d \left(\frac{X-A}{n}\right)}{dX}
         \\&&&+
         \Tran\left(
-          \Tran\left(\frac{X-A}{n}, ||Y||\right)
-          \mmult{||Y||}
+          \Tran\left(\frac{X-A}{n}, \shape{\shape{Y}}\right)
+          \mmult{\shape{\shape{Y}}}
           \Tran\left(\frac{
             d \left\{F\left(A+\frac{i}{n}(X-A)\right)\right\}
-          }{dX}, |\vec{f}|\right),
-          |\vec{x} \oplus \vec{x}|
+          }{dX}, \shape{\vec{f}}\right),
+          \shape{\vec{x} \oplus \vec{x}}
         \right) \\
   &=&&
     \lim_{n \to \infty}
       \sum_{i=1}^n
         F\left(A+\frac{i}{n}(X-A)\right)
-          \mmult{||Y||}
-          \frac{1}{n}\Ident^2(|X|)
+          \mmult{\shape{\shape{Y}}}
+          \frac{1}{n}\Ident^2(\shape{X})
         \\&&&+
         \Tran\left(
           \frac{X-A}{n}
-          \mmult{||Y||}
+          \mmult{\shape{\shape{Y}}}
           \Tran\left(
             \frac{dF(X)}{dX}
-            \mmult{|X|}
-            \frac{i}{n}\Ident^2(|X|), |\vec{f}|\right),
-          |\vec{x} \oplus \vec{x}|
+            \mmult{\shape{X}}
+            \frac{i}{n}\Ident^2(\shape{X}), \shape{\vec{f}}\right),
+          \shape{\vec{x} \oplus \vec{x}}
         \right) \\
   &=&&
     \lim_{n \to \infty}
@@ -3491,11 +3573,11 @@ Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
         \\&&&+
         \Tran\left(
           \frac{X-A}{n}
-          \mmult{||Y||}
+          \mmult{\shape{\shape{Y}}}
           \Tran\left(
             \frac{i}{n}\frac{dF(X)}{dX}
-            , |\vec{f}|\right),
-          |\vec{x} \oplus \vec{x}|
+            , \shape{\vec{f}}\right),
+          \shape{\vec{x} \oplus \vec{x}}
         \right)
 \end{alignat*}
 At this point I'm fairly stuck.
@@ -3507,7 +3589,7 @@ Ok, lets think of this in another way. Is this true?
 		G(X+\epsilon H) - G(X)
 	}{\epsilon}
 	=
-	F(X) \mmult{||X||} H
+	F(X) \mmult{\shape{\shape{X}}} H
 \]
 Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 
@@ -3548,16 +3630,16 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 \end{solution}
 
 \begin{solution}
-\[ \left|\frac{dF}{dX}\right| = \left<6,7,3,7,2\right> \]
+\[ \shape{\frac{dF}{dX}} = \left<6,7,3,7,2\right> \]
 \end{solution}
 
 \begin{solution}
-\[ \left|\frac{df}{dX}\right| = |X| = \left<2,3,2\right> \]
+\[ \shape{\frac{df}{dX}} = \shape{X} = \left<2,3,2\right> \]
 \[ \frac{df}{dX}[\bar{v}] = 1 \]
 \end{solution}
 
 \begin{solution}
-\[ \left|\frac{df}{dX}\right| = |X| = \left<2,3,2\right> \]
+\[ \shape{\frac{df}{dX}} = \shape{X} = \left<2,3,2\right> \]
 \[ \frac{df}{dX}[\bar{v}] = 1 \]
 \end{solution}
 
@@ -3577,12 +3659,12 @@ Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
 
 \begin{drule}
 Self Derivative (Thm. \ref{self_derivative})
-\[ \frac{dX}{dX} = \Ident^2(|X|) \]
+\[ \frac{dX}{dX} = \Ident^2(\shape{X}) \]
 \end{drule}
 
 \begin{drule}
 Elementwise Derivative (Thm. \ref{elementwise_derivative})
-\[ \frac{dM(X)}{dX} = \Ident^3(|X|) \mmult{||X||} M'(X) \]
+\[ \frac{dM(X)}{dX} = \Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} M'(X) \]
 \end{drule}
 
 \begin{drule}
@@ -3604,24 +3686,24 @@ Implies,
 \begin{drule}
 Transpose Derivative
 (Thm. \ref{tran_derivative})
-\[ |X| = \vec{l} \oplus \vec{r} \]
+\[ \shape{X} = \vec{l} \oplus \vec{r} \]
 Implies,
 \[
- \frac{d\Tran(X, |\vec{l}|)}{dX} =
- \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), |\vec{r}|)
+ \frac{d\Tran(X, \shape{\vec{l}})}{dX} =
+ \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), \shape{\vec{r}})
 \]
 \end{drule}
 
 \begin{drule}
 Right Multiplicative Derivative
 (Thm. \ref{right_mult_derivative})
-\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(|X|) \]
+\[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(\shape{X}) \]
 \end{drule}
 
 \begin{drule}
 Left Multiplicative Derivative
 (Thm. \ref{left_mult_derivative})
-\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(|X \mmult{n} A|) \mmult{n} \Tran(A, n) \]
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(\shape{X \mmult{n} A}) \mmult{\shape{\shape{A}}-n} \Tran(A, n) \]
 \end{drule}
 
 \begin{drule}
@@ -3640,16 +3722,16 @@ Scalar Multiplication Rule
 Multiplication Rule
 (Thm. \ref{multiplication_rule})
 
-Let $|F| = \vec{f} \oplus \vec{c}$, $|G| = \vec{c} \oplus \vec{g}$,
-and $|X| = \vec{x}$. Then,
+Let $\shape{F} = \vec{f} \oplus \vec{c}$, $\shape{G} = \vec{c} \oplus \vec{g}$,
+and $\shape{X} = \vec{x}$. Then,
 \begin{align*}
- \frac{d\left(F(X) \mmult{|\vec{c}|} G(X)\right)}{dX} =&
- F(X) \mmult{|\vec{c}|} \frac{dG(X)}{dX} + \\
+ \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX} =&
+ F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} + \\
  &\Tran\left(
-   \Tran(G(X), |\vec{c}|)
-     \mmult{|\vec{c}|}
-   \Tran\left(\frac{dF(X)}{dX}, |\vec{f}|\right),
-   |\vec{g} \oplus \vec{x}|
+   \Tran(G(X), \shape{\vec{c}})
+     \mmult{\shape{\vec{c}}}
+   \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right),
+   \shape{\vec{g} \oplus \vec{x}}
  \right)
 \end{align*}
 \end{drule}
@@ -3657,7 +3739,7 @@ and $|X| = \vec{x}$. Then,
 \begin{drule}
 Chain Rule
 (Thm. \ref{mmm_chain_rule})
-\[ \frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{||G||} \frac{dG}{dX} \]
+\[ \frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{\shape{\shape{G}}} \frac{dG}{dX} \]
 \end{drule}
 
 \end{appendices}
