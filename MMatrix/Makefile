@@ -10,14 +10,25 @@ test_math: bin/mmatrix.o test/test_math.cc
 test_jpeg_decoder: test/test_jpeg_decoder.cc
 	${CMP} -o test_jpeg_decoder test/test_jpeg_decoder.cc ${CFLAGS}
 
+test_audio: bin/audio.o test/test_audio.cc
+	${CMP} -o test_audio test/test_audio.cc bin/audio.o ${CFLAGS}
+
+wav_example: src/wav_example.cc src/audio.o
+	${CMP} -o wav_example src/wav_example.cc bin/audio.o ${CFLAGS}
+
 bin/:
 	mkdir bin
 
 bin/mmatrix.o: bin/ src/mmatrix.cc src/mmatrix.h
 	${CMP} -c src/mmatrix.cc -o bin/mmatrix.o ${CFLAGS}
 
+bin/audio.o: bin/ src/audio.cc src/audio.h
+	${CMP} -c src/audio.cc -o bin/audio.o ${CFLAGS}
+
 clean:
 	-rm test_mmatrix
+	-rm test_math
 	-rm test_jpeg_decoder
-	-rm -r test_mmatrix.dSYM
+	-rm test_audio
+	-rm wav_example
 	-rm -r bin

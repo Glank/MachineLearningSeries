@@ -1,6 +1,10 @@
 test_mmatrix
+test_math
 test_jpeg_decoder
+test_audio
+wav_example
 *.o
 *.dSYM/*
 bin/
 *.swp
+.DS_Store
