@@ -96,7 +96,14 @@ void FromValueIndex(const std::vector<int>& shape, int vindex,
 void Multiply(int n, const MMatrixInterface* a,
   const MMatrixInterface* b, MMatrixInterface* out);
 
+// Adds m to out
 void AddTo(const MMatrixInterface* m, MMatrixInterface* out);
+
+// Subtracts m from out
+void SubFrom(const MMatrixInterface* m, MMatrixInterface* out);
+
+// Returns the sum of the square of each  element of m
+double SquaredSum(const MMatrixInterface* m);
 
 void Elementwise(std::function<MMFloat(MMFloat)> f, const MMatrixInterface* m,
   MMatrixInterface* out);

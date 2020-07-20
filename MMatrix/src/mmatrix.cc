@@ -246,6 +246,41 @@ void AddTo(const MMatrixInterface* m, MMatrixInterface* out) {
   }
 }
 
+void SubFrom(const MMatrixInterface* m, MMatrixInterface* out) {
+  if (m == nullptr || out == nullptr) {
+    throw std::invalid_argument("SubFrom cannot take null arguments.");
+  }
+
+  // bound = product of m's shape
+  int bound = 1;
+  for (int s : m->shape()) {
+    bound *= s;
+  }
+  
+  for (int i = 0; i < bound; i++) {
+    out->set(i, out->get(i)-m->get(i));
+  }
+}
+
+double SquaredSum(const MMatrixInterface* m) {
+  if (m == nullptr) {
+    throw std::invalid_argument("SquaredSum cannot take null arguments.");
+  }
+
+  // bound = product of m's shape
+  int bound = 1;
+  for (int s : m->shape()) {
+    bound *= s;
+  }
+  
+  double result = 0;
+  for (int i = 0; i < bound; i++) {
+    double tmp = m->get(i);
+    result += tmp*tmp;
+  }
+  return result;
+}
+
 void Elementwise(std::function<MMFloat(MMFloat)> f, const MMatrixInterface* m,
     MMatrixInterface* out) {
   if (m == nullptr || out == nullptr) {

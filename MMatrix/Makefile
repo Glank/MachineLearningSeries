@@ -10,11 +10,12 @@ test_math: bin/mmatrix.o test/test_math.cc
 test_jpeg_decoder: test/test_jpeg_decoder.cc
 	${CMP} -o test_jpeg_decoder test/test_jpeg_decoder.cc ${CFLAGS}
 
-test_audio: bin/audio.o test/test_audio.cc
-	${CMP} -o test_audio test/test_audio.cc bin/audio.o ${CFLAGS}
+test_audio: bin/audio.o test/test_audio.cc bin/mmatrix.o
+	${CMP} -o test_audio test/test_audio.cc bin/audio.o bin/mmatrix.o ${CFLAGS}
 
-wav_example: src/wav_example.cc src/audio.o
-	${CMP} -o wav_example src/wav_example.cc bin/audio.o ${CFLAGS}
+wav_example: src/wav_example.cc bin/audio.o bin/mmatrix.o
+	echo "Reached"
+	${CMP} -o wav_example src/wav_example.cc bin/audio.o bin/mmatrix.o ${CFLAGS}
 
 bin/:
 	mkdir bin

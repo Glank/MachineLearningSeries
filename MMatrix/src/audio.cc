@@ -77,6 +77,17 @@ void ReadWavFile(std::istream& file, WavHdr* hdr, std::vector<double>* samples) 
   }
 }
 
+std::unique_ptr<mmatrix::DenseMMatrix> ReadWavFile(std::istream& file, WavHdr* hdr) {
+  // TODO: read directly
+  std::vector<double> samples;
+  ReadWavFile(file, hdr, &samples);
+  std::unique_ptr<mmatrix::DenseMMatrix> out(new mmatrix::DenseMMatrix({static_cast<int>(samples.size())}));
+  for (int i = 0; i < samples.size(); i++) {
+    out->set(i, samples[i]);
+  }
+  return out;
+}
+
 void WriteWavFile(std::ostream& file, uint32_t sampleRate, int bytesPerSample, const std::vector<double>& samples) {
   if (bytesPerSample != 1 && bytesPerSample != 2) {
     throw std::runtime_error("Invalid byesPerSample, only 1 or 2 are valid.");
@@ -126,10 +137,19 @@ void WriteWavFile(std::ostream& file, uint32_t sampleRate, int bytesPerSample, c
     }
   }
 }
+void WriteWavFile(std::ostream& file, uint32_t sampleRate, int bytesPerSample,
+    const mmatrix::MMatrixInterface* samples) {
+  std::vector<double> tmp;
+  tmp.reserve(samples->shape()[0]);
+  for (int i = 0; i < samples->shape()[0]; i++) {
+    tmp.push_back(samples->get(i));
+  }
+  WriteWavFile(file, sampleRate, bytesPerSample, tmp);
+}
 
 namespace internal {
 
-std::vector<double> GetFrequencyDomain(uint32_t sampleRate) {
+std::unique_ptr<mmatrix::DenseMMatrix> GetFrequencyDomain(uint32_t sampleRate) {
   const double pi = std::acos(-1);
   // sampleRate = samples / second
   // From A0 = 440/(2^4) = 27.5 1/s
@@ -139,14 +159,89 @@ std::vector<double> GetFrequencyDomain(uint32_t sampleRate) {
   // t = i / sampleRate
   // y = sin(2*pi*f_t*i/sampleRate)
   // f_d = 2*pi*f_t/sampleRate
-  std::vector<double> frequencies;
-  frequencies.reserve(88);
+  std::unique_ptr<mmatrix::DenseMMatrix> frequencies(new mmatrix::DenseMMatrix({88}));
   for (int i = 0; i <= 87; i++) {
     double f_t = 27.5*std::pow(2, i/12.0);
     double f_d = 2*pi*f_t/sampleRate;
-    frequencies.push_back(f_d);
+    frequencies->set(i, f_d);
   }
   return frequencies;
+}
+
+void FourierTransform(const mmatrix::MMatrixInterface* samples,
+    const mmatrix::MMatrixInterface* frequencies,
+    int window, mmatrix::MMatrixInterface* out) {
+  // TODO: check shape too
+  // out.shape = <frequency, time offset>
+  if (out == nullptr) {
+    throw std::runtime_error("FourierTransform: Output space cannot be null.");
+  } 
+  int nf = frequencies->shape()[0];
+  for (int f = 0; f < nf; f++) {
+    // Calculate the first window
+    double f_r = 0, f_i = 0;
+    for (int i = 0; i < window; i++) {
+      f_r += std::cos(frequencies->get(f)*i)*samples->get(i);
+      f_i += std::sin(frequencies->get(f)*i)*samples->get(i);
+    }
+    out->set(f, std::sqrt(f_r*f_r+f_i*f_i));
+    // Dynamically calculate the rest
+    for (int i = 1; i < samples->shape()[0]-window; i++) {
+      f_r = f_r - std::cos(frequencies->get(f)*(i-1))*samples->get(i-1) + std::cos(frequencies->get(f)*(i+window-1))*samples->get(i+window-1);
+      f_i = f_i - std::sin(frequencies->get(f)*(i-1))*samples->get(i-1) + std::sin(frequencies->get(f)*(i+window-1))*samples->get(i+window-1);
+      out->set(f+i*nf, std::sqrt(f_r*f_r+f_i*f_i));
+    }
+  }
+}
+
+double GetFourierDifference(
+    const mmatrix::MMatrixInterface* samples1,
+    const mmatrix::MMatrixInterface* samples2,
+    const mmatrix::MMatrixInterface* frequencies,
+    int window) {
+  // TODO verify input shapes
+  mmatrix::DenseMMatrix tmp({frequencies->shape()[0], samples1->shape()[0]-window});
+  mmatrix::DenseMMatrix ft2({frequencies->shape()[0], samples2->shape()[0]-window});
+  FourierTransform(samples1, frequencies, window, &tmp);
+  FourierTransform(samples2, frequencies, window, &ft2);
+  mmatrix::SubFrom(&ft2, &tmp);
+  return mmatrix::SquaredSum(&tmp);
+}
+
+void DerivFourierTransorm(
+    const mmatrix::MMatrixInterface* samples,
+    const mmatrix::MMatrixInterface* frequencies,
+    int window,
+    const mmatrix::MMatrixInterface* ft,
+    mmatrix::MMatrixInterface* out) {
+  // shape of out is <f, s-w, s>
+  // TODO verify inputs  
+  out->zero();
+  double nf = frequencies->shape()[0];
+  double ni = samples->shape()[0]-window;
+  double nt = samples->shape()[0];
+  for (int f = 0; f < nf; f++) {
+    double fc = frequencies->get(f);
+    for (int t = 0; t < nt; t++) {
+      int i = std::max(t-window+1, 0);
+      double gt = 0;
+      for (int d = 0; d < window; d++) {
+        gt += samples->get(i+d)*std::cos(fc*(i+d-t));
+      }
+      if (t == 3211) {
+        std::cout << "Reached: " << gt << std::endl;
+      }
+      out->set(f+i*nf+t*nf*ni, gt/ft->get(f+i*nf));
+      for (i++; i <= t; i++) {
+        gt -= samples->get(i-1)*std::cos(fc*(i-1-t));
+        gt += samples->get(i-1+window)*std::cos(fc*(i-1+window-t));
+        if (t == 3211) {
+          std::cout << "Reached: " << gt << std::endl;
+        }
+        out->set(f+i*nf+t*nf*ni, gt/ft->get(f+i*nf));
+      }
+    }
+  }
 }
 
 }  // namespace internal
