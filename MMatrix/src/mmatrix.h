@@ -27,10 +27,10 @@ class MMatrixInterface {
   virtual MMFloat get(const std::vector<int>& indices) const;
   // Returns the value stored at the given indices represented by i.
   // See ToValueIndex.
-  virtual MMFloat get(int i) const;
+  virtual MMFloat get(long i) const;
   // Stores a value at the given indicies represented by i.
   // See ToValueIndex.
-  virtual void set(int i, MMFloat value);
+  virtual void set(long i, MMFloat value);
   // Stores a value at the given indicies. Each index must be within it's
   // dimension defined by shape().
   virtual void set(const std::vector<int>& indices, MMFloat value);
@@ -49,8 +49,8 @@ class DenseMMatrix : public MMatrixInterface {
 
   using MMatrixInterface::get;
   using MMatrixInterface::set;
-  MMFloat get(int i) const override;
-  void set(int i, MMFloat value) override;
+  MMFloat get(long i) const override;
+  void set(long i, MMFloat value) override;
   const std::vector<int>& shape() const override;
   void zero() override;
   internal::MMatrixType type() const override;
@@ -67,8 +67,8 @@ class SparseMMatrix : public MMatrixInterface {
 
   using MMatrixInterface::get;
   using MMatrixInterface::set;
-  MMFloat get(int i) const override;
-  void set(int i, MMFloat value) override;
+  MMFloat get(long i) const override;
+  void set(long i, MMFloat value) override;
   const std::vector<int>& shape() const override;
   void zero() override;
   internal::MMatrixType type() const override;
@@ -76,20 +76,22 @@ class SparseMMatrix : public MMatrixInterface {
   // Returns the number of non-zero values in the matrix.
   int size() const;
 
-  std::unordered_map<int, MMFloat>::iterator begin() { return values_.begin(); }
-  std::unordered_map<int, MMFloat>::iterator end() { return values_.end(); }
-  std::unordered_map<int, MMFloat>::const_iterator cbegin() { return values_.cbegin(); }
-  std::unordered_map<int, MMFloat>::const_iterator cend() { return values_.cend(); }
-  std::unordered_map<int, MMFloat>::const_iterator begin() const { return values_.cbegin(); }
-  std::unordered_map<int, MMFloat>::const_iterator end() const { return values_.cend(); }
+  std::unordered_map<long, MMFloat>::iterator begin() { return values_.begin(); }
+  std::unordered_map<long, MMFloat>::iterator end() { return values_.end(); }
+  std::unordered_map<long, MMFloat>::const_iterator cbegin() { return values_.cbegin(); }
+  std::unordered_map<long, MMFloat>::const_iterator cend() { return values_.cend(); }
+  std::unordered_map<long, MMFloat>::const_iterator begin() const { return values_.cbegin(); }
+  std::unordered_map<long, MMFloat>::const_iterator end() const { return values_.cend(); }
  private:
   // Maps the value index to non-zero values.
-  std::unordered_map<int, MMFloat> values_;
+  std::unordered_map<long, MMFloat> values_;
 
   std::vector<int> shape_;
+  // The theoretical maximum number of values_;
+  long size_;
 };
 
-int ToValueIndex(const std::vector<int>& shape, const std::vector<int>& indices);
+long ToValueIndex(const std::vector<int>& shape, const std::vector<int>& indices);
 void FromValueIndex(const std::vector<int>& shape, int vindex,
     std::vector<int>* indices);
 
@@ -127,6 +129,10 @@ std::string DebugString(const MMatrixInterface* m);
 std::string DebugString(const std::vector<int>& v);
 
 void Copy(const MMatrixInterface* m, MMatrixInterface* out);
+
+// Inverts the given matrix on the n'th pivot.
+// The input m is destoryed in this process.
+void Invert(int n, MMatrixInterface* m, MMatrixInterface* out);
 
 }  // namespace mmatrix
 

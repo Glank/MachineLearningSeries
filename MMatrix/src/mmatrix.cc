@@ -11,12 +11,24 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-MMFloat MMatrixInterface::get(int i) const {
+namespace {
+
+inline double product(vector<int> shape) {
+  long prod = 1;
+  for (long s : shape) {
+    prod *= s;
+  }
+  return prod;
+}
+
+}  // namespace
+
+MMFloat MMatrixInterface::get(long i) const {
   vector<int> indices(shape().size(), 0);
   FromValueIndex(shape(), i, &indices);
   return get(indices);
 }
-void MMatrixInterface::set(int i, MMFloat value) {
+void MMatrixInterface::set(long i, MMFloat value) {
   vector<int> indices(shape().size(), 0);
   FromValueIndex(shape(), i, &indices);
   set(indices, value);
@@ -35,11 +47,11 @@ DenseMMatrix::DenseMMatrix(const vector<int>& shape) : shape_(shape) {
   }
   values_ = vector<MMFloat>(total_size, 0);
 }
-MMFloat DenseMMatrix::get(int i) const {
-  return values_[i];
+MMFloat DenseMMatrix::get(long i) const {
+  return values_[static_cast<int>(i)];
 }
-void DenseMMatrix::set(int i, MMFloat value) {
-  values_[i] = value;
+void DenseMMatrix::set(long i, MMFloat value) {
+  values_[static_cast<int>(i)] = value;
 }
 const vector<int>& DenseMMatrix::shape() const {
   return shape_;
@@ -53,15 +65,19 @@ internal::MMatrixType DenseMMatrix::type() const {
   return internal::kMMatrixType_Dense;
 }
 
-SparseMMatrix::SparseMMatrix(const std::vector<int>& shape) : shape_(shape) {}
-MMFloat SparseMMatrix::get(int i) const {
+SparseMMatrix::SparseMMatrix(const std::vector<int>& shape) : shape_(shape), size_(product(shape)) {}
+MMFloat SparseMMatrix::get(long i) const {
   const auto v = values_.find(i);
   if (v != values_.end()) {
     return v->second;
   }
   return 0;
 }
-void SparseMMatrix::set(int i, MMFloat value) {
+void SparseMMatrix::set(long i, MMFloat value) {
+  if (i < 0 || i >= size_) {
+    std::cerr << "0 <= " << i << " < " << size_ << std::endl;
+    throw std::out_of_range("Invalid index for sparse mmatrix.");
+  }
   if (value == 0) {
     const auto it = values_.find(i);
     if (it != values_.end()) {
@@ -84,9 +100,9 @@ int SparseMMatrix::size() const {
   return values_.size();
 }
 
-int ToValueIndex(const vector<int>& shape, const vector<int>& indices) {
-  int vindex = 0;
-  int multiplier = 1;
+long ToValueIndex(const vector<int>& shape, const vector<int>& indices) {
+  long vindex = 0;
+  long multiplier = 1;
   for (int i = 0; i < shape.size(); i++) {
     if (indices[i] < 0 || indices[i] >= shape[i]) {
       throw std::out_of_range("ToValueIndex out of range.");
@@ -438,6 +454,153 @@ void Copy(const MMatrixInterface* m, MMatrixInterface* out) {
   }
   for (int i = 0; i < ncells; i++) {
     out->set(i, m->get(i));
+  }
+}
+
+void Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
+  // The size of m is N*N
+  int N;
+  {
+    if (n > m->shape().size()) {
+      throw std::runtime_error("Invalid n in Invert");
+    }
+    long N1 = 1;
+    long N2 = 1;
+    int i = 0;
+    for(i = 0; i < n; i++) {
+      N1 *= m->shape()[i];
+    }
+    for(; i < m->shape().size(); i++){
+      N2 *= m->shape()[i];
+    }
+    if (N1 != N2) {
+      throw std::runtime_error("Invalid n in Invert");
+    }
+    if (N1 > std::numeric_limits<int>::max()) {
+      throw std::runtime_error("MMatrix too large to invert.");
+    }
+    N = static_cast<int>(N1);
+  }
+
+  // Set up NxN inverse
+  out->zero();
+  for (int i = 0; i < N; i++) {
+    out->set(i+N*i, 1);
+  }
+
+  // Put m in reduced row-echelon form.
+  int pr = 0;
+  for (int pc = 0; pc < N; pc++) {
+
+    /* Debug print
+    for (int r = 0; r < N; r++) {
+      for (int c = 0; c < N; c++) {
+        std::cout << m->get(r+N*c) << "  ";
+      }
+      std::cout << "|  ";
+      for (int c = 0; c < N; c++) {
+        std::cout << out->get(r+N*c) << "  ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+    // */
+
+    // If the current head is zero, find the next row at pr or below
+    // that is non-zero and swap it.
+    if (m->get(pr+N*pc) == 0) {
+      int r = pr+1;
+      while(m->get(r+N*pc) == 0 && r < N) r++;
+      if (r==N) continue;
+      // swap
+      double tmp;
+      for (int c = pc; c < N; c++) {
+        tmp = m->get(r+N*c);
+        m->set(r+N*c, m->get(pr+N*c));
+        m->set(pr+N*c, tmp);
+      }
+      for (int c = 0; c < N; c++) {
+        tmp = out->get(r+N*c);
+        out->set(r+N*c, out->get(pr+N*c));
+        out->set(pr+N*c, tmp);
+      }
+    }
+    
+    // Divide that row by it's pivot
+    double pivot = m->get(pr+N*pc);
+    m->set(pr+N*pc, 1);
+    for (int c = pc+1; c < N; c++)
+      m->set(pr+N*c, m->get(pr+N*c)/pivot);
+    for (int c = 0; c < N; c++)
+      out->set(pr+N*c, out->get(pr+N*c)/pivot);
+
+    // Clear the pivot column below the pivot by subracting
+    // multiples of the pivot row from each row below.
+    for (int r = pr+1; r<N; r++) {
+      double head = m->get(r+N*pc);
+      if (head == 0) continue;
+      for (int c = pc; c < N; c++)
+        m->set(r+N*c, m->get(r+N*c) - m->get(pr+N*c)*head);
+      for (int c = 0; c < N; c++)
+        out->set(r+N*c, out->get(r+N*c) - out->get(pr+N*c)*head);
+    }
+
+    // Increment the pivot row
+    pr++;
+  }
+
+  // Verify that the RRE form is invertable
+  for (int i = 0; i < N; i++) {
+    if (m->get(i+N*i) != 1) {
+      throw std::runtime_error("Not an invertable matrix.");
+    }
+  }
+
+  /* Debug print
+  for (int r = 0; r < N; r++) {
+    for (int c = 0; c < N; c++) {
+      std::cout << m->get(r+N*c) << "  ";
+    }
+    std::cout << "|  ";
+    for (int c = 0; c < N; c++) {
+      std::cout << out->get(r+N*c) << "  ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl << std::endl;
+  // */
+
+  // Clear the columns above the pivots
+  pr = N-1;
+  for (int pc = N-1; pc >= 0; pc--) {
+    // Go up until we find a non-zero element in the pivot column
+    while(m->get(pr+N*pc) == 0 && pr >= 0) pr--;
+    if (pr <= 0) break;
+
+    // Subtract this row every row above it.
+    for (int r = 0; r < pr; r++) {
+      double tail = m->get(r+N*pc);
+      m->set(r+N*pc, 0);
+      for (int c = 0; c < N; c++)
+        out->set(r+N*c, out->get(r+N*c) - out->get(pr+N*c)*tail);
+    }
+
+    /* Debug print
+    for (int r = 0; r < N; r++) {
+      for (int c = 0; c < N; c++) {
+        std::cout << m->get(r+N*c) << "  ";
+      }
+      std::cout << "|  ";
+      for (int c = 0; c < N; c++) {
+        std::cout << out->get(r+N*c) << "  ";
+      }
+      std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+    // */
+    
+    // Go up to the next pivot row
+    pr--;
   }
 }
 

@@ -196,9 +196,10 @@ void TestDerivFourierTransform() {
 
   int errors = 0;
   bool good = false;
-  for (int ind = 0; ind < samples.shape()[0]; ind++) {
+  // TODO reqork to take advantage of sparseness of dft
+  for (long ind = 0; ind < samples.shape()[0]; ind++) {
     int nonZeros = 0;
-    for (int dep = 0; dep < ft.shape()[0]*ft.shape()[1]; dep++) {
+    for (long dep = 0; dep < ft.shape()[0]*ft.shape()[1]; dep++) {
       if (dft.get(dep+ft.shape()[0]*ft.shape()[1]*ind) != 0)
         nonZeros++;
     }
@@ -215,6 +216,7 @@ void TestDerivFourierTransform() {
       }
     }
   }
+  std::cout << "Empty row check end." << std::endl;
 
   mmatrix::DenseMMatrix samples2({sampleRate});
   mmatrix::DenseMMatrix ft2(ft.shape());
@@ -222,10 +224,10 @@ void TestDerivFourierTransform() {
   double epsilon = 0.01;
   for (int i = 0; i < window+20; i++) {
     mmatrix::Copy(&samples, &samples2);
-    int dep_f = 12*4; //std::rand()%(ft.shape()[0]);
-    int dep_i = i; //std::rand()%(ft.shape()[1]);
-    int dep = dep_f+ft.shape()[0]*dep_i;
-    int ind = window+10; // std::rand()%(samples.shape()[0]);
+    long dep_f = 12*4; //std::rand()%(ft.shape()[0]);
+    long dep_i = i; //std::rand()%(ft.shape()[1]);
+    long dep = dep_f+ft.shape()[0]*dep_i;
+    long ind = window+10; // std::rand()%(samples.shape()[0]);
     double before = ft.get(dep);
     samples2.set(ind, samples2.get(ind)+epsilon);
     internal::FourierTransform(&samples2, frequencies.get(), window, &ft2);
@@ -277,16 +279,22 @@ void TestDerivFourierDifference() {
   mmatrix::DenseMMatrix ft1({frequencies->shape()[0], samples1.shape()[0]-window});
   mmatrix::DenseMMatrix ft2({frequencies->shape()[0], samples2.shape()[0]-window});
   mmatrix::SparseMMatrix dft(mmatrix::Concat(ft2.shape(), samples2.shape()));
-  mmatrix::DenseMMatrix dfd(samples2.shape());
+  std::unique_ptr<mmatrix::DenseMMatrix> dfd(new mmatrix::DenseMMatrix(samples2.shape()));
+  std::unique_ptr<mmatrix::DenseMMatrix> dfdPrev(new mmatrix::DenseMMatrix(samples2.shape()));
+  mmatrix::DenseMMatrix delta(samples2.shape());
+  std::unique_ptr<mmatrix::DenseMMatrix> tmp;
+  mmatrix::DenseMMatrix dgdl({});
 
-  constexpr double learningRate = 1;
+  double learningRate = 0.000001;
+  double maxLearningRate = 0.0001;
+  double learningScaleFactor = 1.2;
 
   {
-    std::ofstream f("goal.wav", std::ios::binary);
+    std::ofstream f("data2/goal.wav", std::ios::binary);
     WriteWavFile(f, sampleRate, 2, &samples1);
   }
   {
-    std::ofstream f("start.wav", std::ios::binary);
+    std::ofstream f("data2/start.wav", std::ios::binary);
     WriteWavFile(f, sampleRate, 2, &samples2);
   }
 
@@ -312,43 +320,201 @@ void TestDerivFourierDifference() {
     std::cout << "dft: " << duration.count() << std::endl; 
 
     start = high_resolution_clock::now();
+    // swap dfdPrev and dfd
+    tmp = std::move(dfdPrev);
+    dfdPrev = std::move(dfd);
+    dfd = std::move(tmp);
     mmatrix::SubFrom(&ft1, &ft2);
-    mmatrix::Multiply(2, &ft2, &dft, &dfd);
+    mmatrix::Multiply(2, &ft2, &dft, dfd.get());
     stop = high_resolution_clock::now();
     duration = duration_cast<microseconds>(stop - start);
     std::cout << "dfd: " << duration.count() << std::endl; 
 
 
-    double sz = 0;
-    for (int j = 0; j < dfd.shape()[0]; j++) {
-      if (j%100 == 0) {
-        std::cout << j  << ": " <<  dfd.get(j) << std::endl;
+    // Update learning rate
+    if (i > 0) {
+      start = high_resolution_clock::now();
+      mmatrix::Multiply(1, dfdPrev.get(), dfd.get(), &dgdl);
+      if (dgdl.get(0) > 0 && learningRate < maxLearningRate) {
+        learningRate *= learningScaleFactor;
+      } else {
+        learningRate /= learningScaleFactor;
       }
-      sz += dfd.get(j)*dfd.get(j);
+      std::cout << "learningRate updated to:" << learningRate << std::endl;
+      stop = high_resolution_clock::now();
+      duration = duration_cast<microseconds>(stop - start);
+      std::cout << "lr update: " << duration.count() << std::endl; 
+    }
+
+    start = high_resolution_clock::now();
+    double sz = 0;
+    for (int j = 0; j < dfd->shape()[0]; j++) {
+      sz += dfd->get(j)*dfd->get(j);
     }
     sz = std::sqrt(sz);
     std::cout << "deriv size: " << sz << std::endl;
-    mmatrix::Elementwise([=](mmatrix::MMFloat x){return learningRate*x/sz;}, &dfd, &dfd);
+    mmatrix::Elementwise([=](mmatrix::MMFloat x){return learningRate*x;}, dfd.get(), &delta);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<microseconds>(stop - start);
+    std::cout << "rescale: " << duration.count() << std::endl; 
   
     start = high_resolution_clock::now();
-    mmatrix::SubFrom(&dfd, &samples2);
+    mmatrix::SubFrom(&delta, &samples2);
     stop = high_resolution_clock::now();
     duration = duration_cast<microseconds>(stop - start);
     std::cout << "update: " << duration.count() << std::endl; 
 
     std::stringstream ss;
-    ss << "itteration" << i << ".wav";
+    ss << "data2/itteration" << i << ".wav";
     std::ofstream f(ss.str(), std::ios::binary);
     WriteWavFile(f, sampleRate, 2, &samples2);
   }
+}
+
+void fft(std::vector<double> s, int N, int a, int b, std::vector<double>* outR, std::vector<double>* outI) {
+  if (N == 1) {
+    outR->push_back(s[b]);
+    outI->push_back(0);
+    return;
+  }
+  // How can I be smart about allocating this memory?
+  std::vector<double> evenR, evenI, oddR, oddI;
+  evenR.reserve(N/2);
+  evenI.reserve(N/2);
+  oddR.reserve(N/2);
+  oddI.reserve(N/2);
+  fft(s, N/2, 2*a, b, &evenR, &evenI);
+  fft(s, N/2, 2*a, a+b, &oddR, &oddI);
+  for (int k = 0; k < N; k++) {
+    int km = k%(N/2);
+    double c = std::cos(2*pi*k/N);
+    double s = std::sin(2*pi*k/N);
+    outR->push_back(evenR[km]+c*oddR[km]-s*oddI[km]);
+    outI->push_back(evenI[km]+s*oddR[km]+c*oddI[km]);
+  }
+}
+
+void sft(std::vector<double> s, int N, int a, int b, std::vector<double>* outR, std::vector<double>* outI) {
+  for (int k = 0; k < N; k++) {
+    double real = 0, imag = 0;
+    for (int i = 0; i < N; i++) {
+      real += std::cos(2*pi*i*k/N)*s[a*i+b];
+      imag += std::sin(2*pi*i*k/N)*s[a*i+b];
+    }
+    outR->push_back(real);
+    outI->push_back(imag);
+  }
+}
+
+void TestFFT() {
+  std::vector<double> samples;
+  int N = 4096;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+  // peaks/second
+  // A0 = 27.5
+  // C8 = 4186
+  double realF = 440; // 27.5; // 27.5*std::pow(2, 1/12.0);
+  // peaks/sample
+  double sampleF = realF/sampleRate;
+  // fft bucket for frequency.
+  double kForSampleF = sampleF*N;
+
+  std::cout << "Expected k: " << kForSampleF << std::endl;
+  for (int i = 0; i < N; i++) {
+    double w =  0.5*(1-std::cos(2*pi*i/N));  // hann window
+    samples.push_back(w*(0.5*std::sin(2*pi*i*kForSampleF/N) + 0.01*(std::rand()/static_cast<double>(RAND_MAX)-0.5)));
+  }
+  
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
+
+  std::vector<double> fftR, fftI;
+  fft(samples, N, 1, 0, &fftR, &fftI);
+  std::vector<double> sftR, sftI;
+  sft(samples, N, 1, 0, &sftR, &sftI);
+
+  int maxK = -1;
+  double maxAmp2 = -1;
+  for (int k = 0; k < N*3/4; k++) {
+    double amp2 = fftR[k]*fftR[k]+fftI[k]*fftI[k];
+    //std::cout << k << ": " << amp2 << std::endl;
+    if (amp2 > maxAmp2) {
+      maxK = k;
+      maxAmp2 = amp2;
+    }
+
+    double realDiff = std::abs(fftR[k]-sftR[k]);
+    double imagDiff = std::abs(fftI[k]-sftI[k]);
+    if (realDiff > 0.1) {
+      std::cerr << "Real mismatch: " << k << std::endl;
+      exit(1);
+    }
+    if (imagDiff > 0.1) {
+      std::cerr << "Imaginary mismatch: " << k << std::endl;
+      exit(1);
+    }
+  }
+  std::cout << "Found k: " << maxK << std::endl;
+  std::cout << "Found amp: " << maxAmp2 << std::endl;
+  // 27.5 * 2^(n/12) = f
+  // N*f/sr = k
+  // f = k*sr/N
+  // n = 12*ln(f/27.5)/ln(2)
+  // n = 12*ln(k*sr/(N*27.5))/ln(2)
+  double freq = maxK*sampleRate/N;
+  std::cout << "Frequency: " << freq << std::endl;
+  double note = 12*std::log(freq/27.5)/std::log(2);
+  
+  std::cout << "Note: " << note << std::endl;
+  int noteInt = static_cast<int>(std::round(note))%12;
+  std::cout << "Note (int): " << noteInt << std::endl;
+
+  mmatrix::DenseMMatrix a({3,3});
+  for (int c = 0; c < 3; c++) {
+    for (int r = 0; r < 3; r++) {
+      a.set({r,c}, std::pow((maxK-1+r), 2-c));
+    }
+  }
+  mmatrix::DenseMMatrix aInv({3,3});
+  mmatrix::Invert(1, &a, &aInv);
+  mmatrix::DenseMMatrix x({3});
+  mmatrix::DenseMMatrix b({3});
+  int k = maxK;
+  for (int i = 0; i < 3; i++) {
+    double amp = fftR[k-1+i]*fftR[k-1+i]+fftI[k-1+i]*fftI[k-1+i];
+    b.set(i, amp);
+  }
+  mmatrix::Multiply(1, &aInv, &b, &x);
+
+  for (int i = 0; i < 3; i++) {
+    std::cout << x.get(i) << std::endl;
+  }
+  double validateAmp = x.get(0)*maxK*maxK+x.get(1)*maxK+x.get(2);
+  std::cout << "Validate Amp: " << validateAmp << std::endl;
+  
+  double adjustedK = -x.get(1)/(2*x.get(0));
+  std::cout << "Adjusted K: " << adjustedK << std::endl;
+
+  double adjFreq = adjustedK*sampleRate/N;
+  std::cout << "Adjusted Frequency: " << adjFreq << std::endl;
+  double adjNote = 12*std::log(adjFreq/27.5)/std::log(2);
+  
+  std::cout << "Adjusted Note: " << adjNote << std::endl;
+  int adjNoteInt = static_cast<int>(std::round(adjNote))%12;
+  std::cout << "Adjusted Note (int): " << adjNoteInt << std::endl;
 }
 
 int main() {
   //TestWriteRead();
   //TestFourierTransform();
   //TestFourierDifference();
-  TestDerivFourierTransform();
+  //TestDerivFourierTransform();
   //TestDerivFourierDifference();
+  TestFFT();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }

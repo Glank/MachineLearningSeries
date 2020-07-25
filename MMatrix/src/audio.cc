@@ -217,27 +217,23 @@ void DerivFourierTransorm(
   // shape of out is <f, s-w, s>
   // TODO verify inputs  
   out->zero();
-  double nf = frequencies->shape()[0];
-  double ni = samples->shape()[0]-window;
-  double nt = samples->shape()[0];
+  long nf = frequencies->shape()[0];
+  long ni = samples->shape()[0]-window;
+  long nt = samples->shape()[0];
   for (int f = 0; f < nf; f++) {
     double fc = frequencies->get(f);
-    for (int t = 0; t < nt; t++) {
+    for (int t = 0; t < nt-1; t++) {
       int i = std::max(t-window+1, 0);
       double gt = 0;
       for (int d = 0; d < window; d++) {
         gt += samples->get(i+d)*std::cos(fc*(i+d-t));
       }
-      if (t == 3211) {
-        std::cout << "Reached: " << gt << std::endl;
-      }
       out->set(f+i*nf+t*nf*ni, gt/ft->get(f+i*nf));
-      for (i++; i <= t; i++) {
+
+      int max_i = std::min<int>(t, ni-1);
+      for (i++; i <= max_i; i++) {
         gt -= samples->get(i-1)*std::cos(fc*(i-1-t));
         gt += samples->get(i-1+window)*std::cos(fc*(i-1+window-t));
-        if (t == 3211) {
-          std::cout << "Reached: " << gt << std::endl;
-        }
         out->set(f+i*nf+t*nf*ni, gt/ft->get(f+i*nf));
       }
     }

@@ -399,6 +399,41 @@ void TestConcat() {
   CheckEq(out2, {1,2,3,4,5,6});
 }
 
+void TestInverse() {
+  std::cout << "TestInverse..." << std::endl;
+
+  DenseMMatrix m({3,3});
+  m.set({0,0}, -1);
+  m.set({0,1}, -1);
+  m.set({0,2}, 3);
+  m.set({1,0}, 2);
+  m.set({1,1}, 1);
+  m.set({1,2}, 2);
+  m.set({2,0}, -2);
+  m.set({2,1}, -2);
+  m.set({2,2}, 1);
+
+  DenseMMatrix inv({3,3});
+
+  Invert(1, &m, &inv);
+
+  DenseMMatrix expected({3,3});
+  expected.set({0,0}, -1);
+  expected.set({0,1}, 1);
+  expected.set({0,2}, 1);
+  expected.set({1,0}, 1.2);
+  expected.set({1,1}, -1);
+  expected.set({1,2}, -1.6);
+  expected.set({2,0}, 0.4);
+  expected.set({2,1}, 0);
+  expected.set({2,2}, -0.2);
+
+  if (!AreEqual(&inv, &expected, 0.0001)) {
+    std::cerr << "Inverse broken." << std::endl;
+    exit(1);
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -411,6 +446,7 @@ int main() {
   TestElementwise();
   TestTranspose();
   TestConcat();
+  TestInverse();
   // Requires instrumenting matrix multiplication
   //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;

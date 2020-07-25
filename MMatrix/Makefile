@@ -26,6 +26,10 @@ bin/mmatrix.o: bin/ src/mmatrix.cc src/mmatrix.h
 bin/audio.o: bin/ src/audio.cc src/audio.h
 	${CMP} -c src/audio.cc -o bin/audio.o ${CFLAGS}
 
+clean_swp:
+	-rm src/.*.swp
+	-rm test/.*.swp
+
 clean:
 	-rm test_mmatrix
 	-rm test_math
