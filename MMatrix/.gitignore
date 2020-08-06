@@ -8,3 +8,5 @@ wav_example
 bin/
 *.swp
 .DS_Store
+*.wav
+*.csv

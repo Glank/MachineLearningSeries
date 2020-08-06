@@ -97,8 +97,8 @@ parts. I knew that I had succeeded when I was able to derive the derivative of t
 softmax function completely in my own notation (Thm. \ref{softmax_derivative}).
 
 Now, not knowing what else to do with the results, I've written this book
-about my amature exploration into multidimensional matricies -
-multimatricies - and how they can simplify derivatives of matrix equations.
+about my exploration into multidimensional matricies,
+multimatricies, and how they can elucidate derivatives of matrix equations.
 
 \tableofcontents
 
@@ -114,24 +114,28 @@ This Old Tony, `Making Springs At Home' \cite{youtube:tony}
 To demonstrate how the problem with traditional matricies, let's take a look at a
 simple matrix equation. 
 
-Let one matrix $X$ represent the level of scientific education level of a set of
-undergraduates who work in a densely packed 3 by 5 office.
-Then let $B$ represent the belief each of those undergradutes has in a higher power.
+Let's say we have a small class of undergraduates packed, conveniently in a 3 by 5
+grid. We'll let $X$ be the matrix representing number of semesters of science
+classes each of those student has taken.
+Then let $B$ represent the belief each of those undergradutes has in a higher power,
+thier BHP if you will.
 
 As we all know, Weinersmith's hypothisis states that an undergraduate's belief in a
 higher power fluctuates with respect to their scientific education in a sinusoidal
 pattern (Weinersmith, 2010 \cite{weinersmith:education}).
 
-Suppose the shape of these two matricies are defined,
-$\shape{B} = \shape{X} = \left< 3,5 \right>$.
-And each element of $B$ will be the sine of the corresponding element of
+Let's formally state the shape of these two matricies,
+$\shape{B} = \shape{X} = \left< 3,5 \right>$. (Throughout this work, I'll be using
+$\shape{M}$ to denote the shape of $M$ rather than the determinate because, frankly, it
+is just comes up more frequently.)
+Each element of $B$ will be the sine of the corresponding element of
 $X$. That is, \[B_{r,c} = \sin(X_{r,c})\]
 Which I'll write more simply as, \[B = \sin(X)\]
 
 Now, I would call the derivative of any element of $B$ with respect to any element
 of $X$ a partial derivative of that function. Since
 $\partial B_{r_1, c_1}/\partial X_{r_2, c_2}$ is defined as the rate of change of
-\textit{one} undergraduate's belief in a higher power with respect to \textit{one}
+\textit{one} undergraduate's BPH with respect to \textit{one}
 undergraduate's education level - it only represents a change to part of the whole
 system. 
 We can calculate this partial derivative easily enough,
@@ -144,7 +148,7 @@ We can calculate this partial derivative easily enough,
   \end{array}
 \right.
 \]
-Every student's belief in a higher power changes with respect to their own
+Every student's BHP changes with respect to their own
 scientific education level but does not change with respect to other students'
 scientific education. No mater how much I teach Jane about photosynthesis, I'm
 not going to change Joe's mind about divine mysteries.
@@ -222,8 +226,15 @@ matricies in a similar manner:
 So what is this object we've defined? In all ways that matter, it seems to be
 a multidimensional matrix. It has four dimensions of indices, rather than just
 a row and column but each uniquely indexed cell in this object may have a
-unique value, just like a standard two dimensional matrix. Let's define this
-bit of notation formaly.
+unique value, just like a standard two dimensional matrix.
+
+Programmers might call this object a `tensor' but mathematitians might
+scream at those same programmers, ``WE ALREADY HAVE A DEFINITION OF A TENSOR! DIE!''
+And the ensuing war might wipe out most of the eastern seaboard and would
+certainly not be conductive to a reasonable discussion. To avoid such a
+confrontation I'll be using the incredibly imaginative term `multimatrix'. 
+
+Let's define this bit of notation formaly.
 
 \begin{definition}[Multimatrix]
 A multimatrix $M$ is a multidimensional object that has some shape,
@@ -283,9 +294,20 @@ And this,
 \[ M[\bar{b}] = -8.5 \]
 \end{example}
 
+\begin{definition}[Scalar Filled Multimatrices]
+For convenience, I'll often refer to multimatricies filled with a single value,
+$s \in \mathbb{R}$,
+using the notation $s^{\vec{x}}$ where $\vec{x}$ is some multimatrix shape. So that
+$\shape{s^{\vec{x}}} = \vec{x}$ and for all $\bar{x} \in \Dim(\vec{x})$,
+\[ s^{\vec{x}}[\bar{x}] = s \]
+
+For example, $0^{\left<2,3,2\right>}$ is a multimatrix with shape $\left<2,3,2\right>$
+that is filled with zeros.
+\end{definition}
+
 Now that you seem to understand.. Don't give me that look... well if you're confused
-you should have been asking questions, moving on. Now that \textit{most of you}
-seem to have understood, I'll give you a theorem to prove.
+you should have been asking questions. I don't have time to backtrack now.
+Well, seeing as \textit{most of you} seem to have understood, I'll give you a theorem to prove.
 
 \begin{theorem}[Dimensional Set and Index Concatenation]
 \label{dim_set_ind_concat_thm}
@@ -298,8 +320,8 @@ Left as an exercise for the reader (Exercise \ref{dim_set_ind_concat_ex}).
 
 \section{Defining the Derivative}
 
-Going back to our original motivating problem, we (that is to say, myself and my
-split personalities whom I reference as to give my writing the percieved authority
+Going back to our original motivating problem, we (that is to say, myself and the voices
+in my head whom I reference as to give my writing the percieved authority
 of more than one author) can express our derivative notation thusly,
 
 \begin{definition}[Multimatrix on Multimatrix Derivative]
@@ -430,8 +452,8 @@ you'll be dead.'' - Mr. Peanutbutter (BoJack Horseman Season 1, Episode 12
 
 \section{Defining Multiplication}
 
-The multiplication of traditional matricies is a calculation that, when first
-encoutered, inspires thoughts of omnicide.
+The multiplication of traditional matricies is often considered a rather confusing
+proposition, especially when one first encounters it.
 
 After seeing the method used in practice, one slowly comes to understand the
 reason behind the madness. That is, that madness is the natural state of things
@@ -672,7 +694,7 @@ So,
     \end{array}
   \right.
 \]
-But, $(B \mmult{2} C)[\bar{x}] = 0$ so $(A \mmult{2} (B \mmult{2} C))[\bar{x}] = 0$
+But, $B \mmult{2} C = 0^{\left<2,2,2\right>}$ so $A \mmult{2} (B \mmult{2} C) = 0^{\left<2,2,2\right>}$
 Which goes to show that even though both $(A \mmult{2} B) \mmult{2} C$ and
 $A \mmult{2} (B \mmult{2} C)$ are valid calculations which result in multimatrixes
 of the same dimensionality, they are not equal so multiplicative associativity
@@ -778,13 +800,12 @@ Let $\shape{A} = \vec{x}$ and $\shape{B} = \vec{x}$. Then,
 \end{theorem}
 \begin{proof}
 Let $A$, $B$, and $\vec{x}$ be as described above. Notice that then $\shape{A \mmult{\shape{\vec{x}}} B}$
-results in a zero dimensional multimatrix - a multimatrix with one element which is effectively
-just a scalar.
+results in a zero dimensional multimatrix - a multimatrix with one element which is just a scalar.
 \begin{align*}
-(A \mmult{\shape{\vec{x}}} B)[\{\}]
+(A \mmult{\shape{\vec{x}}} B)[\left<\right>]
   &= \sum_{\forall \bar{x} \in \Dim(\vec{x})} A[\bar{x}]B[\bar{x}] \\
   &= \sum_{\forall \bar{x} \in \Dim(\vec{x})} B[\bar{x}]A[\bar{x}] \\
-  &= (B \mmult{\shape{\vec{x}}} A)[\{\}]
+  &= (B \mmult{\shape{\vec{x}}} A)[\left<\right>]
 \end{align*}
 \end{proof}
 
@@ -800,12 +821,13 @@ situation even more so, like loosing a troup of clowns in children's cancer ward
 \label{mm_mult_ident}
 Let us define $\Ident^n(\vec{v})$ as the $n^{\text{th}}$ order identity with base shape
 $\vec{v}$. This $\Ident^n(\vec{v})$ is a multimatrix with shape,
-\[ \shape{\Ident^n(\vec{v})} = \bigoplus_{i \in [1, n]} \vec{v} \]
+\[ \shape{\Ident^n(\vec{v})} = \bigoplus_{i = 1}^n \vec{v}  = n * \vec{v} \]
 That is, it's shape is $n$ successive concatinations of $\vec{v}$.
 Let each element of $\Ident^n(\vec{v})$ is defined as,
-\[ \forall \bar{v_1}, \bar{v_2}, \ldots, \bar{v_n} \text{ each in } \Dim(\vec{v}) : \]
+\[ \forall \bar{v_1}, \bar{v_2}, \ldots, \bar{v_n} \text{ each in } \Dim(\vec{v}) \]
+\[ \bigoplus_{i = 1}^n \bar{v_i} = \bar{v_I} \]
 \[
- \Ident^n(\vec{v})[\bar{v_1}, \bar{v_2}, \ldots, \bar{v_n}]
+ \Ident^n(\vec{v})[\bar{v_I}]
  = \left\{
   \begin{array}{ll}
     1 & \mbox{if } \bar{v_1} = \bar{v_2} = \ldots = \bar{v_n} \\
@@ -819,10 +841,10 @@ $\Ident^3(\vec{v})$ the cubic identity of $\vec{v}$.
 \end{definition}
 
 That definition seems rather arbitrary but stick with me, I know what I'm
-talking about. I've got a \sout{doctorate}
-masters degree in \sout{mathematics} I mean \sout{a real engineering field}, fine, software
-engineering. Whatever. Just look at how the
-square identity it relates to a multiplication operation.
+talking about. What credentials do I have? Totally irrelevant. Stop asking questions.
+
+Now, please direct your attention to this example of how the square identity relates
+to a multiplication operation.
 
 \begin{theorem}[Multimatrix Multiplicative Identity]
 \label{mm_ident}
@@ -941,6 +963,41 @@ $X \mmult{\shape{\vec{x}}} B = B$ this implies that, in the case of $B = \Ident^
 \end{ppart}
 \end{proof}
 
+Multimatrix identities also have the nice property of being communicative when multiplied
+across multiples of their base shape and completely engulfing a smaller multimatrix.
+
+\begin{theorem}[Communicativity of Multiplicative Identities]
+Let $X$ be a multimatrix of shape $k * \vec{x}$ where $k$ is some natural number.
+Remember (from the identity definition) that the $*$ operator denote successive concatenations of a vector so that,
+\[ k * \vec{x} = \bigoplus_{i=1}^k \vec{x} \]
+Then for any $n \ge k$,
+\[ X \mmult{k \shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^n(\vec{x}) \mmult{k \shape{\vec{x}}} X \]
+\end{theorem}
+\begin{proof}
+Given that $\shape{X} = k * \vec{x}$ we know that
+$\shape{X \mmult{k \shape{\vec{x}}} \Ident^n(\vec{x})} = (n-k) * \vec{x}$.
+Let $\bar{x}_1, \bar{x}_2 \ldots \bar{x}_{n-k}$ each be index vectors in $\Dim(\vec{x})$,
+for simplicity denoted as,
+\[ \bar{x}_I = \bigoplus_{i=1}^{n-k} \bar{x}_i \]
+We'll also need a similarly denoted $\bar{y}_1 \ldots \bar{y}_k$ for the free indicies of
+the sum below and that shall also be represented as,
+\[ \bar{y}_J = \bigoplus_{j=1}^{k} \bar{y}_j \]
+Then we know that,
+\[
+  \left(X \mmult{k \shape{\vec{x}}} \Ident^n(\vec{x}) \right)[\bar{x}_I]
+  = \sum_{\forall \bar{y}_J} X[\bar{y}_J] \Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I]
+\]
+Notice that $\Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I] = \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J]$
+since the sub index vectors will always either be equal or not equal, $1$ or $0$, their order doesnt matter.
+So,
+\begin{align*}
+  \left(X \mmult{k \shape{\vec{x}}} \Ident^n(\vec{x}) \right)[\bar{x}_I]
+  &= \sum_{\forall \bar{y}_J} X[\bar{y}_J] \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J] \\
+  &= \sum_{\forall \bar{y}_J} \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J] X[\bar{y}_J] \\
+  &= \left(\Ident^n(\vec{x}) \mmult{k \shape{\vec{x}}} X \right)[\bar{x}_I]
+\end{align*}
+\end{proof}
+
 The square identity also pops up in the derivative of a multimatrix
 with respect to itself.
 
@@ -975,7 +1032,7 @@ Therefore $dX/dX = \Ident^2(\shape{X})$
 \end{proof}
 
 The cubic identity, strangely enough, appear in the derivative of elementwise
-functions. Which is one of the reaspons I needed to expand my definition of
+functions. Which is one of the reasons I needed to expand my definition of
 identities beyond $\Ident^2(\vec{v})$.
 
 \begin{theorem}[Elementwise Derivative]
@@ -993,7 +1050,7 @@ Then,
 \end{theorem}
 \begin{proof}
 By the definition of a multimatrix derivative,
-\[ \forall \bar{m} \in \Dim(\shape{M}), \bar{x} \in \Dim(\shape{X}) : \]
+\[ \forall \bar{m}, \bar{x} \in \Dim(\shape{X}) : \]
 \begin{align*}
  \frac{dM}{dX}[\bar{m} \oplus \bar{x}]
  &= \frac{\partial M[\bar{m}]}{\partial X[\bar{x}]} \\
@@ -1027,6 +1084,69 @@ say that,
 Therefore $dM/dX = \Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} M'(X)$
 \end{proof}
 
+Another important fact about the identity multimatrix is that it can be
+reduced by multiplication with a $1^{\vec{s}}$ matrix.
+
+\begin{theorem}[Identity Reduction]
+Let $\vec{x}$ be a valid multimatrix shape and $m$ and $n$ be natural numbers
+such that $m < n$.
+Remember (from the identity definition) that the $*$ operator denote successive
+concatenations of a vector so that,
+\[ m*\vec{x} = \bigoplus_{i=1}^{m} \vec{x} \]
+Then,
+\[1^{m*\vec{x}} \mmult{m \shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^{n-m}(\vec{x})\]
+and,
+\[\Ident^n(\vec{x}) \mmult{m \shape{\vec{x}}} 1^{m*\vec{x}} = \Ident^{n-m}(\vec{x})\]
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $\bar{x}_1, \bar{x}_2 \ldots  \bar{x}_{n-m}$ each in $\Dim(\vec{x})$ and let
+\[\bigoplus_{i = 1}^{n-m} \bar{x}_i = \bar{x}_I \]
+In the sum below, let $\bar{y}_1, \bar{y}_2 \ldots \bar{y}_m$ each in $\Dim(\vec{x})$ be the
+free indicies denoted,
+\[\bigoplus_{j = 1}^m \bar{y}_j = \bar{y}_J \]
+Then,
+\begin{align*}
+  1^{m*\vec{x}} \mmult{m \shape{\vec{x}}} \Ident^n(\vec{x}) [\bar{x}_I] &=
+  \sum_{\forall \bar{y}_J} 1^{m*\vec{x}}[\bar{y}_J] \Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I] \\
+  &=
+  \sum_{\forall \bar{y}_J} (1) \Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I] \\
+  &=
+  \sum_{\forall \bar{y}_J} \Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I] \\
+  &=
+  \left(
+    \sum_{\forall \bar{y}_J, \text{ each } \bar{y}_i \ne \bar{x}_1} \Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I]
+  \right)
+  + \Ident^n(\vec{x})\left[\left( \bigoplus_{j=1}^m \bar{x}_1 \right) \oplus \bar{x}_I\right] \\
+  &= 0 + \Ident^n(\vec{x})\left[\left( \bigoplus_{j=1}^m \bar{x}_1 \right) \oplus \bar{x}_I\right] \\
+  &= \Ident^{n-m}(\vec{x})[\bar{x}_I]
+\end{align*}
+\end{ppart}
+\begin{ppart}
+Let $\bar{x}_1, \bar{x}_2 \ldots \bar{x}_{n-m}$ each in $\Dim(\vec{x})$ and let
+\[\bigoplus_{i = 1}^{n-m} \bar{x}_i = \bar{x}_I \]
+In the sum below, let $\bar{y}_1, \bar{y}_2 \ldots \bar{y}_m$ each in $\Dim(\vec{x})$ be the
+free indicies denoted,
+\[\bigoplus_{j = 1}^m \bar{y}_j = \bar{y}_J \]
+Then,
+\begin{align*}
+  \Ident^n(\vec{x}) \mmult{m \shape{\vec{x}}} 1^{m*\vec{x}} [\bar{x}_I] &=
+  \sum_{\forall \bar{y}_J} \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J] 1^{m*\vec{x}}[\bar{y}_J] \\
+  &=
+  \sum_{\forall \bar{y}_J} \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J] (1) \\
+  &=
+  \sum_{\forall \bar{y}_J} \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J] \\
+  &=
+  \left(
+    \sum_{\forall \bar{y}_J, \text{ each } \bar{y}_i \ne \bar{x}_1} \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J]
+  \right)
+  + \Ident^n(\vec{x})\left[\bar{x}_I \oplus \bigoplus_{j=1}^m \bar{x}_1 \right] \\
+  &= 0 + \Ident^n(\vec{x})\left[\bar{x}_I \oplus \bigoplus_{j=1}^m \bar{x}_1 \right] \\
+  &= \Ident^{n-m}(\vec{x})[\bar{x}_I]
+\end{align*}
+\end{ppart}
+\end{proof}
+
 Multimatrix identities also tend to cancel eachother out when multiplied by
 multiples of their base shape lengths.
 
@@ -1037,71 +1157,94 @@ where $m > k$ and $n > k$,
 \[ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{theorem}
 \begin{proof}
-Consider that for some indicies
-$\{\bar{a_1}, \bar{a_2}, \ldots \bar{a}_{m-k}\}$
-and $\{\bar{b_1}, \bar{b_2}, \ldots \bar{b}_{n-k}\}$ where each
-$\bar{a_i} \in \Dim(\vec{x})$ and each $\bar{b_i} \in \Dim(\vec{x})$,
+Consider that for some indicies vectors
+$\bar{a}_1, \bar{a}_2 \ldots \bar{a}_{m-k}$
+and $\bar{b}_1, \bar{b}_2 \ldots \bar{b}_{n-k}$ where each
+$\bar{a_i} \in \Dim(\vec{x})$ and each $\bar{b_i} \in \Dim(\vec{x})$.
+Now let,
+\[ \bigoplus_{i=1}^{m-k} \bar{a}_i = \bar{a}_I \]
+and,
+\[ \bigoplus_{j=1}^{n-k} \bar{b}_j = \bar{b}_J \]
+In the sums below we'll let $\bar{c}_1, \bar{c}_2 \ldots \bar{c}_k$ be free indicies
+each in $\Dim(\vec{x})$ and denote,
+\[ \bigoplus_{l = 1}^k \bar{c}_l = \bar{c}_K \]
 
-\begin{align*}
-&\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
-[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] = \\
-&\sum_{\forall \bar{c_1}, \bar{c_2}, \ldots \bar{c_k} \in \Dim(\vec{x})}
-\Ident^m(\vec{x})
-[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{c_1} \oplus \bar{c_2} \oplus \ldots]
-\Ident^n(\vec{x})
-[\bar{c_1} \oplus \bar{c_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots]
-\end{align*}
-
-Consider that $\Ident^m(\vec{x})
-[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{c_1} \oplus \bar{c_2} \oplus \ldots]$
-will be 0 whenever the any $\bar{c_i} \ne \bar{c_j}$ - we can simplify that to all
-the same $c$.
-
-\begin{align*}
-&\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
-[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] = \\
-&\sum_{\forall \bar{c} \in \Dim(\vec{x})}
-\Ident^m(\vec{x})
-[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{c} \oplus \bar{c} \oplus \ldots]
-\Ident^n(\vec{x})
-[\bar{c} \oplus \bar{c} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots]
-\end{align*}
-
-Consider also that there can be at most one $\bar{c}$ for which
-$\bar{c} = \bar{a_1} = \bar{a_2} \ldots$. And since our right hand side is
-the sum of products of ones and zeros, we can therefore conclude it is either 1 or 0.
-
-We can futher reason that the right hand side can only be one when all of the
-$\bar{a_i}$ and all of the $\bar{b_i}$ equal $\bar{c}$. Furthermore, if all
-$\bar{a_i}$ and all $\bar{b_i}$ are equal then that $\bar{c}$ must exist since it can
-be any value in the range of all $\bar{a_i}$ and $\bar{b_i}$ and this is not a
-zero width multiplication ($k >= 1$). Therefore,
-
-\begin{align*}
+Then,
+\[
 \left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
-[\bar{a_1} \oplus \bar{a_2} \oplus \ldots \bar{b_1} \oplus \bar{b_2} \oplus \ldots] =
-\left\{
+[\bar{a}_I \oplus \bar{b}_J] = 
+\sum_{\forall \bar{c}_K} \Ident^m(\vec{x}) [\bar{a}_I \oplus \bar{c}_K] \Ident^n(\vec{x}) [\bar{c}_K \oplus \bar{b}_J]
+\]
+
+Consider, for any $i$ if $\bar{a}_i \ne \bar{a}_1$ then
+$\Ident^m(\vec{x}) [\bar{a}_I \oplus \bar{c}_K]$ will always be zero.
+Similarly, if for any $j$, $\bar{b}_j \ne \bar{b}_1$ 
+$\Ident^n(\vec{x}) [\bar{c}_K \oplus \bar{b}_J]$ will always be zero.
+
+So, if we let, $\hat{a}_1 = (m-k) * \bar{a}_1$ and $\hat{b}_1 = (n-k) * \bar{b}_1$ then,
+\begin{align*}
+\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right) &
+[\bar{a}_I \oplus \bar{b}_J] = \\
+&\left\{
   \begin{array}{ll}
-    1 & \mbox{if } \bar{a_1} = \bar{a_2} = \ldots = \bar{b_1} = \bar{b_2} = \ldots \\
+    \sum_{\forall \bar{c}_K}
+      \Ident^m(\vec{x}) [\hat{a}_1 \oplus \bar{c}_K] 
+      \Ident^n(\vec{x}) [\bar{c}_K \oplus \hat{b}_1]
+    & \mbox{if } \forall i, j : \bar{a}_i = \bar{a}_1 \mbox{ and } \bar{b}_j = \bar{b}_1 \\
     0 & \mbox{otherwise}
   \end{array}
 \right.
-\end{align*} 
+\end{align*}
 
-Which is an identity matrix! And since the dimensional rules of multimatrix 
-multiplication show that,
+Now, for any $\bar{c}_i$ that is not equal to $\bar{a}_1$, 
+$\Ident^m(\vec{x}) [\hat{a}_1 \oplus \bar{c}_K]$ will be zero.
+So, we only need to consider the part of the sum where $\bar{c}_K = k * \bar{a}_1$
+\begin{align*}
+\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right) &
+[\bar{a}_I \oplus \bar{b}_J] = \\
+&\left\{
+  \begin{array}{ll}
+    \Ident^m(\vec{x}) [\hat{a}_1 \oplus (k * \bar{a}_1)] 
+    \Ident^n(\vec{x}) [(k * \bar{a}_1) \oplus \hat{b}_1]
+    & \mbox{if } \forall i, j : \bar{a}_i = \bar{a}_1 \mbox{ and } \bar{b}_j = \bar{b}_1 \\
+    0 & \mbox{otherwise}
+  \end{array}
+\right.
+\end{align*}
 
+But $\Ident^m(\vec{x}) [\hat{a}_1 \oplus (k * \bar{a}_1)]$ is just $1$, so,
 \[
- \shape{\shape{ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) }}
- =
- \shape{\shape{\Ident^m(\vec{x})}} + \shape{\shape{\Ident^n(\vec{x})}} - 2k\shape{\vec{x}}
+\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
+[\bar{a}_I \oplus \bar{b}_J] =
+\left\{
+  \begin{array}{ll}
+    \Ident^n(\vec{x}) [(k * \bar{a}_1) \oplus \hat{b}_1]
+    & \mbox{if } \forall i, j : \bar{a}_i = \bar{a}_1 \mbox{ and } \bar{b}_j = \bar{b}_1 \\
+    0 & \mbox{otherwise}
+  \end{array}
+\right.
 \]
 
-We've shown that,
+And $\Ident^n(\vec{x}) [(k * \bar{a}_1) \oplus \hat{b}_1]$ is only $1$ when $\bar{a}_1 = \bar{b}_1$,
+\[
+\left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right)
+[\bar{a}_I \oplus \bar{b}_J] =
+\left\{
+  \begin{array}{ll}
+    1 & \mbox{if } \forall i, j : \bar{a}_i = \bar{a}_1 \mbox{ and } \bar{b}_j = \bar{a}_1 \\
+    0 & \mbox{otherwise}
+  \end{array}
+\right.
+\]
 
-\[ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
+Which is exactly equal the result we were looking for,
+\[
+  \left( \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) \right) [\bar{a}_I \oplus \bar{b}_J]
+  = \Ident^{m+n-2k}(\vec{x}) [\bar{a}_I \oplus \bar{b}_J]
+\]
 \end{proof}
 \end{landscape}
+
 
 A final useful theorem (definition?) happens to involve 0 overlap multiplication.
 You'll notice that I very carefully constructed my definition to allow for this
@@ -1753,7 +1896,7 @@ it's elements by that scalar.
 \end{definition}
 
 But actually, you'll find that scalars can be modeled equally well by multricies
-with the shpe $\left<\right>$. It works with multiplication and derivatives. Look:
+with the shape $\left<\right>$. It works with multiplication and derivatives. Look:
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Multiplication Equivalence]
 \label{s_mm_mult_equiv}
@@ -1909,6 +2052,7 @@ Left as an exercise for the reader (Exercise \ref{eq_add_sub_ex}).
 
 As with scalar, vector, or regular matrix addition, multimatrix addition is
 communicative. 
+
 \begin{theorem}[Communicative Property of Multimatrix Addition]
 Let $A, B \in \mathbb{R}^{\vec{x}}$. Then,
 \[ A + B = B + A \]
@@ -1920,7 +2064,7 @@ By standard scalar addition rules that also means that,
 $C[\bar{x}] = B[\bar{x}] + A[\bar{x}]$. So $C = B + A = A + B$.
 \end{proof}
 
-It's similarly trial to show that multimatrix addition is associative.
+It's similarly trivial to show that multimatrix addition is associative.
 
 \begin{theorem}[Associative Property of Multimatrix Addition]
 Let $A, B, C \in \mathbb{R}^{\vec{x}}$. Then,
@@ -1936,12 +2080,11 @@ For all $\bar{x} \in \Dim(\vec{x})$,
 \end{align*}
 \end{proof}
 
-A little less obvious, in that a coffee-deprived undergraduate might
-struggle with it for a second, is that multimatrix multiplication can be
+A little less obvious is that multimatrix multiplication can be
 distributed over it's addition.
 
 \begin{landscape}
-\begin{theorem}[Multimatrix on Multimatrix Distributive Property]
+\begin{theorem}[Multiplication Distributive Property]
 If $\shape{A} = \vec{a} \oplus \vec{n}$ and $\shape{B}=\shape{C}=\vec{n} \oplus \vec{r}$ then,
 \[ A \mmult{n} (B + C) = A \mmult{n} B + A \mmult{n} C \]
 Similarly, if $\shape{C} = \vec{n} \oplus \vec{c}$ and $\shape{A}=\shape{B}=\vec{l} \oplus \vec{n}$ then,
@@ -1995,13 +2138,15 @@ So $(A+B) \mmult{n} C = A \mmult{n} C + B \mmult{n} C$
 \end{proof}
 \end{landscape}
 
-But it should be obvious - seriously, how have you not figured this out yet -
-that that the same applies to scalar  multiplication distributing over multimatrix
-addition..
-\begin{theorem}[Scalar on Multimatrix Distributive Property]
+But it should be obvious that that the same applies to scalar 
+multiplication distributing over multimatrix addition, since
+scalar multiplication is equivalent to multiplication by an
+empty shaped multimatrix.
+
+\begin{corollary}[Scalar on Multimatrix Distributive Property]
 If $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$ then,
 \[ s(A + B) = sA + sB \]
-\end{theorem}
+\end{corollary}
 \begin{proof}
 Let $s \in \mathbb{R}$ and $A, B \in \mathbb{R}^{\vec{x}}$.
 Then for all $\bar{x} \in \Dim(\vec{x})$
@@ -3462,155 +3607,62 @@ left multiplicative rule to find that,
 \end{proof}
 \end{landscape}
 
+\chapter{Slicing and Dicing}
+
+TODO: cheeky quote
+
+\begin{definition}[Multimatrix Wildcard Notation]
+TODO: rigorous definition
+
+Example:
+$\shape{X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}]} = \vec{s}$
+\end{definition}
+
+
 \chapter{Integration}
 
-I think, I'm not sure but I think, that the integral of a multimatrix function should
-be defined,
+\begin{quote}
+TODO: cheeky quote
+\end{quote}
 
+I'll just throw this out there. I think the integral of a multimatrix function should
+be defined like this,
+
+\begin{definition}[Integration of Multimatrix]
+If $G(X)$ is a multimatrix function of shape $\shape{G(X)} = \vec{g} \oplus \shape{X}$,
+for some shape vector $\vec{g}$, then it can be integrated over $dX$ by,
+\[ \shape{\int_A^B G(X) dX} = \vec{g} \]
 \[
- \int_A^B F(X) dX = \lim_{n \to \infty}
+ \int_A^B G(X) dX = \lim_{n \to \infty}
  \sum_{i=1}^n
-  F\left(A+\frac{i}{n}(B-A)\right)
+  G\left(A+\frac{i}{n}(B-A)\right)
   \mmult{\shape{\shape{X}}}
   \left(\frac{B-A}{n}\right)
 \]
+\end{definition}
 
-Which, I have very little idea what that means geometriclly but
-if you let $G(X) = \int_A^X F(Y) dY$ you seem to end up with $dG/dX = F(X)$.
+But what does this actually mean? I'll show, below, that this actually breaks down into
+a series of line integrals from over a strait line from $A$ to $B$. It will also be
+shown that the integral of $dF/dX$ will return $F(X) + C$, as one would expect from an
+integral.
 
-Maybe... well look at it this way. $F(X)$ is a function which produces some,
-afine-like transformation multimatrix for multimatricies of shape $\shape{X}$,
-since it must have a right hand shape of $\ldots \oplus \shape{X}$. This integration
-occures over a linear path of $X$ as it moves from $A$ to $B$ applying that
-transformation and adding up the results of the transformed multimatricies with
-a weight proportional to the step size... and in the direction of the step.
-
-So, it's sort of like a line integral but not really. They're related somehow.
-
-\begin{landscape}
-Let's see if I can prove that theory,
-\begin{theorem}[Fundamental Rule of Multimatrix Calculus]
-Let $G(X) = \int_A^X F(Y) dY$ then $dG(X)/dX = F(X)$.
+\begin{theorem}[Line Integrals Inside Multimatrix Integral]
+If $G(X)$ is an integrable multimatrix function (i.e. it has a shape
+$\shape{G(X)} = \vec{g} \oplus \shape{X}$) then each output element of it's
+integral is a line integral.
+Specifically, for all $\bar{g}$ in $\Dim(\vec{g})$,
+\[ \left(\int_A^B G(X) dX\right)[\bar{g}] = \int_C G(X)[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} dX \]
+Where $C$ is the straight line from $A$ to $B$. And $\mmult{\shape{\shape{X}}} dX$ serves the same notational purpose as
+$\cdot dr$ (see \cite{wiki:line_int}) because multiplication by the entire shape of $X$ is the same as a dot product.
 \end{theorem}
 \begin{proof}
-\begin{align*}
-  G(X)
-  &= \int_A^X F(Y) dY \\
-  &= 
-    \lim_{n \to \infty}
-     \sum_{i=1}^n
-      F\left(A+\frac{i}{n}(X-A)\right)
-      \mmult{\shape{\shape{Y}}}
-      \left(\frac{X-A}{n}\right)
-\end{align*}
-\begin{alignat*}{3}
-  \frac{dG(X)}{dX}
-  &=&&
-    \frac{
-      d \left\{
-      \lim_{n \to \infty}
-      \sum_{i=1}^n
-        F\left(A+\frac{i}{n}(X-A)\right)
-        \mmult{\shape{\shape{Y}}}
-        \left(\frac{X-A}{n}\right)
-      \right\}
-    }{dX} \\
-  &=&&
-    \lim_{n \to \infty}
-    \frac{
-      d \left\{
-      \sum_{i=1}^n
-        F\left(A+\frac{i}{n}(X-A)\right)
-        \mmult{\shape{\shape{Y}}}
-        \left(\frac{X-A}{n}\right)
-      \right\}
-    }{dX} \\
-  &=&&
-    \lim_{n \to \infty}
-    \sum_{i=1}^n
-      \frac{
-        d \left\{
-          F\left(A+\frac{i}{n}(X-A)\right)
-          \mmult{\shape{\shape{Y}}}
-          \left(\frac{X-A}{n}\right)
-        \right\}
-      }{dX} \\
-  &=&&
-    \lim_{n \to \infty}
-      \sum_{i=1}^n
-        F\left(A+\frac{i}{n}(X-A)\right)
-          \mmult{\shape{\shape{Y}}}
-          \frac{d \left(\frac{X-A}{n}\right)}{dX}
-        \\&&&+
-        \Tran\left(
-          \Tran\left(\frac{X-A}{n}, \shape{\shape{Y}}\right)
-          \mmult{\shape{\shape{Y}}}
-          \Tran\left(\frac{
-            d \left\{F\left(A+\frac{i}{n}(X-A)\right)\right\}
-          }{dX}, \shape{\vec{f}}\right),
-          \shape{\vec{x} \oplus \vec{x}}
-        \right) \\
-  &=&&
-    \lim_{n \to \infty}
-      \sum_{i=1}^n
-        F\left(A+\frac{i}{n}(X-A)\right)
-          \mmult{\shape{\shape{Y}}}
-          \frac{1}{n}\Ident^2(\shape{X})
-        \\&&&+
-        \Tran\left(
-          \frac{X-A}{n}
-          \mmult{\shape{\shape{Y}}}
-          \Tran\left(
-            \frac{dF(X)}{dX}
-            \mmult{\shape{X}}
-            \frac{i}{n}\Ident^2(\shape{X}), \shape{\vec{f}}\right),
-          \shape{\vec{x} \oplus \vec{x}}
-        \right) \\
-  &=&&
-    \lim_{n \to \infty}
-      \sum_{i=1}^n
-        \frac{1}{n}F\left(A+\frac{i}{n}(X-A)\right)
-        \\&&&+
-        \Tran\left(
-          \frac{X-A}{n}
-          \mmult{\shape{\shape{Y}}}
-          \Tran\left(
-            \frac{i}{n}\frac{dF(X)}{dX}
-            , \shape{\vec{f}}\right),
-          \shape{\vec{x} \oplus \vec{x}}
-        \right)
-\end{alignat*}
-At this point I'm fairly stuck.
-
-Ok, lets think of this in another way. Is this true?
-\[
-	\lim_{\epsilon \to 0}
-	\frac{
-		G(X+\epsilon H) - G(X)
-	}{\epsilon}
-	=
-	F(X) \mmult{\shape{\shape{X}}} H
-\]
-Where $SS(H) = 1$. More specifically, $H = \frac{X-A}{\sqrt{SS(X-A)}}$
-
-\begin{align*}
-\lim_{\epsilon \to 0}
-\frac{
-	G(X+\epsilon H) - G(X)
-}{\epsilon}
-&= 
-\lim_{\epsilon \to 0}
-\frac{
-	\left( \int_A^{X+\epsilon H} F(Y) dY \right) - \left( \int_A^X F(Y) dY \right)
-}{\epsilon} \\
-&= 
-\lim_{\epsilon \to 0}
-\frac{
-	\int_X^{X+\epsilon H} F(Y) dY
-}{\epsilon}
-\end{align*}
+Let us parameterize $C$ such that $C(t) = A + t(B-A)$. Then $dC/dt = B-A$ and
+we can rewrite the line integral over $C$ as,
+\[ \int_C G(X)[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} dX = \int_0^1 G(C(t))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt} dt \]
+TODO
 \end{proof}
-\end{landscape}
+
+TODO:fundamental theorem
 
 \begin{appendices}
 

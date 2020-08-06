@@ -377,20 +377,24 @@ void fft(std::vector<double> s, int N, int a, int b, std::vector<double>* outR, 
     outI->push_back(0);
     return;
   }
-  // How can I be smart about allocating this memory?
-  std::vector<double> evenR, evenI, oddR, oddI;
-  evenR.reserve(N/2);
-  evenI.reserve(N/2);
-  oddR.reserve(N/2);
-  oddI.reserve(N/2);
-  fft(s, N/2, 2*a, b, &evenR, &evenI);
-  fft(s, N/2, 2*a, a+b, &oddR, &oddI);
-  for (int k = 0; k < N; k++) {
-    int km = k%(N/2);
+  int kOff = outR->size();
+  // Calculate even parts
+  fft(s, N/2, 2*a, b, outR, outI);
+  // Calculate odd parts
+  fft(s, N/2, 2*a, a+b, outR, outI);
+  for (int k = 0; k < N/2; k++) {
     double c = std::cos(2*pi*k/N);
     double s = std::sin(2*pi*k/N);
-    outR->push_back(evenR[km]+c*oddR[km]-s*oddI[km]);
-    outI->push_back(evenI[km]+s*oddR[km]+c*oddI[km]);
+    double evenR = (*outR)[k+kOff];
+    double evenI = (*outI)[k+kOff];
+    double oddR = (*outR)[k+N/2+kOff];
+    double oddI = (*outI)[k+N/2+kOff];
+    (*outR)[k+kOff] = evenR+c*oddR-s*oddI;
+    (*outI)[k+kOff] = evenI+s*oddR+c*oddI;
+    (*outR)[k+N/2+kOff] = evenR-c*oddR+s*oddI;
+    (*outI)[k+N/2+kOff] = evenI-s*oddR-c*oddI;
+    //outR->push_back(evenR[km]+c*oddR[km]-s*oddI[km]);
+    //outI->push_back(evenI[km]+s*oddR[km]+c*oddI[km]);
   }
 }
 
@@ -437,9 +441,17 @@ void TestFFT() {
   std::vector<double> sftR, sftI;
   sft(samples, N, 1, 0, &sftR, &sftI);
 
+  /*
+  for (int i = 0; i < N; i++) {
+    std::cout << fftR[i] << '\t' << fftI[i] << '\t';
+    std::cout << sftR[i] << '\t' << sftI[i] << std::endl;
+  }
+  exit(0);
+  // */
+  
   int maxK = -1;
   double maxAmp2 = -1;
-  for (int k = 0; k < N*3/4; k++) {
+  for (int k = 0; k < N/2; k++) {
     double amp2 = fftR[k]*fftR[k]+fftI[k]*fftI[k];
     //std::cout << k << ": " << amp2 << std::endl;
     if (amp2 > maxAmp2) {
@@ -506,6 +518,251 @@ void TestFFT() {
   std::cout << "Adjusted Note: " << adjNote << std::endl;
   int adjNoteInt = static_cast<int>(std::round(adjNote))%12;
   std::cout << "Adjusted Note (int): " << adjNoteInt << std::endl;
+
+  {
+    std::ofstream f("fft.csv", std::ios::binary);
+    f << "k\tfreq\tR\tI\tAmp2" << std::endl;
+    for (int i = 0; i < N; i++) {
+      double freq = i*sampleRate/static_cast<double>(N);
+      f << i << '\t'
+        << freq << '\t'
+        << fftR[i] << '\t'
+        << fftI[i] << '\t'
+        << (fftR[i]*fftR[i]+fftI[i]*fftI[i]) << std::endl;
+    }
+  }
+}
+
+// Frequency in hz
+// window in seconds
+void partialFT(double frequency, double sampleRate, double window, const std::vector<double>& samples, std::vector<double>* out) {
+  double real = 0, imag = 0;
+  double f = frequency/sampleRate;
+  int w = static_cast<int>(std::ceil((window*sampleRate)-1)/2)*2+1;
+  // std::cout << w << std::endl;
+
+  for (int i = 0; i < w/2; i++) {
+    real += samples[i] * std::cos(2*pi*f*i);
+    imag += samples[i] * std::sin(2*pi*f*i);
+  }
+
+  for (int i = 0; i < samples.size(); i++) {
+    int head = i+w/2+1;
+    int tail = i-w/2;
+    if (head < samples.size()) {
+      real += samples[head] * std::cos(2*pi*f*head);
+      imag += samples[head] * std::sin(2*pi*f*head);
+    }
+    if (tail >= 0) {
+      real -= samples[tail] * std::cos(2*pi*f*tail);
+      imag -= samples[tail] * std::sin(2*pi*f*tail);
+    }
+    out->push_back(std::sqrt(real*real+imag*imag));
+  }
+}
+
+void pushFrequency(double frequency, double sampleRate, double seconds, std::vector<double>* samples) {
+  double sampleF = frequency/sampleRate;
+  double nSamples = sampleRate*seconds;
+  for (int i = 0; i < nSamples; i++) {
+    samples->push_back(0.5*std::sin(2*pi*i*sampleF));
+  }
+}
+
+void partialFT(const std::vector<double>& frequencies, double sampleRate, const std::vector<double>& samples, mmatrix::MMatrixInterface* out) {
+  std::vector<double> partial;
+  partial.reserve(samples.size());
+  for (int f = 0; f < frequencies.size(); f++) {
+    double freq = frequencies[f];
+    partial.clear();
+    partial.reserve(samples.size());
+    partialFT(freq, sampleRate, 5.0/freq, samples, &partial);
+    for (int s = 0; s < samples.size(); s++) {
+      out->set({f, s}, partial[s]);
+    }
+  }
+}
+
+void TestPartialFT() {
+  std::vector<double> samples;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+  // peaks/second
+  // A0 = 27.5
+  // C8 = 4186
+  //double a4 = 440; // 27.5; // 27.5*std::pow(2, 1/12.0);
+  double c4 = 261.63;
+  double d4 = 293.66;
+  double e4 = 329.63;
+
+  std::vector<double> notes{e4, d4, c4, d4, e4};
+  for (int i = 0; i < notes.size(); i++) {
+    pushFrequency(notes[i], sampleRate, 0.25, &samples);
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
+
+  mmatrix::DenseMMatrix out({3,static_cast<int>(samples.size())});
+  
+  std::vector<double> frequencies{c4,d4,e4};
+  std::vector<std::string> fnames{"c4", "d4", "e4"};
+  partialFT(frequencies, sampleRate, samples, &out);
+
+  int lastMax = -1;
+  int maxStart = 0;
+  for (int i = 0; i < samples.size(); i++) {
+    //*
+    int max = -1;
+    double maxValue = -1;
+    for (int f = 0; f < frequencies.size(); f++) {
+      if (out.get({f, i}) > maxValue) {
+        maxValue = out.get({f, i});
+        max = f;
+      }
+    }
+    if (max != lastMax) {
+      if (i - maxStart > sampleRate*0.01) {
+        std::cout << fnames[lastMax] << std::endl;;
+      }
+      // std::cout << i << ": " << fnames[max] << " " << maxValue << "  " << (i/static_cast<double>(sampleRate)) << "  " << (i-maxStart)/static_cast<double>(sampleRate) << std::endl;
+      //std::cout << out.get({0, i}) << "  " << out.get({1,i}) << "  " << out.get({2,i}) << std::endl;
+      maxStart = i;
+    }
+    lastMax = max;
+    // */
+    /*
+    if (i % 100 == 0)
+      std::cout << i << ": " << out.get({2,i}) << std::endl;
+    // */
+  }
+}
+
+void SimulateDrum() {
+  std::vector<double> samples;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+
+  for (int b = 0; b < 10; b++) {
+    for (int i = 0; i < sampleRate/4; i++) {
+      double s = 0;
+      s += (std::rand()/static_cast<double>(RAND_MAX))*std::exp(-i*0.01);
+      for (double f : {440, 480, 520}) {
+        s += 0.5*std::sin(2*pi*f/sampleRate*i)*std::exp(-i*0.001);
+      }
+      samples.push_back(s);
+    }
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
+}
+
+void SimulateCymbal() {
+  std::vector<double> samples;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+
+  // See: https://www.soundonsound.com/techniques/synthesizing-realistic-cymbals
+
+  // Top Curve
+  std::function<double(double)> topCurve = [&](double t_){
+    constexpr int k = 7;
+    constexpr double tPts[k] = {-4, -3.9, -3.5, -2, -1, 0, 1};
+    constexpr double hPts[k] = {3.5, 3.8, 3.1, 4.1, 4.5, 4.1, 2};
+    double t = std::log(t_)/std::log(10);
+    int i;
+    for (i = 0; i < k && tPts[i] < t; i++);
+    if (i == 0) {
+      i = 1;
+    }
+    if (i == k) {
+      i = k-1;
+    }
+    double t1 = tPts[i-1];
+    double t2 = tPts[i];
+    double h1 = hPts[i-1];
+    double h2 = hPts[i];
+    double dt = t2-t1;
+    double dh = h2-h1;
+    double tp = (t-t1)/dt;
+    double h = tp*dh+h1;
+    return std::pow(10,h);
+  };
+  
+  {
+    std::ofstream f("top_curve.csv");
+    f << "t\th" << std::endl;
+    for (double t = -4.1; t < 1; t+=0.1) {
+        f << t << '\t'
+          << std::log(topCurve(std::pow(10,t)))/std::log(10) << std::endl;
+    }
+  }
+
+  // Bottom Curve
+  std::function<double(double)> bottomCurve = [&](double t_){
+    constexpr int k = 5;
+    constexpr double tPts[k] = {-4, -2.5, -1.1, 0, 1};
+    constexpr double hPts[k] = {1, 2.5, 2.9, 2.1, 0.8};
+    double t = std::log(t_)/std::log(10);
+    int i;
+    for (i = 0; i < k && tPts[i] < t; i++);
+    if (i == 0) {
+      i = 1;
+    }
+    if (i == k) {
+      i = k-1;
+    }
+    double t1 = tPts[i-1];
+    double t2 = tPts[i];
+    double h1 = hPts[i-1];
+    double h2 = hPts[i];
+    double dt = t2-t1;
+    double dh = h2-h1;
+    double tp = (t-t1)/dt;
+    double h = tp*dh+h1;
+    return std::pow(10,h);
+  };
+  
+  {
+    std::ofstream f("curves.csv");
+    f << "t\ttop\tbottom" << std::endl;
+    for (double t = -4.1; t < 1; t+=0.1) {
+        f << t << '\t'
+          << std::log(topCurve(std::pow(10,t)))/std::log(10) << '\t'
+          << std::log(bottomCurve(std::pow(10,t)))/std::log(10) << std::endl;
+    }
+  }
+
+  double df = 1.05;
+  for (int b = 0; b < 10; b++) {
+    for (int i = 0; i < sampleRate/4; i++) {
+      double s = 0;
+      double t = i/static_cast<double>(sampleRate);
+      double top = topCurve(t);
+      double bottom  = bottomCurve(t);
+      for (double h = 10; h < top; h*=df) {
+        if (h < bottom) continue;
+        //double h = (top-bottom)*(f/static_cast<double>(nf))+bottom;
+        s += 0.1*std::sin(2*pi*h/sampleRate*i)*std::exp(-i*0.0005);
+        s += 0.05*(std::rand()/static_cast<double>(RAND_MAX)-0.5)*std::exp(-i*0.001);
+      }
+      samples.push_back(s);
+    }
+  }
+
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
 }
 
 int main() {
@@ -514,7 +771,10 @@ int main() {
   //TestFourierDifference();
   //TestDerivFourierTransform();
   //TestDerivFourierDifference();
-  TestFFT();
+  //TestFFT();
+  //TestPartialFT();
+  //SimulateDrum();
+  SimulateCymbal();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }
