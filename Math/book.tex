@@ -3609,21 +3609,41 @@ left multiplicative rule to find that,
 
 \chapter{Slicing and Dicing}
 
-TODO: cheeky quote
+\begin{displayquote}
+\textbf{Julian Bashir:} They broke seven of your transverse ribs and fractured your clavicle.
+
+\textbf{Elim Garak:} Ah, but I got off several cutting remarks, which no doubt did serious damage to their egos.
+
+(Star Trek Deep Space Nine, Season 4. Episode 1 \& 2 \cite{stds9})
+\end{displayquote}
 
 \begin{definition}[Multimatrix Wildcard Notation]
-TODO: rigorous definition
-
 Example:
 $\shape{X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}]} = \vec{s}$
 \end{definition}
 
+\begin{theorem}[Wildcard Multiplication]
+TODO:generalize
+Let $A$ and $X$ be multimatrixes of shape $\shape{A} = \vec{a} \oplus \vec{x}$ and $\shape{X} = \vec{x}$ respectively.
+Then $A[\bar{a} \oplus *^{\vec{x}}] \mmult{\shape{\vec{x}}} X = (A \mmult{\shape{\vec{x}}} X)[\bar{a}]$.
+\end{theorem}
+\begin{proof}
+\begin{align*}
+  A[\bar{a} \oplus *^{\vec{x}}] \mmult{\shape{\vec{x}}} X
+  &=
+  \sum_{\forall \bar{x} \in \Dim(\vec{X})} A[\bar{a} \oplus *^{\vec{x}}][\bar{x}] X[\bar{x}] \\
+  &=
+  \sum_{\forall \bar{x} \in \Dim(\vec{X})} A[\bar{a} \oplus \bar{x}] X[\bar{x}] \\
+  &= (A \mmult{\shape{\vec{x}}} X)[\bar{a}]
+\end{align*}
+\end{proof}
+
 
 \chapter{Integration}
 
-\begin{quote}
+\begin{displayquote}
 TODO: cheeky quote
-\end{quote}
+\end{displayquote}
 
 I'll just throw this out there. I think the integral of a multimatrix function should
 be defined like this,
@@ -3641,12 +3661,14 @@ for some shape vector $\vec{g}$, then it can be integrated over $dX$ by,
 \]
 \end{definition}
 
+\begin{landscape}
 But what does this actually mean? I'll show, below, that this actually breaks down into
 a series of line integrals from over a strait line from $A$ to $B$. It will also be
 shown that the integral of $dF/dX$ will return $F(X) + C$, as one would expect from an
 integral.
 
 \begin{theorem}[Line Integrals Inside Multimatrix Integral]
+\label{line_inside}
 If $G(X)$ is an integrable multimatrix function (i.e. it has a shape
 $\shape{G(X)} = \vec{g} \oplus \shape{X}$) then each output element of it's
 integral is a line integral.
@@ -3659,10 +3681,40 @@ $\cdot dr$ (see \cite{wiki:line_int}) because multiplication by the entire shape
 Let us parameterize $C$ such that $C(t) = A + t(B-A)$. Then $dC/dt = B-A$ and
 we can rewrite the line integral over $C$ as,
 \[ \int_C G(X)[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} dX = \int_0^1 G(C(t))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt} dt \]
-TODO
+For which we can write out the Riemann integral \cite{wiki:riemann_int}:
+\begin{align*}
+  \int_0^1 G(C(t))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt} dt
+  &=
+  \lim_{n \to \inf} \sum_{i=1}^n G(C(i/n))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt}(i/n) \frac{1}{n} \\
+  &=
+  \lim_{n \to \inf} \sum_{i=1}^n G(A + \frac{i}{n}(B-A))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{B-A}{n} \\
+  &=
+  \lim_{n \to \inf} \sum_{i=1}^n \left( G(A + \frac{i}{n}(B-A)) \mmult{\shape{\shape{X}}} \frac{B-A}{n} \right)[\bar{g}] \\
+  &=
+  \left( \lim_{n \to \inf} \sum_{i=1}^n G(A + \frac{i}{n}(B-A)) \mmult{\shape{\shape{X}}} \frac{B-A}{n} \right)[\bar{g}] \\
+  &=
+  \left(\int_A^B G(X) dX\right)[\bar{g}] 
+\end{align*}
 \end{proof}
+\end{landscape}
 
-TODO:fundamental theorem
+This leads us to my final observation about integrals. 
+
+\begin{theorem}[Integral of Multimatrix Derivatives]
+For any multimatrix function $F(X)$,
+\[ \int_A^B \frac{dF}{dX} dX = F(B) - F(A) \]
+\end{theorem}
+\begin{proof}
+We know from the above theorem \ref{line_inside} that for all $\bar{f} \in \Dim(\vec{f})$
+\[ \left(\int_A^B \frac{dF}{dX}(X) dX\right)[\bar{f}] = \int_C \frac{dF}{dX}(X)[\bar{f} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} dX \]
+Notice that $\frac{dF}{dX}(X)[\bar{f} \oplus *^{\shape{X}}]$ is the equivalent
+to the gradient of $F(X)[\bar{f}]$ at $X$ since for all $\bar{x} \in \Dim(\vec{x})$,
+\[ \frac{dF}{dX}(X)[\bar{f} \oplus \bar{x}] = \frac{\partial F[\bar{f}]}{\partial X[\bar{x}]} \]
+Then by the Gradient theorem \cite{wiki:gradient_thm} we can conclude that,
+\[ \left(\int_A^B \frac{dF}{dX}(X) dX\right)[\bar{f}] =  F(B)[\bar{f}] - F(A)[\bar{f}] = \left( F(B)-F(A) \right)[\bar{f}] \]
+So, 
+\[ \int_A^B \frac{dF}{dX} dX = F(B) - F(A) \]
+\end{proof}
 
 \begin{appendices}
 
