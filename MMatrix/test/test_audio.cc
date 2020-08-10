@@ -371,28 +371,29 @@ void TestDerivFourierDifference() {
   }
 }
 
-void fft(std::vector<double> s, int N, int a, int b, std::vector<double>* outR, std::vector<double>* outI) {
+void fft(const std::vector<double>& s, int N, int a, int b, std::vector<double>* outR, std::vector<double>* outI) {
   if (N == 1) {
     outR->push_back(s[b]);
     outI->push_back(0);
     return;
   }
-  int kOff = outR->size();
+  int kOffR = outR->size();
+  int kOffI = outI->size();
   // Calculate even parts
   fft(s, N/2, 2*a, b, outR, outI);
   // Calculate odd parts
   fft(s, N/2, 2*a, a+b, outR, outI);
   for (int k = 0; k < N/2; k++) {
-    double c = std::cos(2*pi*k/N);
-    double s = std::sin(2*pi*k/N);
-    double evenR = (*outR)[k+kOff];
-    double evenI = (*outI)[k+kOff];
-    double oddR = (*outR)[k+N/2+kOff];
-    double oddI = (*outI)[k+N/2+kOff];
-    (*outR)[k+kOff] = evenR+c*oddR-s*oddI;
-    (*outI)[k+kOff] = evenI+s*oddR+c*oddI;
-    (*outR)[k+N/2+kOff] = evenR-c*oddR+s*oddI;
-    (*outI)[k+N/2+kOff] = evenI-s*oddR-c*oddI;
+    double c = std::cos(-2*pi*k/N);
+    double s = std::sin(-2*pi*k/N);
+    double evenR = (*outR)[k+kOffR];
+    double evenI = (*outI)[k+kOffI];
+    double oddR = (*outR)[k+N/2+kOffR];
+    double oddI = (*outI)[k+N/2+kOffI];
+    (*outR)[k+kOffR] = evenR+c*oddR-s*oddI;
+    (*outI)[k+kOffI] = evenI+s*oddR+c*oddI;
+    (*outR)[k+N/2+kOffR] = evenR-c*oddR+s*oddI;
+    (*outI)[k+N/2+kOffI] = evenI-s*oddR-c*oddI;
     //outR->push_back(evenR[km]+c*oddR[km]-s*oddI[km]);
     //outI->push_back(evenI[km]+s*oddR[km]+c*oddI[km]);
   }
@@ -402,8 +403,8 @@ void sft(std::vector<double> s, int N, int a, int b, std::vector<double>* outR, 
   for (int k = 0; k < N; k++) {
     double real = 0, imag = 0;
     for (int i = 0; i < N; i++) {
-      real += std::cos(2*pi*i*k/N)*s[a*i+b];
-      imag += std::sin(2*pi*i*k/N)*s[a*i+b];
+      real += std::cos(-2*pi*i*k/N)*s[a*i+b];
+      imag += std::sin(-2*pi*i*k/N)*s[a*i+b];
     }
     outR->push_back(real);
     outI->push_back(imag);
@@ -765,6 +766,356 @@ void SimulateCymbal() {
   }
 }
 
+void SimulateMarimba() {
+  std::vector<double> samples;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+
+  for (int b = 0; b < 10; b++) {
+    for (int i = 0; i < sampleRate/4; i++) {
+      double s = 0;
+      for (double f : {440/4, 440*2, 440/2}) {
+        s += 0.1*std::sin(2*pi*f/sampleRate*i)*std::exp(-i*0.001);
+      }
+      s += 0.5*std::sin(2*pi*440/sampleRate*i)*std::exp(-i*0.0002);
+      s += 0.2*std::sin(2*pi*(440*0.5)/sampleRate*i)*std::exp(-i*0.0002);
+      samples.push_back(s);
+    }
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
+}
+
+void SimulatePiano() {
+  std::vector<double> samples;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+
+  double fund = 440;
+  std::vector<double> frequencies = {fund, fund*std::pow(2,-1), fund*std::pow(2,-2), fund*std::pow(2,1)};
+  std::vector<double> amps = {0.5, 0.2, 0.1, 0.1};
+
+  for (int b = 0; b < 5; b++) {
+    for (int i = 0; i < sampleRate/2; i++) {
+      double s = 0;
+      for (int fi = 0; fi < frequencies.size(); fi++) {
+        double f = frequencies[fi];
+        double amp = amps[fi];
+        s += amp*std::sin(2*pi*f/sampleRate*i)*(std::exp(-i*0.0001)+1);
+      }
+      samples.push_back(s);
+    }
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
+}
+
+void LowPassFilter() {
+  std::vector<double> samplesIn;
+  std::vector<double> samplesOut;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+
+  // Fill SamplesIn with white noise
+  for (int i = 0; i < sampleRate*2; i++) {
+    double s = 0;
+    s += std::rand()/static_cast<double>(RAND_MAX)-0.5;
+    samplesIn.push_back(s);
+  }
+
+  double cap = 0;
+  double capConst = 0.9;
+  for (int i = 0; i < samplesIn.size(); i++) {
+    double sIn = samplesIn[i];
+    cap = (cap*capConst+sIn*(1-capConst));
+    double sOut = cap;
+    samplesOut.push_back(sOut);
+  }
+
+  {
+    std::ofstream f("sampleIn.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesIn);
+  }
+  {
+    std::ofstream f("sampleOut.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesOut);
+  }
+}
+
+void HighPassFilter() {
+  std::vector<double> samplesIn;
+  std::vector<double> samplesOut;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+
+  // Fill SamplesIn with white noise
+  for (int i = 0; i < sampleRate*2; i++) {
+    double s = 0;
+    s += std::rand()/static_cast<double>(RAND_MAX)-0.5;
+    samplesIn.push_back(s);
+  }
+
+  double cap = 0;
+  double capConst = 0.9;
+  for (int i = 0; i < samplesIn.size(); i++) {
+    double sIn = samplesIn[i];
+    cap = (cap*capConst+sIn*(1-capConst));
+    double sOut = cap-sIn;
+    samplesOut.push_back(sOut);
+  }
+
+  {
+    std::ofstream f("sampleIn.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesIn);
+  }
+  {
+    std::ofstream f("sampleOut.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesOut);
+  }
+}
+
+void HighLowPassFilter() {
+  std::vector<double> samplesIn;
+  std::vector<double> samplesHigh;
+  std::vector<double> samplesLow;
+  std::srand(314);
+  WavHdr hdr;
+  {
+    std::ifstream f("WayfaringStranger.wav", std::ios::binary);
+    ReadWavFile(f,&hdr,&samplesIn);
+  }
+  int sampleRate = hdr.SamplesPerSec;
+
+  // High Pass
+  double cap = 0;
+  double capConst = 0.99;
+  for (int i = 0; i < samplesIn.size(); i++) {
+    double sIn = samplesIn[i];
+    cap = (cap*capConst+sIn*(1-capConst));
+    double sOut = cap-sIn;
+    samplesHigh.push_back(sOut);
+  }
+
+  // Low Pass
+  for (int i = 0; i < samplesIn.size(); i++) {
+    double sIn = samplesIn[i];
+    cap = (cap*capConst+sIn*(1-capConst));
+    double sOut = cap;
+    samplesLow.push_back(sOut);
+  }
+
+  {
+    std::ofstream f("sampleHigh.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesHigh);
+  }
+  {
+    std::ofstream f("sampleLow.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesLow);
+  }
+}
+
+void ifft(const std::vector<double>& sR, const std::vector<double>& sI, int N, int a, int b, std::vector<double>* outR, std::vector<double>* outI) {
+  if (N == 1) {
+    outR->push_back(sR[b]);
+    outI->push_back(sI[b]);
+    return;
+  }
+  int kOffR = outR->size();
+  int kOffI = outI->size();
+  // Calculate even parts
+  ifft(sR, sI, N/2, 2*a, b, outR, outI);
+  // Calculate odd parts
+  ifft(sR, sI, N/2, 2*a, a+b, outR, outI);
+  for (int k = 0; k < N/2; k++) {
+    double c = std::cos(2*pi*k/N);
+    double s = std::sin(2*pi*k/N);
+    double evenR = (*outR)[k+kOffR];
+    double evenI = (*outI)[k+kOffI];
+    double oddR = (*outR)[k+N/2+kOffR];
+    double oddI = (*outI)[k+N/2+kOffI];
+    (*outR)[k+kOffR] = (evenR+c*oddR-s*oddI)/2.0;
+    (*outI)[k+kOffI] = (evenI+s*oddR+c*oddI)/2.0;
+    (*outR)[k+N/2+kOffR] = (evenR-c*oddR+s*oddI)/2.0;
+    (*outI)[k+N/2+kOffI] = (evenI-s*oddR-c*oddI)/2.0;
+    //outR->push_back(evenR[km]+c*oddR[km]-s*oddI[km]);
+    //outI->push_back(evenI[km]+s*oddR[km]+c*oddI[km]);
+  }
+}
+
+void TestIFFT() {
+  std::cout << "TestIFFT..." << std::endl;
+  std::vector<double> samples;
+  std::srand(314);
+  int N = 1024;
+
+  // Fill SamplesIn with white noise
+  for (int i = 0; i < N; i++) {
+    double s = 0;
+    s += std::rand()/static_cast<double>(RAND_MAX)-0.5;
+    samples.push_back(s);
+  }
+
+  std::vector<double> fftR, fftI;
+  fft(samples, N, 1, 0, &fftR, &fftI);
+  std::vector<double> ifftR, ifftI;
+  ifft(fftR, fftI, N, 1, 0, &ifftR, &ifftI);
+
+  for (int i = 0; i < N; i++) {
+    double err = std::abs(samples[i]-ifftR[i]);
+    if (err > 0.01) {
+      std::cout << "Error." << std::endl;
+    }
+    if (std::abs(ifftI[i]) > 0.01) {
+      std::cout << "Error." << std::endl;
+    }
+  }
+}
+
+inline double sigmoid(double x) {
+  return 1.0/(1.0+std::exp(-x));
+}
+
+void BandPassFilter() {
+  std::cout << "Band Pass Filter" << std::endl;
+
+  std::vector<double> samplesIn;
+  std::vector<double> samplesOut;
+  std::srand(314);
+  WavHdr hdr;
+  {
+    std::ifstream f("WayfaringStranger.wav", std::ios::binary);
+    ReadWavFile(f,&hdr,&samplesIn);
+  }
+  int sampleRate = hdr.SamplesPerSec;
+  int p = 24;
+  std::cout << "p:" << p << std::endl;
+  int N = 1<<p;
+
+  int origLength = samplesIn.size();
+  while(samplesIn.size()%N != 0) {
+    samplesIn.push_back(0);
+  }
+
+  for (int b = 0; b < samplesIn.size(); b+=N) {
+    std::cout << b/static_cast<double>(samplesIn.size()) << std::endl;
+    std::vector<double> fftR, fftI;
+    fft(samplesIn, N, 1, b, &fftR, &fftI);
+    std::function<double(double)> filter = [](double f){
+      constexpr double kMaxF = 440*2;
+      constexpr double kMinF = 440/2;
+      double fLtMax = sigmoid(std::log(kMaxF)-std::log(f));
+      double fGtMin = sigmoid(std::log(f)-std::log(kMinF));
+      return fLtMax*fGtMin;
+    };
+    for (int k = 0; k < N; k++) {
+      // N*f/sr = k
+      // f = k*sr/N
+      double f = (k/static_cast<double>(N))*sampleRate;
+      if (k >= N/2) {
+        f = ((N-k)/static_cast<double>(N))*sampleRate;
+      }
+      fftR[k] *= filter(f);
+      fftI[k] *= filter(f);
+    }
+    std::vector<double> ifftI;
+    ifft(fftR, fftI, N, 1, 0, &samplesOut, &ifftI);
+  }
+  while (samplesOut.size() > origLength){
+    samplesOut.pop_back();
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesOut);
+  }
+}
+
+void AutoTune() {
+  std::cout << "AutoTune" << std::endl;
+
+  std::vector<double> samplesIn;
+  std::vector<double> samplesOut;
+  std::srand(314);
+  WavHdr hdr;
+  {
+    std::ifstream f("testing.wav", std::ios::binary);
+    ReadWavFile(f,&hdr,&samplesIn);
+  }
+  int sampleRate = hdr.SamplesPerSec;
+  int p = 1;
+  while ((1<<p) < samplesIn.size()) {
+    p++;
+  }
+  std::cout << "p:" << p << std::endl;
+  int N = 1<<p;
+  std::cout << "N:" << N << std::endl;
+  std::cout << "samplesIn:" << samplesIn.size() << std::endl;
+  while(samplesIn.size() < N) {
+    samplesIn.push_back(0);
+  }
+
+  std::vector<double> fftR, fftI;
+  fft(samplesIn, N, 1, 0, &fftR, &fftI);
+
+  // Find the orignal frequncy;
+  int maxK = -1;
+  double maxKAmp = -1;
+  for (int k = 0; k < N/2; k++) {
+    double amp = std::sqrt(fftR[k]*fftR[k]+fftI[k]*fftI[k]);
+    if (amp > maxKAmp) {
+      maxKAmp = amp;
+      maxK = k;
+    }
+  }
+  // f = k*sr/N
+  double origK = maxK;
+  double origFreq = (origK/static_cast<double>(N))*sampleRate;
+  std::cout << "origFreq:" << origFreq << std::endl;
+
+  double G4 = 392.00;
+  double E4 = 329.63;
+  double C4 = 261.63;
+  std::vector<double> frequencies = {C4, E4, G4, E4, C4};
+  for (double goalFreq : frequencies) {
+    // k = f*N/sr
+    double goalK = goalFreq*N/sampleRate;
+    double deltaK = goalK-origK;
+    int intDeltaK = static_cast<int>(std::round(deltaK));
+    std::cout << "intDeltaK:" << intDeltaK << std::endl;
+    
+    // Shift by the fft by intDeltaK
+    std::vector<double> afftR, afftI;
+    for (int k = 0; k < N; k++) {
+      afftR.push_back(0);
+      afftI.push_back(0);
+    }
+    for (int k = 0; k < N; k++) {
+      int adjK = k+intDeltaK;
+      if (adjK >= 0 && adjK < N) {
+        afftR[adjK] = fftR[k];
+        afftI[adjK] = fftI[k];
+      }
+    }
+    std::vector<double> ifftI;
+    ifft(afftR, afftI, N, 1, 0, &samplesOut, &ifftI);
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samplesOut);
+  }
+}
+
 int main() {
   //TestWriteRead();
   //TestFourierTransform();
@@ -773,8 +1124,16 @@ int main() {
   //TestDerivFourierDifference();
   //TestFFT();
   //TestPartialFT();
-  //SimulateDrum();
-  SimulateCymbal();
+  //SimulateDrum(); // Success
+  //SimulateCymbal(); // fail
+  //SimulateMarimba(); // Success 
+  //SimulatePiano();  // fail
+  //LowPassFilter(); // success
+  //HighPassFilter(); // success
+  //HighLowPassFilter();  // fail, ish looks like I'll need a FFT for this
+  //TestIFFT(); // success
+  //BandPassFilter(); // success
+  AutoTune();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }
