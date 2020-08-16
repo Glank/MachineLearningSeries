@@ -58,6 +58,7 @@
 \DeclareMathOperator{\Dim}{Dim}
 \DeclareMathOperator{\Ident}{I}
 \DeclareMathOperator{\Tran}{Tran}
+\DeclareMathOperator{\Part}{Part}
 \DeclareMathOperator{\SoS}{\mathbb{S}}
 \DeclareMathOperator{\Softmax}{Softmax}
 \DeclareMathOperator{\Sum}{\Sigma}
@@ -70,6 +71,7 @@
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
 \newcommand{\dmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\,\bullet\,}$}}}
+\newcommand{\mconcat}[1]{\text{\raisebox{1ex}{$\underset{#1}{\oplus}$}}}
 \newcommand{\shape}[1]{\left|#1\right|}
 
 \begin{document}
@@ -963,10 +965,11 @@ $X \mmult{\shape{\vec{x}}} B = B$ this implies that, in the case of $B = \Ident^
 \end{ppart}
 \end{proof}
 
-Multimatrix identities also have the nice property of being communicative when multiplied
+Multimatrix identities also have the nice property of being commutative when multiplied
 across multiples of their base shape and completely engulfing a smaller multimatrix.
 
-\begin{theorem}[Communicativity of Multiplicative Identities]
+\begin{theorem}[Commutativity of Multiplicative Identities]
+\label{ident_commute}
 Let $X$ be a multimatrix of shape $k * \vec{x}$ where $k$ is some natural number.
 Remember (from the identity definition) that the $*$ operator denote successive concatenations of a vector so that,
 \[ k * \vec{x} = \bigoplus_{i=1}^k \vec{x} \]
@@ -1796,6 +1799,24 @@ For any $\bar{x} \in \Dim(\vec{x})$,
   &= A[\bar{x}] B[\bar{x}] \\
   &= B[\bar{x}] A[\bar{x}] \\
   &= (B \dmult{\shape{\vec{x}}} A)[\bar{x}]
+\end{align*}
+\end{proof}
+
+\begin{theorem}[Cubic Identity Multiplication]
+\label{hada_cubic}
+If $A$ and $B$ are multimatrixes of shaep, $\shape{A} = \vec{a} \oplus \vec{x}$
+and $\shape{B} = \vec{x} \oplus \vec{b}$ respectively. Then,
+\[ A \mmult{\shape{\vec{x}}} \Ident^3(\vec{x}) \mmult{\shape{\vec{x}}} B = A \dmult{\shape{\vec{x}}} B \]
+\end{theorem}
+\begin{proof}
+\[ \shape{A \mmult{\shape{\vec{x}}} \Ident^3(\vec{x}) \mmult{\shape{\vec{x}}} B} = \vec{a} \oplus \vec{x} \oplus \vec{b}  \]
+For all $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and $\bar{x} \in \Dim(\vec{x})$, 
+\begin{align*}
+  (A \mmult{\shape{\vec{x}}} \Ident^3(\vec{x}) \mmult{\shape{\vec{x}}} B)[\bar{a} \oplus \bar{x} \oplus \bar{b}]
+  &= \sum_{\forall \bar{x}_1, \bar{x_2}} A[\bar{a} \oplus \bar{x}_1] \Ident^3(\vec{x})[\bar{x}_1 \oplus \bar{x} \oplus \bar{x}_2] B[\bar{x}_2 \oplus \bar{b}] \\
+  &= A[\bar{a} \oplus \bar{x}] \Ident^3(\vec{x})[\bar{x} \oplus \bar{x} \oplus \bar{x}] B[\bar{x} \oplus \bar{b}] \\
+  &= A[\bar{a} \oplus \bar{x}] B[\bar{x} \oplus \bar{b}] \\
+  &= (A \dmult{\shape{\vec{x}}} B) [\bar{a} \oplus \bar{x} \oplus \bar{b}]
 \end{align*}
 \end{proof}
 
@@ -3106,6 +3127,7 @@ Therefore
 \end{landscape}
 
 \begin{theorem}[Hadamard Multiplication Rule]
+\label{hadamard_rule}
 Let $F(X)$ and $G(X)$ be functions of $X$ where
 $\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$
 then,
@@ -3546,6 +3568,26 @@ depend on $W_j$. So we can just use the chain rule and the right multiplicative 
     \mmult{\shape{\shape{L_i}}}
     \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right)
 \]
+Now will a little manipulation, keeping in mind how identies are sometimes commutative (Thm. \ref{ident_commute})
+and how cubic identities collapse into hadamard products (Thm. \ref{hada_cubic}),
+\begin{align*}
+  \frac{dL_i}{dW_{j=i}}
+  &=
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)\right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right) \\
+  &=
+    \left(a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \mmult{\shape{\shape{L_i}}} \Ident^3(\shape{L_i})\right) 
+    \mmult{\shape{\shape{L_i}}}
+    \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right) \\
+  &=
+    a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \mmult{\shape{\shape{L_i}}} \Ident^3(\shape{L_i})
+    \mmult{\shape{\shape{L_i}}}
+    \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right) \\
+  &=
+    a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \dmult{\shape{\shape{L_i}}}
+    \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right)
+\end{align*}
 \end{ppart}
 \begin{ppart} $i > j$
 In this case, $L_{i-1}$ depends on $W_j$ but $W_i$ does not. So we can use the chain rule and the
@@ -3616,6 +3658,313 @@ left multiplicative rule to find that,
 
 (Star Trek Deep Space Nine, Season 4. Episode 1 \& 2 \cite{stds9})
 \end{displayquote}
+
+\begin{definition}[Multimatrix Concatenation]
+Let $A$ and $B$ be multimatricies of shape $\shape{A} = \vec{a}$ and
+$\shape{B} = \vec{b}$ respectively. Then if, for all $i \ne n$,
+$\vec{a}[i] = \vec{b}[i]$, the following operation is valid,
+\[ A \mconcat{n} B \]
+In layman's terms, this is the operation of stacking two similar multimatricies on top of or to the side of one another.
+It's just complicated by this being an opperation in multiple dimensions.
+Formally we'll say that, 
+\[ \shape{\shape{A \mconcat{n} B}} = \shape{\shape{A}} = \shape{\shape{B}} \]
+\[
+  \shape{A \mconcat{n} B}[i] = \left\{
+  \begin{array}{ll}
+	  \vec{a}[i] + \vec{b}[i] & \mbox{if } i = n \\
+	  \vec{a}[i] & \mbox{if } i \ne n
+  \end{array}
+ \right.
+\]
+And for all sub index metricies $\bar{l}$ and $\bar{r}$ of lengths $\shape{\bar{l}} = n-1$ and $\shape{\bar{r}} = \shape{\shape{A}}-n$ respectively,
+and natural number $j \in [1,\vec{a}[n]+\vec{b}[n]]$ such that $\bar{l} \oplus \left<j\right> \oplus \bar{r} \in \Dim(\shape{A \mconcat{n} B})$,
+\[
+  \left(A \mconcat{n} B\right)[\bar{l} \oplus \left<j\right> \oplus \bar{r}] = \left\{
+  \begin{array}{ll}
+	  A[\bar{l} \oplus \left<j\right> \oplus \bar{r}] & \mbox{if } j  \le \vec{a}[n] \\
+	  A[\bar{l} \oplus \left<j-\vec{a}[n]\right> \oplus \bar{r}] & \mbox{if } j > \vec{a}[n]
+  \end{array}
+ \right.
+\]
+\end{definition}
+
+\begin{definition}[Multimatrix Partitions]
+Let $M$ be some multimatrix of shape $\vec{m}$.
+Then for any natural number $n \in [1, \shape{\vec{m}}]$, the dimension,
+and natural number $k \in [1,\vec{m}[n]-1]$, the split,
+\[ \Part(M, n, k) = \{M_1, M_2\} \]
+\[ \Part_1(M, n, k) = M_1 \]
+\[ \Part_2(M, n, k) = M_2 \]
+Where $M_1 \mconcat{n} M_2 = M$ and $\shape{M_1}[n] = k$ (therefore $\shape{M_2}[n] = \vec{m}[n]-k$).
+
+In essence, this is the inverse operation of multimatrix concatenation.
+
+Let $\vec{l}$ and $\vec{r}$ be vectors of length $n-1$ and $\shape{\vec{m}}-n$ respectively
+such that $\vec{l} \oplus \left<\vec{m}[n]\right> \oplus \vec{r} = \vec{m}$ then
+\[ \shape{\Part_1(M, n, k)} = \vec{l} \oplus \left<k\right> \oplus \vec{r} \]
+\[ \shape{\Part_2(M, n, k)} = \vec{l} \oplus \left<\vec{m}[n]-k\right> \oplus \vec{r} \]
+
+For all $\bar{l} \in \Dim(\vec{l})$, $\bar{r} \in \Dim(\vec{r})$, and $j \in [1, k]$,
+\[ \Part_1(M, n, k)[\bar{l} \oplus \left<j\right> \oplus \bar{r}] = M[\bar{l} \oplus \left<j\right> \oplus \bar{r}] \]
+
+And for all $\bar{l} \in \Dim(\vec{l})$, $\bar{r} \in \Dim(\vec{r})$, and $j \in [1, \vec{m}[n]-k]$,
+\[ \Part_2(M, n, k)[\bar{l} \oplus \left<j\right> \oplus \bar{r}] = M[\bar{l} \oplus \left<j+k\right> \oplus \bar{r}] \]
+\end{definition}
+
+\begin{theorem}[Multiplication Over Concatenation Rules]
+Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+
+For any natural number $m$ where $m < n$,
+if and only if $C$ is a multimatrix for which $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid then,
+\[ C \mmult{m} \left(A \mconcat{n} B\right) = \left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right) \]
+
+And if $m \le \shape{\shape{A}}-n$
+then if and only if  $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid then,
+\[ \left(A \mconcat{n} B\right) \mmult{m} C = \left(A \mmult{m} C\right) \mconcat{n} \left(B \mmult{m} C\right) \]
+
+And when $m \ge n$, if and only if $C$ is a multimatrix for which $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid,
+then for the multimatrices $C_1$ and $C_2$ defined by,
+\[ \Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) = \{C_1, C_2\} \]
+\[
+  C \mmult{m} \left(A \mconcat{n} B\right)
+  =
+  \left( C_1 \mmult{m} A \right) + 
+  \left( C_1 \mmult{m} B \right)
+\]
+
+Lastly, when $m > \shape{\shape{A}}-n$, if and only if $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid,
+then for multimatrices $C_1$ and $C_2$ defined by,
+\[ \Part(C, m+n-\shape{\shape{A}}+1, \shape{A}[n]) = \{C_1, C_2\} \]
+\[
+  \left(A \mconcat{n} B\right) \mmult{m} C
+  =
+  \left( A \mmult{m} C_1 \right) + 
+  \left( B \mmult{m} C_1 \right)
+\]
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+Let $m$ be a natural number where $m < n$, and let $C$ be a multimatrix where
+$C \mmult{m} \left(A \mconcat{n} B\right)$ is valid.
+
+Since $A \mconcat{n} B$ is valid, we can describe the shapes of $A$ and $B$ thusly,
+\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
+Where $a$ and $b$ are both natural numbers, $\shape{\vec{l}} = n-1$, and
+$\shape{\vec{r}} = \shape{\shape{A}} - n$. So,
+\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{r} \]
+
+Now, because $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid, we know that
+there is some division in the shape of $C$ such that,
+\[ \shape{C} = \vec{c} \oplus \vec{m} \]
+For some shape vetors $\vec{c}$ and $\vec{m}$ where $\shape{\vec{m}} = m$ and
+$\shape{\vec{c}} = \shape{\shape{C}}-m$
+We also know that there exists some similar subdivision of $\shape{A \mconcat{n} B}$.
+\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} \]
+For some $\vec{d}$. Therefore,
+\[ \vec{m} \oplus \vec{d} = \vec{l} \oplus \left<a + b\right> \oplus \vec{r} \]
+
+Since $m < n$, $\shape{\vec{m}} \le \shape{\vec{l}}$ so $\vec{l}$ can be subdivided
+into,
+\[ \vec{l} = \vec{m} \oplus \vec{e} \]
+For some shape vector $\vec{e}$ where $\shape{\vec{e}} = n-1-m$.
+
+So,
+\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r} \]
+\[ \shape{A} = \vec{m} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{m} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+
+Therefore $C \mmult{m} A$ and $C \mmult{m} B$ are both valid operations and,
+\[ \shape{C \mmult{m} A} = \vec{c} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{C \mmult{m} B} = \vec{c} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+
+Which shows that $(C \mmult{m} A) \mconcat{\shape{\vec{c} \oplus \vec{e}}+1} (C \mmult{m} B)$
+is also valid.
+\[
+  (C \mmult{m} A) \mconcat{(\shape{\shape{C}}-m)+(n-1-m)+1} (C \mmult{m} B)
+  = 
+  (C \mmult{m} A) \mconcat{\shape{\shape{C}}+n-2m} (C \mmult{m} B)
+\]
+
+\begin{landscape}
+Which means that,
+\begin{align*}
+  \shape{C \mmult{m} \left(A \mconcat{n} B\right)}
+  &= \shape{(C \mmult{m} A) \mconcat{\shape{\shape{C}}+n-2m} (C \mmult{m} B)} \\
+  &= \vec{c} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r}
+\end{align*}
+
+Now for any $\bar{c}$, $\bar{e}$, and $\bar{r}$ be in $\Dim(\vec{c})$, $\Dim(\vec{e})$,
+and $\Dim(\vec{r})$ respectively and $k \in [1,a+b]$, then,
+\begin{align*}
+  \left(C \mmult{m} \left(A \mconcat{n} B\right)\right)[\bar{c} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
+  &= \sum_{\forall \bar{m} \in \Dim(\vec{m})} C[\bar{c} \oplus \bar{m}] \left(A \mconcat{n} B\right)[\bar{m} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}] \\
+  &= \left\{
+  \begin{array}{ll}
+    \sum_{\forall \bar{m}} C[\bar{c} \oplus \bar{m}] A[\bar{m} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
+    & \mbox{if } k \le a \\
+    \sum_{\forall \bar{m}} C[\bar{c} \oplus \bar{m}] B[\bar{m} \oplus \bar{e} \oplus \left<k-a\right> \oplus \bar{r}]
+    & \mbox{if } k > a
+  \end{array}
+  \right. \\
+  &= \left\{
+  \begin{array}{ll}
+    (C \mmult{m} A)[\bar{c} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
+    & \mbox{if } k \le a \\
+    (C \mmult{m} B)[\bar{c} \oplus \bar{e} \oplus \left<k-a\right> \oplus \bar{r}]
+    & \mbox{if } k > a
+  \end{array}
+  \right. \\
+  &= \left(\left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right)\right)[\bar{c} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
+\end{align*}
+\end{landscape}
+\end{ppart}
+\begin{ppart}
+TODO: Prove the converse.
+\end{ppart}
+\begin{ppart}
+Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+Let $m$ be a natural number where $m \le \shape{\shape{A}}-n$
+and $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid.
+Then there exit shape vectors $\vec{l}$ and $\vec{r}$ and integers $a$ and $b$ such that,
+
+\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
+\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{r} \]
+
+Where $\shape{\vec{l}} = n-1$ and $\shape{\vec{r}} = \shape{\shape{A}}-n$.
+
+Then since $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid, $\shape{C}$ can
+be partitioned into $\vec{m}$ and $\vec{c}$ where,
+
+\[ \shape{C} = \vec{m} \oplus \vec{c} \]
+
+And $\shape{\vec{m}} = m$. This also means that,
+
+\[ \shape{A \mconcat{n} B} = \vec{d} \oplus \vec{m} \]
+
+Now since $m \le \shape{\shape{A}}-n$ we can partition $\vec{r}$ like this,
+
+\[ \vec{r} = \vec{e} \oplus \vec{m} \]
+
+So we can use that repartion in our original shape definitions,
+
+\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{e} \oplus \vec{m} \]
+\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{e} \oplus \vec{m} \]
+\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{e} \oplus \vec{m} \]
+
+So $A \mmult{m} C$ and $B \mmult{m} C$ are both valid and,
+
+\[ \shape{A \mmult{m} C} = \vec{l} \oplus \left<a\right> \oplus \vec{e} \oplus \vec{c} \]
+\[ \shape{B \mmult{m} C} = \vec{l} \oplus \left<b\right> \oplus \vec{e} \oplus \vec{c} \]
+
+And finally we can see that $(A \mmult{m} C) \mconcat{\shape{\vec{l}}+1} (B \mmult{m} C)$
+is valid and,
+
+\[
+  (A \mmult{m} C) \mconcat{\shape{\vec{l}}+1} (B \mmult{m} C)
+  =
+  (A \mmult{m} C) \mconcat{n} (B \mmult{m} C)
+\]
+
+\begin{align*}
+  \shape{(A \mmult{m} C) \mconcat{n} (B \mmult{m} C)}
+  &= \vec{l} \oplus \left<a+b\right> \oplus \vec{e} \oplus \vec{c} \\
+  &= \shape{(A \mconcat{n} B) \mmult{m} C}
+\end{align*}
+
+\begin{landscape}
+Now for all $\bar{l}$, $\bar{e}$, and $\bar{c}$ are in $\Dim(\vec{l})$, $\Dim(\vec{e})$,
+and $\Dim(\vec{c})$ respectively and all $k \in [1,a+b]$,
+
+\begin{align*}
+  \left(\left(A \mconcat{n} B\right) \mmult{m} C\right)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{c}]
+  &= \sum_{\forall \bar{m} \in \Dim(\vec{m})} \left(A \mconcat{n} B\right)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{m}] C[\bar{m} \oplus \bar{c}] \\
+  &= \left\{
+  \begin{array}{ll}
+    \sum_{\forall \bar{m}} A[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{m}] C[\bar{m} \oplus \bar{c}] 
+    & \mbox{if } k \le a \\
+    \sum_{\forall \bar{m}} B[\bar{l} \oplus \left<k-a\right> \oplus \bar{e} \oplus \bar{m}] C[\bar{m} \oplus \bar{c}] 
+    & \mbox{if } k > a
+  \end{array}
+  \right. \\
+  &= \left\{
+  \begin{array}{ll}
+    (A \mmult{m} C)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{c}]
+    & \mbox{if } k \le a \\
+    (B \mmult{m} C)[\bar{l} \oplus \left<k-a\right> \oplus \bar{e} \oplus \bar{c}]
+    & \mbox{if } k > a
+  \end{array}
+  \right. \\
+  &= 
+    \left(\left(A \mmult{m} C\right) \mconcat{n} \left(B \mmult{m} C\right)\right)
+    [\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{c}]
+\end{align*}
+\end{landscape}
+\end{ppart}
+
+\begin{ppart}
+TODO: Prove the converse.
+\end{ppart}
+
+\begin{ppart}
+Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+Let $m$ be a natural number where $m \ge n$, and let $C$ be a multimatrix where
+$C \mmult{m} (A \mconcat{n} B)$ is valid.
+
+Then we can partition the shapes of $A$ and $B$ thusly,
+
+\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
+\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{r} \]
+
+Where $\shape{\vec{l}} = n-1$. 
+
+We can also partiton the shapes of $C$ and $(A \mconcat{n} B)$ like this,
+
+\[ \shape{C} = \vec{c} \oplus \vec{m} \]
+\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} \]
+
+Where $\shape{\vec{m}} = m$. Now since $m \ge n$ we can know that
+$\shape{\vec{m}} \ge \shape{\vec{l} \oplus \left<a+b\right>}$ 
+so $\vec{m}$ encompases $\vec{l}$, the $n$'th index and potentially part of $\vec{r}$.
+There for if we partition $\vec{r}$ like this,
+
+\[ \vec{r} = \vec{p} \oplus \vec{q} \]
+
+Where,
+
+\[ \vec{m} = \vec{l} \oplus \left<a+b\right> \oplus \vec{p} \]
+
+Then we can define the resulting shape of $C$ like this,
+
+\[ \shape{C} = \vec{c} \oplus \vec{l} \oplus \left<a+b\right> \oplus \vec{p} \]
+
+Since $\shape{\vec{c}} = \shape{\shape{C}}-m$, if we let $C_1$ and $C_2$ be defined by,
+\[ \Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) = \{C_1, C_2\} \]
+Then,
+\[ \shape{C_1} = \vec{c} \oplus \vec{l} \oplus \left<a\right> \oplus \vec{p} \]
+\[ \shape{C_2} = \vec{c} \oplus \vec{l} \oplus \left<b\right> \oplus \vec{p} \]
+
+Now, let us define $\vec{m}_1$ and $\vec{m}_2$ such that,
+\[ \vec{m}_1 = \vec{l} \oplus \left<a\right> \oplus \vec{p} \]
+\[ \vec{m}_2 = \vec{l} \oplus \left<b\right> \oplus \vec{p} \]
+And notice that $\shape{\vec{m}_1} = \shape{\vec{m}_2} = m$
+
+Next, since $\vec{r} = \vec{p} \oplus \vec{q}$ the shapes of $A$ and $B$ and be described,
+\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{p} \oplus \vec{q} = \vec{m}_1 \oplus \vec{q} \]
+\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{p} \oplus \vec{q} = \vec{m}_2 \oplus \vec{q} \]
+
+So $C_1 \mmult{m} A$ and $C_2 \mmult{m} B$ are both valid.
+
+\end{ppart}
+\begin{ppart}
+TODO: Prove the converse.
+\end{ppart}
+
+TODO
+\end{proof}
 
 \begin{definition}[Multimatrix Wildcard Notation]
 Example:
@@ -3841,10 +4190,146 @@ and $\shape{X} = \vec{x}$. Then,
 \end{drule}
 
 \begin{drule}
+Hadamard Multiplication Rule
+(Thm. \ref{hadamard_rule})
+If $\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$, then,
+\[
+  \frac{d(F(X) \dmult{\shape{\vec{c}}} G(X))}{dX} =
+    F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX} +
+    \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right)
+\]
+\end{drule}
+
+\begin{drule}
 Chain Rule
 (Thm. \ref{mmm_chain_rule})
 \[ \frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{\shape{\shape{G}}} \frac{dG}{dX} \]
 \end{drule}
+
+\chapter{Scratch}
+
+What is $A \dmult{m} (B \mmult{n} C)$ ?
+
+\[ \shape{A} = \vec{a} \oplus \vec{m} \]
+\[ \shape{B} = \vec{b} \oplus \vec{n} \]
+\[ \shape{C} = \vec{n} \oplus \vec{c} \]
+
+if $\vec{m} = \vec{b}$ then,
+
+\[ \shape{A \dmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+
+\begin{align*}
+(A \dmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{b} \oplus \bar{c}]
+  &=
+  A[\bar{a} \oplus \bar{b}] \sum_{\forall \bar{n}} B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &=
+  \sum_{\forall \bar{n}} A[\bar{a} \oplus \bar{b}] B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &=
+  \sum_{\forall \bar{n}} (A \dmult{m} B)[\bar{a} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &= ((A \dmult{m} B) \mmult{n} C)[\bar{a} \oplus \bar{b} \oplus \bar{c}]
+\end{align*}
+
+If $m < \shape{\vec{b}}$ then
+\[ \vec{b} = \vec{m} \oplus \vec{d} \]
+\[ \shape{B} = \vec{m} \oplus \vec{d} \oplus \vec{n} \]
+\[ \shape{A \dmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{m} \oplus \vec{d} \oplus \vec{c} \]
+
+\begin{align*}
+(A \dmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{m} \oplus \bar{d} \oplus \bar{c}]
+  &=
+  A[\bar{a} \oplus \bar{m}] \sum_{\forall \bar{n}} B[\bar{m} \oplus \bar{d} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &=
+  \sum_{\forall \bar{n}} A[\bar{a} \oplus \bar{m}] B[\bar{m} \oplus \bar{d} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &=
+  \sum_{\forall \bar{n}} (A \dmult{m} B)[\bar{a} \oplus \bar{m} \oplus \bar{d} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &= ((A \dmult{m} B) \mmult{n} C)[\bar{a} \oplus \bar{b} \oplus \bar{c}]
+\end{align*}
+
+If $m > \shape{\vec{b}}$ then
+\[ \vec{c} = \vec{l} \oplus \vec{r} \]
+\[ \vec{m} = \vec{b} \oplus \vec{l} \]
+\[ \shape{A \dmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{l} \oplus \vec{r} \]
+
+\begin{align*}
+(A \dmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{b} \oplus \bar{l} \oplus \bar{r}]
+  &=
+  A[\bar{a} \oplus \bar{b} \oplus \bar{l}] \sum_{\forall \bar{n}} B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{l} \oplus \bar{r}] \\
+  &=
+  \sum_{\forall \bar{n}} A[\bar{a} \oplus \bar{b} \oplus \bar{l}] B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{l} \oplus \bar{r}] \\
+\end{align*}
+
+What about $A \mmult{a} \Ident^2(\vec{a} \oplus \vec{b})$
+
+\begin{align*}
+\left(A \mmult{a} \Ident^2(\vec{a} \oplus \vec{b}) \right)[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2]
+  &= 
+  \sum_{\forall \bar{x}}
+    A[\bar{x}] \Ident^2(\vec{a} \oplus \vec{b})[\bar{x} \oplus \bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2] \\
+  &= 
+  \sum_{\forall \bar{x}}
+    A[\bar{x}] \delta_{\bar{x},\bar{a}} \delta_{\bar{b}_1,\bar{b}_2} \\
+  &=
+  \delta_{\bar{b}_1,\bar{b}_2}
+  \sum_{\forall \bar{x}}
+    A[\bar{x}] \delta_{\bar{x},\bar{a}} \\
+  &=
+  \Ident^2(\vec{b})[\bar{b}_2 \oplus \bar{b}_1]
+  A[\bar{a}] \\
+  &=
+  (\Ident^2(\vec{b}) \mmult{0} A) [\bar{b}_2 \oplus \bar{b}_1 \oplus \bar{a}] \\
+  &=
+  \Tran(\Ident^2(\vec{b}) \mmult{0} A, \shape{\vec{b}})[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2] \\
+  &=
+  \Tran(A \mmult{0} \Ident^2(\vec{b}), \shape{\vec{a} \oplus \vec{b}})[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2] \\
+  &= 
+  \sum_{\forall \bar{x}}
+    \delta_{\bar{b}_1,\bar{b}_2} \delta_{\bar{a},\bar{x}} A[\bar{x}] \\
+  &= 
+  \sum_{\forall \bar{x}}
+    \Ident^2(\vec{b} \oplus \vec{a})[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2 \oplus \bar{x}]
+    A[\bar{x}] \\
+  &= 
+  (\Ident^2(\vec{b} \oplus \vec{a}) \mmult{a} A) [\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2]
+\end{align*}
+
+So
+\[ A \mmult{a} \Ident^2(\vec{a} \oplus \vec{b}) = \Ident^2(\vec{b} \oplus \vec{a}) \mmult{a} A \]
+
+Now what is $A \dmult{a} \Ident^2(\vec{a} \oplus \vec{b})$...
+
+\begin{align*}
+\left(A \dmult{a} \Ident^2(\vec{a} \oplus \vec{b})\right) [\bar{a}_1 \oplus \bar{b}_1 \oplus \bar{a}_2 \oplus \bar{b}_2]
+  &=
+  A [\bar{a}_1] \Ident^2(\vec{a} \oplus \vec{b}) [\bar{a}_1 \oplus \bar{b}_1 \oplus \bar{a}_2 \oplus \bar{b}_2] \\
+  &=
+  A [\bar{a}_1] \delta_{\bar{a}_1, \bar{a}_2} \delta_{\bar{b}_1, \bar{b}_2}
+\end{align*}
+
+\begin{align*}
+\left( A \dmult{a} \Ident^2(\vec{a} \oplus \vec{b}) \mmult{b} B \right)[\bar{a}_1 \oplus \bar{b} \oplus \bar{a}_2]
+  &=
+  \sum_{\forall \bar{x}} A [\bar{a}_1] \Ident^2(\vec{a} \oplus \vec{b}) [\bar{a}_1 \oplus \bar{b} \oplus \bar{a}_2 \oplus \bar{x}] B[\bar{x}] \\
+  &=
+  \sum_{\forall \bar{x}} A [\bar{a}_1] \delta_{\bar{a}_1, \bar{a}_2} \delta_{\bar{b}, \bar{x}} B[\bar{x}] \\
+  &=
+  A [\bar{a}_1] \delta_{\bar{a}_1, \bar{a}_2} B[\bar{b}] \\
+  &=
+  A [\bar{a}_1] B[\bar{b}] \delta_{\bar{a}_1, \bar{a}_2} \\
+  &=
+  \delta_{\bar{a}_2, \bar{a}_1} A [\bar{a}_2] B[\bar{b}] \\
+  &=
+  \Ident^2(\vec{a})[\bar{a}_2 \oplus \bar{a}_1] A [\bar{a}_1] B[\bar{b}] \\
+  &=
+  \left(\Ident^2(\vec{a}) \dmult{a} A\right) [\bar{a}_2 \oplus \bar{a}_1]B[\bar{b}] \\
+  &=
+  \left(\left(\Ident^2(\vec{a}) \dmult{a} A\right) \dmult{0} B\right) [\bar{a}_2 \oplus \bar{a}_1 \oplus \bar{b}] \\
+  &=
+  \left(\Ident^2(\vec{a}) \dmult{a} A \dmult{0} B\right) [\bar{a}_2 \oplus \bar{a}_1 \oplus \bar{b}] \\
+  &=
+  \Tran\left(\Ident^2(\vec{a}) \dmult{a} A \dmult{0} B, a\right) [\bar{a}_1 \oplus \bar{b} \oplus \bar{a}_2]
+\end{align*}
+
+What about $A \dmult{0} \Tran(B, n)$? Is that just $\Tran(A \dmult{0} B, k)$ ?
 
 \end{appendices}
 
