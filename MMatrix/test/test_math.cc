@@ -1,4 +1,6 @@
 #include "mmatrix.h"
+#include "math_functions.h"
+#include "mmatrix_test_utils.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -7,71 +9,11 @@
 #include <functional>
 
 using namespace mmatrix;
+using namespace mmatrix::test;
+using namespace math;
 using std::vector;
 using std::unique_ptr;
 using std::rand;
-
-///// Utils
-
-MMFloat randf() {
-  return rand()/static_cast<MMFloat>(RAND_MAX);
-}
-
-vector<int> RandShape(int length = -1 /* rand 0 to 2 */, int max = 5) {
-  if (length == -1) length = rand()%3;
-  vector<int> s;
-  s.reserve(length);
-  for (int i = 0; i < length; i++) {
-    int val = rand()%max+1;
-    s.push_back(val);
-  }
-  return s;
-}
-
-vector<int> RandIndex(const vector<int>& shape) {
-  vector<int> idx;
-  idx.reserve(shape.size());
-  for (int i = 0; i < shape.size(); i++) {
-    idx.push_back(rand()%shape[i]);
-  }
-  return idx;
-}
-
-void RandMatrix(MMatrixInterface* out, MMFloat zerochance = 0) {
-  // zerochance in [0.0,1.0]
-  // 1.0 would mean always zero
-  int ncells = 1;
-  for (int s : out->shape()) {
-    ncells *= s;
-  }
-  for (int i = 0; i < ncells; i++) {
-    if (randf() < zerochance) continue;
-    out->set(i, rand()%11-5);
-  }
-}
-
-// Approximate df/dx(x)[f_index + x_index]
-MMFloat ApproxDerivative(std::function<void(MMatrixInterface*,MMatrixInterface*)> f, MMatrixInterface* out_tmp,
-    MMatrixInterface* x, vector<int> f_index, vector<int> x_index, MMFloat epsilon = 1/static_cast<double>(2>>10)) {
-  MMFloat x1 = x->get(x_index);
-  f(x, out_tmp);
-  MMFloat y1 = out_tmp->get(f_index);
-  MMFloat x2 = x1+epsilon;
-  x->set(x_index, x2);
-  f(x, out_tmp);
-  MMFloat y2 = out_tmp->get(f_index);
-  x->set(x_index, x1);
-  return (y2-y1)/epsilon;
-}
-
-vector<int> ConcatNTimes(int n, const vector<int>& x) {
-  vector<int> out;
-  out.reserve(n*x.size());
-  for (int i = 0; i < n*x.size(); i++) {
-    out.push_back(x[i%x.size()]);
-  }
-  return out;
-}
 
 ///// Tests
 
@@ -117,7 +59,7 @@ void TestAssociativity() {
     }
 
     //std::cout << DebugString(&AB_C) << std::endl;
-    //std::cout << DebugString(&A_BC) << std::endl << std::endl;
+    //std::cout << DebugString(&A_BC) << std::endl << std::endl; }
   }
 }
 
@@ -185,7 +127,7 @@ void TestSelfDerivative() {
   std::cout << "Testing Self Derivative..." << std::endl;
   std::srand(314);
   for (int trials = 0; trials < kTrials; trials++) {
-    std::function<void(MMatrixInterface*, MMatrixInterface*)> f = [](MMatrixInterface* x, MMatrixInterface* out) {
+    MMFunction f = [](const MMatrixInterface* x, MMatrixInterface* out) {
       Copy(x, out);
     };
     // |f(x)| = s
@@ -247,7 +189,7 @@ void TestElementwiseDerivative() {
       }
       return out;
     };
-    std::function<void(MMatrixInterface*, MMatrixInterface*)> f = [&](MMatrixInterface* x, MMatrixInterface* out) {
+    MMFunction f = [&](const MMatrixInterface* x, MMatrixInterface* out) {
       Elementwise(ef, x, out);
     };
     // |f(x)| = s
@@ -257,7 +199,7 @@ void TestElementwiseDerivative() {
     RandMatrix(&x);
 
     // Real derivative
-    std::function<void(MMatrixInterface*, MMatrixInterface*)> dfdx = [&](MMatrixInterface* x, MMatrixInterface* out) {
+    MMFunction dfdx = [&](const MMatrixInterface* x, MMatrixInterface* out) {
       auto ident = Ident(3, x->shape());
       DenseMMatrix ew(s);
       Elementwise(defdx, x, &ew);
@@ -323,6 +265,8 @@ void TestIdentityContraction() {
     }
   }
 }
+
+
 
 int main() {
   TestAssociativity();

@@ -434,6 +434,27 @@ void TestInverse() {
   }
 }
 
+void TestHMultiply() {
+  std::cout << "TestHMultiply..." << std::endl;
+  DenseMMatrix a({1});
+  DenseMMatrix b({1,2});
+  a.set(std::vector<int>{0}, 5);
+  b.set({0,0}, 3);
+  b.set({0,1}, 2);
+
+  DenseMMatrix hm({1,2});
+  HMultiply(1, &a, &b, &hm);
+
+  DenseMMatrix exp({1,2});
+  exp.set({0,0}, 15);
+  exp.set({0,1}, 10);
+
+  if (!AreEqual(&hm, &exp)) {
+    std::cerr << "HMultiply Broken." << std::endl;
+    exit(1);
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -447,6 +468,7 @@ int main() {
   TestTranspose();
   TestConcat();
   TestInverse();
+  TestHMultiply();
   // Requires instrumenting matrix multiplication
   //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;

@@ -246,6 +246,57 @@ void Multiply(int n, const MMatrixInterface* a, const MMatrixInterface* b,
   }
 }
 
+void HMultiply(int n, const MMatrixInterface* a, const MMatrixInterface* b, MMatrixInterface* out) {
+  if (a == nullptr || b == nullptr || out == nullptr) {
+    throw std::invalid_argument("HMultiply cannot take null arguments.");
+  }
+
+  // ||a|| = l + n
+  // ||b|| = n + r
+  // ||a * b|| = l + n + r
+  int l = a->shape().size()-n;
+  int r = b->shape().size()-n;
+  if (l < 0 || r < 0) {
+    throw std::out_of_range("Invalid Hadamard multiplication size");
+  }
+  int midBound = 1;
+  for (int i = 0; i < n; i++) {
+    if (a->shape()[l+i] != b->shape()[i]) {
+      throw std::out_of_range("Invalid Hadamard multiplication shapes.");
+    }
+    if (a->shape()[l+i] != out->shape()[l+i]) {
+      throw std::out_of_range("Invalid mid output Hadamard multiplication shape.");
+    }
+    midBound *= b->shape()[i];
+  }
+  int lBound  = 1;
+  for (int i = 0; i < l; i++) {
+    if (a->shape()[i] != out->shape()[i]) {
+      throw std::out_of_range("Invalid left output Hadamard multiplication shape.");
+    }
+    lBound *= a->shape()[i];
+  }
+  int rBound = 1;
+  for (int i = 0; i < r; i++) {
+    if (b->shape()[n+i] != out->shape()[l+n+i]) {
+      throw std::out_of_range("Invalid right output Hadamard multiplication shape.");
+    }
+    rBound *= b->shape()[n+i];
+  }
+
+  // TODO: accelerate for sparse matricies
+  for (int i = 0; i < lBound; i++) {
+    for (int j = 0; j < midBound; j++) {
+      int va = i+lBound*j;
+      for (int k = 0; k < rBound; k++) {
+        int vo = i+lBound*j+lBound*midBound*k;
+        int vb = j+midBound*k;
+        out->set(vo, a->get(va)*b->get(vb)); 
+      }
+    }
+  }
+}
+
 void AddTo(const MMatrixInterface* m, MMatrixInterface* out) {
   if (m == nullptr || out == nullptr) {
     throw std::invalid_argument("AddTo cannot take null arguments.");
@@ -276,6 +327,24 @@ void SubFrom(const MMatrixInterface* m, MMatrixInterface* out) {
   for (int i = 0; i < bound; i++) {
     out->set(i, out->get(i)-m->get(i));
   }
+}
+
+double Sum(const MMatrixInterface* m) {
+  if (m == nullptr) {
+    throw std::invalid_argument("Sum cannot take null arguments.");
+  }
+
+  // bound = product of m's shape
+  int bound = 1;
+  for (int s : m->shape()) {
+    bound *= s;
+  }
+  
+  double result = 0;
+  for (int i = 0; i < bound; i++) {
+    result += m->get(i);
+  }
+  return result;
 }
 
 double SquaredSum(const MMatrixInterface* m) {
@@ -382,6 +451,21 @@ unique_ptr<MMatrixInterface> Ident(int n, const vector<int>& base_shape) {
     ident->set(index, 1);
   }
   return ident;
+}
+
+void Fill(MMFloat f, MMatrixInterface* m) {
+  if (m == nullptr) {
+    throw std::invalid_argument("Fill cannot take null argument.");
+  }
+
+  int bound = 1;
+  for (int s : m->shape()) {
+    bound *= s;
+  }
+
+  for (int i = 0; i < bound; i++) {
+    m->set(i, f);
+  }
 }
 
 std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b) {

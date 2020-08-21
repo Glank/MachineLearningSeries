@@ -20,6 +20,7 @@ constexpr MMatrixType kMMatrixType_Sparse = 1;
 
 typedef double MMFloat;
 
+
 class MMatrixInterface {
  public:
   virtual ~MMatrixInterface() = default;
@@ -41,6 +42,8 @@ class MMatrixInterface {
   // Sets all values of the matrix to zero.
   virtual void zero() = 0;
 };
+
+typedef std::function<void (const MMatrixInterface*,MMatrixInterface*)> MMFunction;
 
 class DenseMMatrix : public MMatrixInterface {
  public:
@@ -98,11 +101,18 @@ void FromValueIndex(const std::vector<int>& shape, int vindex,
 void Multiply(int n, const MMatrixInterface* a,
   const MMatrixInterface* b, MMatrixInterface* out);
 
+// Applies the Hadamard product over n dimensions.
+void HMultiply(int n, const MMatrixInterface* a,
+  const MMatrixInterface* b, MMatrixInterface* out);
+
 // Adds m to out
 void AddTo(const MMatrixInterface* m, MMatrixInterface* out);
 
 // Subtracts m from out
 void SubFrom(const MMatrixInterface* m, MMatrixInterface* out);
+
+// Returns the sum of each element of m
+double Sum(const MMatrixInterface* m);
 
 // Returns the sum of the square of each  element of m
 double SquaredSum(const MMatrixInterface* m);
@@ -121,6 +131,9 @@ bool AreEqual(const MMatrixInterface* a, const MMatrixInterface* b, MMFloat epsi
 
 // Returns an n'th order identity with the given base_shape.
 std::unique_ptr<MMatrixInterface> Ident(int n, const std::vector<int>& base_shape);
+
+// Fills m with f.
+void Fill(MMFloat f, MMatrixInterface* m);
 
 std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b);
 std::vector<int> Concat(const std::vector<int>& a, const std::vector<int>& b, const std::vector<int>& c);
