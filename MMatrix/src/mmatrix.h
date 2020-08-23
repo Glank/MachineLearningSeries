@@ -111,6 +111,8 @@ void AddTo(const MMatrixInterface* m, MMatrixInterface* out);
 // Subtracts m from out
 void SubFrom(const MMatrixInterface* m, MMatrixInterface* out);
 
+void Combine(const std::vector<const MMatrixInterface*>& matrices, const std::vector<MMFloat>& consts, MMatrixInterface* out);
+
 // Returns the sum of each element of m
 double Sum(const MMatrixInterface* m);
 

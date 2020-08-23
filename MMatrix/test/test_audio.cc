@@ -1,5 +1,7 @@
 #include "audio.h"
 
+#include "covering.h"
+
 #include <cmath>
 #include <chrono> 
 #include <cstdlib>
@@ -577,7 +579,7 @@ void partialFT(const std::vector<double>& frequencies, double sampleRate, const 
     double freq = frequencies[f];
     partial.clear();
     partial.reserve(samples.size());
-    partialFT(freq, sampleRate, 5.0/freq, samples, &partial);
+    partialFT(freq, sampleRate, 10.0/freq, samples, &partial);
     for (int s = 0; s < samples.size(); s++) {
       out->set({f, s}, partial[s]);
     }
@@ -1116,6 +1118,82 @@ void AutoTune() {
   }
 }
 
+void TestRealCovering() {
+  std::vector<double> samples;
+  std::srand(314);
+  // 44100 1/second
+  int sampleRate = 44100; //44100;
+  // peaks/second
+  // A0 = 27.5
+  // C8 = 4186
+  //double a4 = 440; // 27.5; // 27.5*std::pow(2, 1/12.0);
+  double c4 = 261.63;
+  double d4 = 293.66;
+  double e4 = 329.63;
+
+
+  std::vector<double> notes{e4, d4, c4, d4, e4};
+  for (int i = 0; i < notes.size(); i++) {
+    pushFrequency(notes[i], sampleRate, 0.25, &samples);
+  }
+
+  {
+    std::ofstream f("sample.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, samples);
+  }
+
+  auto pft = std::unique_ptr<mmatrix::DenseMMatrix>(
+    new mmatrix::DenseMMatrix({3,static_cast<int>(samples.size())}));
+  
+  std::vector<double> frequencies{c4,d4,e4};
+  std::vector<std::string> fnames{"c4", "d4", "e4"};
+  partialFT(frequencies, sampleRate, samples, pft.get());
+
+  for (int i = 0; i < samples.size(); i++) {
+    if (i%(sampleRate/4) == 0) {
+      std::cout << "--------------" << std::endl;
+    }
+    if (i%100 == 0)
+      std::cout << pft->get({0,i}) <<std::endl;
+  }
+
+  // Calculate the coverings.
+  covering::CoveringMatrices coverings(std::move(pft));
+  coverings.set_primary_params(3.2);
+  coverings.update_weights([&](mmatrix::MMatrixInterface* w) {
+    mmatrix::Copy(coverings.fourier_basis_regularized(), w);
+  });
+
+  // Generate a new sample based on the coverings.
+  std::vector<double> outSamples;
+  double max_weight = -100;
+  double min_weight = 100;
+  for(int i = 0; i < samples.size(); i++) {
+    double s = 0;
+    for (int f = 0; f < frequencies.size(); f++) {
+      double w = coverings.weights()->get({f,i});
+      if (w > 0.8) {
+        double sampleF = frequencies[f]/sampleRate;
+        s += 0.5*std::sin(2*pi*i*sampleF);
+      }
+      if (w > max_weight) {
+        max_weight = w;
+      }
+      if (w < min_weight) {
+        min_weight = w;
+      }
+    }
+    outSamples.push_back(s);
+  }
+  {
+    std::ofstream f("coverings.wav", std::ios::binary);
+    WriteWavFile(f, sampleRate, 2, outSamples);
+  }
+  std::cout << max_weight << std::endl;
+  std::cout << min_weight << std::endl;
+  std::cout << coverings.continuity() << std::endl;
+}
+
 int main() {
   //TestWriteRead();
   //TestFourierTransform();
@@ -1133,7 +1211,8 @@ int main() {
   //HighLowPassFilter();  // fail, ish looks like I'll need a FFT for this
   //TestIFFT(); // success
   //BandPassFilter(); // success
-  AutoTune();
+  //AutoTune();
+  TestRealCovering();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }

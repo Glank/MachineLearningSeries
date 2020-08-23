@@ -11,8 +11,8 @@
 using namespace mmatrix;
 using namespace mmatrix::test;
 
-void TestCoveringErrorDerivative() {
-  std::cout << "Testing Covering Error Derivative..." << std::endl;
+void TestCoveringPrimaryDerivative() {
+  std::cout << "Testing Covering Primary Derivative..." << std::endl;
   std::srand(31415);
   std::vector<int> xShape = {3, 10};
   std::vector<int> fShape = {};
@@ -22,17 +22,17 @@ void TestCoveringErrorDerivative() {
   covering::CoveringMatrices covering(std::move(T));
   covering.set_primary_params(6);
 
-  MMFunction covErr = [&](const MMatrixInterface* x, MMatrixInterface* out) {
+  MMFunction primErr = [&](const MMatrixInterface* x, MMatrixInterface* out) {
     covering.update_weights([&](MMatrixInterface* w) { Copy(x, w);});
     out->set(0, covering.primary());
   };
 
-  MMFunction covErrDeriv = [&](const MMatrixInterface* x, MMatrixInterface* out) {
+  MMFunction primErrDeriv = [&](const MMatrixInterface* x, MMatrixInterface* out) {
     covering.update_weights([&](MMatrixInterface* w) { Copy(x, w);});
     Copy(covering.primary_deriv(), out);
   };
 
-  TestGenericDerivative("Covering Error", xShape, fShape, covErr, covErrDeriv, 10, 10);
+  TestGenericDerivative("Covering Primary", xShape, fShape, primErr, primErrDeriv, 10, 10);
 }
 
 void TestCoveringSigmoidDerivative() {
@@ -118,12 +118,37 @@ void TestCoveringRegulationDerivative() {
   TestGenericDerivative("Covering Regulation", xShape, fShape, regErr, regErrDeriv, 10, 10);
 }
 
+void TestCoveringErrorDerivative() {
+  std::cout << "Testing Covering Error Derivative..." << std::endl;
+  std::srand(31415);
+  std::vector<int> xShape = {3, 10};
+  std::vector<int> fShape = {};
+
+  std::unique_ptr<DenseMMatrix> T(new DenseMMatrix(xShape));
+  RandMatrix(T.get(), 0, 0, 1000);
+  covering::CoveringMatrices covering(std::move(T));
+  covering.set_primary_params(6);
+
+  MMFunction covErr = [&](const MMatrixInterface* x, MMatrixInterface* out) {
+    covering.update_weights([&](MMatrixInterface* w) { Copy(x, w);});
+    out->set(0, covering.covering_error());
+  };
+
+  MMFunction covErrDeriv = [&](const MMatrixInterface* x, MMatrixInterface* out) {
+    covering.update_weights([&](MMatrixInterface* w) { Copy(x, w);});
+    Copy(covering.covering_error_deriv(), out);
+  };
+
+  TestGenericDerivative("Covering Error", xShape, fShape, covErr, covErrDeriv, 10, 10);
+}
+
 int main() {
-  TestCoveringErrorDerivative();
+  TestCoveringPrimaryDerivative();
   TestCoveringSigmoidDerivative();
   TestCoveringDensityDerivative();
   TestCoveringContinuityDerivative();
   TestCoveringRegulationDerivative();
+  TestCoveringErrorDerivative();
   std::cout << "All tests pass." << std::endl;
   return 0;
 }

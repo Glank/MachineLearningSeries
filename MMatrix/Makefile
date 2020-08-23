@@ -15,8 +15,8 @@ test_covering: bin/mmatrix.o bin/covering.o bin/mmatrix_test_utils.o test/test_c
 test_jpeg_decoder: test/test_jpeg_decoder.cc
 	${CMP} -o test_jpeg_decoder test/test_jpeg_decoder.cc ${CFLAGS}
 
-test_audio: bin/audio.o test/test_audio.cc bin/mmatrix.o
-	${CMP} -o test_audio test/test_audio.cc bin/audio.o bin/mmatrix.o ${CFLAGS}
+test_audio: bin/audio.o test/test_audio.cc bin/mmatrix.o bin/covering.o
+	${CMP} -o test_audio test/test_audio.cc bin/audio.o bin/mmatrix.o bin/covering.o ${CFLAGS}
 
 wav_example: src/wav_example.cc bin/audio.o bin/mmatrix.o
 	${CMP} -o wav_example src/wav_example.cc bin/audio.o bin/mmatrix.o ${CFLAGS}

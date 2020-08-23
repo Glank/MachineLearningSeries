@@ -11,6 +11,7 @@ class CoveringMatrices {
  public:
   CoveringMatrices(std::unique_ptr<mmatrix::MMatrixInterface> fourier_basis);
 
+  mmatrix::MMatrixInterface* weights();
   void update_weights(std::function<void(mmatrix::MMatrixInterface*)> update);
 
   // The covering and deriv by  weights
@@ -33,6 +34,7 @@ class CoveringMatrices {
   void set_primary_params(double k);
   double primary();
   const mmatrix::MMatrixInterface* primary_deriv();
+  const mmatrix::MMatrixInterface* fourier_basis_regularized();
 
   // The covering density and deriv by weights
   // 0 <= d <= 1
@@ -44,6 +46,17 @@ class CoveringMatrices {
   double continuity();
   const mmatrix::MMatrixInterface* continuity_deriv();
 
+  // The full covering error and deriv by weights
+  // 0 <= p, r, d, c
+  // p+r+d+c = 1 is ideal to avoid effecting the learning rate
+  // p = primary error weight
+  // r = regulation error weight
+  // d = density error weight
+  // c = continuity error weight
+  void set_covering_error_params(double p, double r, double d, double c);
+  double covering_error();
+  const mmatrix::MMatrixInterface* covering_error_deriv();
+
  private:
 
   // The base fourier transform that we will be attempting to cover.
@@ -51,7 +64,6 @@ class CoveringMatrices {
   // The size of the fourier_basis_
   long size_;
   int cur_state_ = 1;
-  mmatrix::MMatrixInterface* weights();
   std::unique_ptr<mmatrix::DenseMMatrix> weights_;
 
   int sigmoid_state_ = 0;
@@ -71,7 +83,6 @@ class CoveringMatrices {
   double primary_;
   int primary_deriv_state_ = 0;
   bool fourier_basis_regularized_update_needed_ = true;
-  const mmatrix::MMatrixInterface* fourier_basis_regularized();
   std::unique_ptr<mmatrix::DenseMMatrix> fourier_basis_regularized_;
   std::unique_ptr<mmatrix::DenseMMatrix> primary_deriv_;
 
@@ -85,6 +96,15 @@ class CoveringMatrices {
   double continuity_;
   int continuity_deriv_state_ = 0;
   std::unique_ptr<mmatrix::DenseMMatrix> continuity_deriv_;
+
+  double covering_weight_p_ = 0.25;
+  double covering_weight_r_ = 0.25;
+  double covering_weight_d_ = 0.25;
+  double covering_weight_c_ = 0.25;
+  int covering_error_state_ = 0;
+  double covering_error_;
+  int covering_error_deriv_state_ = 0;
+  std::unique_ptr<mmatrix::DenseMMatrix> covering_error_deriv_;
   
   // Ident^3(|weights|)
   const mmatrix::MMatrixInterface* ident3_w();

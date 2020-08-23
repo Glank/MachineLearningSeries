@@ -240,4 +240,41 @@ const mmatrix::MMatrixInterface* CoveringMatrices::continuity_deriv() {
   return continuity_deriv_.get();
 }
 
+void CoveringMatrices::set_covering_error_params(double p, double r, double d, double c) {
+  covering_weight_p_ = p;
+  covering_weight_r_ = r;
+  covering_weight_d_ = d;
+  covering_weight_c_ = c;
+  covering_error_state_ = 0;
+  covering_error_deriv_state_ = 0;
+}
+
+double CoveringMatrices::covering_error() {
+  if (covering_error_state_ < cur_state_) {
+    covering_error_ =
+      covering_weight_p_*primary() +
+      covering_weight_r_*regulation() +
+      covering_weight_d_*density() +
+      covering_weight_c_*continuity();
+
+    covering_error_state_ = cur_state_;
+  }
+  return covering_error_;
+}
+
+const mmatrix::MMatrixInterface* CoveringMatrices::covering_error_deriv() {
+  if (covering_error_deriv_state_ < cur_state_) {
+    if (covering_error_deriv_ == nullptr) {
+      covering_error_deriv_ = std::unique_ptr<DenseMMatrix>(new DenseMMatrix(weights()->shape()));
+    }
+
+    Combine({primary_deriv(), regulation_deriv(), density_deriv(), continuity_deriv()},
+      {covering_weight_p_, covering_weight_r_, covering_weight_d_, covering_weight_c_},
+      covering_error_deriv_.get());
+
+    covering_error_deriv_state_ = cur_state_;
+  }
+  return covering_error_deriv_.get();
+}
+
 }  // covering

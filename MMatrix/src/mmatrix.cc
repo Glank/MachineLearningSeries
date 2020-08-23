@@ -329,6 +329,40 @@ void SubFrom(const MMatrixInterface* m, MMatrixInterface* out) {
   }
 }
 
+void Combine(const std::vector<const MMatrixInterface*>& matrices, const std::vector<MMFloat>& consts, MMatrixInterface* out) {
+  bool any_null = false;
+  for (const MMatrixInterface* m : matrices) {
+    if(m == nullptr) {
+      any_null = true;
+      break;
+    }
+  }
+  if (out == nullptr || any_null) {
+    throw std::invalid_argument("Combine cannot take null arguments.");
+  }
+  if (matrices.size() != consts.size()) {
+    throw std::invalid_argument("Combine requires same number of consts as matrices.");
+  }
+
+  if (matrices.empty()) {
+    out->zero();
+    return;
+  }
+  
+  int bound = 1;
+  for (int s : matrices[0]->shape()) {
+    bound *= s;
+  }
+
+  for (int i = 0; i < bound; i++) {
+    double term = 0;
+    for (int m = 0; m < matrices.size(); m++) {
+      term += consts[m]*matrices[m]->get(i);
+    }
+    out->set(i, term);
+  }
+}
+
 double Sum(const MMatrixInterface* m) {
   if (m == nullptr) {
     throw std::invalid_argument("Sum cannot take null arguments.");
