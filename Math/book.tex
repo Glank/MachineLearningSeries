@@ -14,6 +14,7 @@
 \usepackage[toc,page]{appendix}
 % package used for \llparenthesis
 \usepackage{stmaryrd}
+\usepackage{hyperref}
 
 \title{%
   \sout{Machine Learning for Global Conquest} \\
@@ -67,6 +68,8 @@
 \DeclareMathOperator{\LMult}{LMult}
 \DeclareMathOperator{\Idx}{Idx}
 \DeclareMathOperator{\size}{size}
+\DeclareMathOperator{\FFT}{FFT}
+\DeclareMathOperator{\IFFT}{IFFT}
 %\newcommand{\mmult}[1]{\stackrel{\times}{#1}}
 %\newcommand{\mmult}[1]{\underset{#1}{\times}}
 \newcommand{\mmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\times}$}}}
@@ -4205,6 +4208,85 @@ Chain Rule
 (Thm. \ref{mmm_chain_rule})
 \[ \frac{dF(G(X))}{dX} = \frac{dF}{dG} \mmult{\shape{\shape{G}}} \frac{dG}{dX} \]
 \end{drule}
+
+\chapter{Audio Project}
+
+\begin{landscape}
+\section{2d Derivatives with Fast Fourier Transforms}
+
+According to wikipedia \cite{wiki:fourier}, if $f(x)$ is an absolutely continuous differentiable function, and both $f$ and its derivative $f'$ are integrable. Then the Fourier transform of the derivative is given by
+\[ \hat{f'}(\xi) = 2 \pi i \xi \hat{f}(\xi) \]
+
+What that means in practice is that we can approximate the derivative of a sequence, or in our case a multimatrix, using a FFT.
+The method I'm using comes from a youtube series by Steve Brunton \cite{youtube:fourier} which I've found to be particularly helpful.
+
+We'll define a function, $\FFT(X) = F$, and it's inverse, $\IFFT(F) = X$ as the fast fourier transform of $X$ and it's inverse of $F$.
+Specifically, we'll let $X$ be a multimatrix of shape $\shape{X} = \left<N\right>$ where $N = 2^p$ for some $p>1$.
+And we'll let $F$ be a multimatrix representing a similar shape of complex numbers, $\shape{F} = \left<N, 2\right>$ where $F[k,1]$ is
+the real componenet and $F[k,2]$ is the imaginary component. So,
+
+\[ \FFT(X)[k,1] = \sum_{n=1}^{N} X[n] \cos\left(\frac{2 \pi (k-1)(n-1)}{N}\right) \]
+\[ \FFT(X)[k,2] = -\sum_{n=1}^{N} X[n] \sin\left(\frac{2 \pi (k-1)(n-1)}{N}\right) \]
+\begin{align*}
+  \IFFT(F)[n]
+  &= \frac{1}{N} \sum_{k=1}^{N} Real\left( (F[k,1]+i F[k,2]) e^{\frac{2 \pi i (k-1)(n-1)}{N} } \right) \\
+  &= \frac{1}{N} \sum_{k=1}^{N} F[k,1] \cos\left(\frac{2 \pi (k-1)(n-1)}{N}\right) - F[k,2] \sin\left(\frac{2 \pi (k-1)(n-1)}{N}\right)
+\end{align*}
+
+Now if $X[n] = g(n)$ we can compute $X'$ where $X'[n] = g'(n)$ by the calculation,
+
+\[ X' = \IFFT(C(\FFT(X))) \]
+\[ C(F)[k,1] = \frac{-2 \pi (k-1)}{N} F[k,2] \]
+\[ C(F)[k,2] = \frac{2 \pi (k-1)}{N} F[k,1] \]
+
+\end{landscape}
+
+\chapter{Future Subjects of Study}
+
+The association between product spaces and null spaces. So, if we have $\shape{A} = \vec{a} \oplus \vec{n}$
+then we'll define $ProdSpace(A, n)$ and $NullSpace(A, n)$ as the possible outputs of
+\[ A \mmult{n} X = Y \]
+And the possible solutions to,
+\[ A \mmult{n} X = 0 \]
+Respectively where in both cases $\shape{X} = \vec{n}$. 
+Note that $ProdSpace(A, n) \subset R^{\vec{a}}$ and $NullSpace(A, n) \subset R^{\vec{n}}$
+
+Now for any multimatrices $B$ and $C$ of the same shape, $\shape{B} = \shape{C} = \vec{s}$,
+they are defined as 'orthogonal', i.e. $B \bot C$ iff $B \mmult{\shape{s}} C = 0$.
+And two sets are orthogonal if all any member from one is orthogonal to any member of the other.
+
+I hypothesize that,
+\[ProdSpace(A, n) \bot NullSpace(\Tran(A, a), a)\]
+and
+\[NullSpace(A, n) \bot ProdSpace(\Tran(A, a), a)\]
+based on a similar theory for 2d matrices \cite{youtube:orthogonal} (and the fact that the shapes line up nicely).
+
+And from there I think you can derive a solution to the least squares problem for multimatrices.
+
+If $B - A \mmult{n} X = E$ and where you want to minimize $SS(E)$, you could solve this with derivatives
+but, notice that a shortest $E$ is necessarily orthogonal $ProdSpace(A,n)$ by simple geometry since it is a shortest
+vector from $ProdSpace(A,n)$ to $B$. So if our above hypothesis is correct, $B$ is in $NullSpace(\Tran(A,a), a)$
+
+Therefore the solution to $\Tran(A,a) \mmult{a} E = 0$ for $E$ will be the one that minimizes $SS(E)$. So,
+\begin{align*}
+  \Tran(A,a) \mmult{a} E &= 0 \\
+  \Tran(A,a) \mmult{a} (B - A \mmult{n} X) &= 0 \\
+  \Tran(A,a) \mmult{a} B - \Tran(A,a) \mmult{a} (A \mmult{n} X) &= 0 \\
+  \Tran(A,a) \mmult{a} B - \Tran(A,a) \mmult{a} A \mmult{n} X &= 0 \\
+  \Tran(A,a) \mmult{a} B &= \Tran(A,a) \mmult{a} A \mmult{n} X \\
+  \Tran(A,a) \mmult{a} A \mmult{n} X &= \Tran(A,a) \mmult{a} B
+\end{align*}
+
+This brings to mind the fact that multimatrices themselves form a vector space. Basically, for any shape $\vec{x}$
+there is an associated vector space of multimatrices $R^{\vec{x}}$. And I haven't yet explictly stated that. Need to do
+that because I'm pretty sure that's necesary for the shortest path being the one that's orthoganal.
+
+I think need to prove, in the abstract, that if you have a vector field $F$
+and a distance metric $d(u,v)$ and a bilinear form \cite{wiki:bilinear}, $b(u,v)$, such that
+\[ v \bot u \iff b(u,v) = 0 \]
+Then for any $v \in F$ and any sub field $f \subset F$, for all $u \in f$,
+\[ (v-u) \bot u \iff \forall u' \in f - \{u\} : d(u', v) < d(u,v) \]
+That is, $u$ is the closest vector in $f$ to $v$ if and only if it is the orthoganal project of $v$ onto $f$.
 
 \chapter{Scratch}
 

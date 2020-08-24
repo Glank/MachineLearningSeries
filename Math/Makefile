@@ -11,3 +11,4 @@ clean:
 	-rm book.bbl
 	-rm book.blg
 	-rm book.toc
+	-rm book.out
