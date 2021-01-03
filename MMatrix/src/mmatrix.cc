@@ -575,7 +575,19 @@ void Copy(const MMatrixInterface* m, MMatrixInterface* out) {
   }
 }
 
-void Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
+void Reshape(const MMatrixInterface* m, MMatrixInterface* out) {
+  // TODO: improve for sparse matrices
+  // TODO: shape checks
+  int ncells = 1;
+  for (int i = 0; i < m->shape().size(); i++) {
+    ncells *= m->shape()[i];
+  }
+  for (int i = 0; i < ncells; i++) {
+    out->set(i, m->get(i));
+  }
+}
+
+bool Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
   // The size of m is N*N
   int N;
   {
@@ -599,6 +611,7 @@ void Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
     }
     N = static_cast<int>(N1);
   }
+
 
   // Set up NxN inverse
   out->zero();
@@ -643,7 +656,7 @@ void Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
         out->set(pr+N*c, tmp);
       }
     }
-    
+
     // Divide that row by it's pivot
     double pivot = m->get(pr+N*pc);
     m->set(pr+N*pc, 1);
@@ -670,7 +683,7 @@ void Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
   // Verify that the RRE form is invertable
   for (int i = 0; i < N; i++) {
     if (m->get(i+N*i) != 1) {
-      throw std::runtime_error("Not an invertable matrix.");
+      return false;
     }
   }
 
@@ -720,6 +733,7 @@ void Invert(int n, MMatrixInterface* m, MMatrixInterface* out) {
     // Go up to the next pivot row
     pr--;
   }
+  return true;
 }
 
 }  // namespace mmatrix

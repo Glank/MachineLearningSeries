@@ -15,6 +15,8 @@
 % package used for \llparenthesis
 \usepackage{stmaryrd}
 \usepackage{hyperref}
+% package used for \shrug
+\usepackage{tikz}
 
 \title{%
   \sout{Machine Learning for Global Conquest} \\
@@ -77,33 +79,53 @@
 \newcommand{\mconcat}[1]{\text{\raisebox{1ex}{$\underset{#1}{\oplus}$}}}
 \newcommand{\shape}[1]{\left|#1\right|}
 
+\newcommand{\shrug}[1][]{%
+\begin{tikzpicture}[baseline,x=0.8\ht\strutbox,y=0.8\ht\strutbox,line width=0.125ex,#1]
+\def\arm{(-2.5,0.95) to (-2,0.95) (-1.9,1) to (-1.5,0) (-1.35,0) to (-0.8,0)};
+\draw \arm;
+\draw[xscale=-1] \arm;
+\def\headpart{(0.6,0) arc[start angle=-40, end angle=40,x radius=0.6,y radius=0.8]};
+\draw \headpart;
+\draw[xscale=-1] \headpart;
+\def\eye{(-0.075,0.15) .. controls (0.02,0) .. (0.075,-0.15)};
+\draw[shift={(-0.3,0.8)}] \eye;
+\draw[shift={(0,0.85)}] \eye;
+% draw mouth
+\draw (-0.1,0.2) to [out=15,in=-100] (0.4,0.95); 
+\end{tikzpicture}}
+
 \begin{document}
 
 \maketitle
 
 \chapter*{Preface}
 I was working my way through a hobby programming project, trying to create deep fakes of
-\sout{polititians in compromising positions} humorous celebrity mashups, when I ran into a problem.
+\sout{politicians in compromising positions} humorous celebrity mashups, when I ran into a problem.
 The existing notation for derivatives of matrix equations is terrible.
 It's so deliberately obtuse that I can only conclude that some hidden cabal of
 mathematicians is actively working to sabotage \sout{the rise of our glorious AI overlords}
 our machine learning research.
 I, for one, will not stand for such heresy.
 
-So, I set out to invent a system of my own. Much to my surprise, some of the
-results with were rather elegant. For example, I stumbled onto a
+So I set out to invent a system of my own. Much to my surprise, some of the
+results were actually kinda neat. For example, I found a
 multidimensional version of the derivative chain rule (Thm. \ref{mmm_chain_rule})
-that's nearly as consise as the same rule for scalars.
+that's nearly as concise as the same rule for scalars.
 
 The ultimate goal of this notation system was to \sout{bring about the downfall
-of humanity} figure out a way to take derivatives
-of matrix equations without having to break apart matricies into their constituent
-parts. I knew that I had succeeded when I was able to derive the derivative of the
-softmax function completely in my own notation (Thm. \ref{softmax_derivative}).
+of the military industrial complex} figure out a way to take derivatives
+of matrix equations without having to break apart matrices into their constituent
+parts. I've been able to derive the derivative of the softmax function completely
+in my own notation (Thm. \ref{softmax_derivative}) so I can safely say I succeeded.
 
-Now, not knowing what else to do with the results, I've written this book
-about my exploration into multidimensional matricies,
-multimatricies, and how they can elucidate derivatives of matrix equations.
+Granted, that proof is longer than the original. And harder to follow. So maybe the 
+system isn't exactly ``elegant'' but it does serve its intended purpose as a new lens
+on derivatives involving matrices. It just comes with its own set of
+problems, like an algebra with multiple ternary operators. \shrug
+
+Now, not really knowing what else to do, I've written this book about my exploration into
+multidimensional matrices, `multimatrices', and how they can elucidate
+(or obfuscate) derivatives of matrix equations.
 
 \tableofcontents
 
@@ -116,23 +138,27 @@ This Old Tony, `Making Springs At Home' \cite{youtube:tony}
 
 \section{Motivating the Multimatrix}
 
-To demonstrate how the problem with traditional matricies, let's take a look at a
+To demonstrate the problem with traditional matrices, let's take a look at a
 simple matrix equation. 
 
-Let's say we have a small class of undergraduates packed, conveniently in a 3 by 5
-grid. We'll let $X$ be the matrix representing number of semesters of science
-classes each of those student has taken.
-Then let $B$ represent the belief each of those undergradutes has in a higher power,
-thier BHP if you will.
+Let's say we have a small class of undergraduates packed, conveniently, into a 3 by 5
+seating arrangement. Each of these students is at a different point in their education
+and some of them are taking more classes than others.
+Let's label their total level of education with a matrix, $X$, where each entry
+in the matrix is the number of hours of science classes each student has taken.
 
-As we all know, Weinersmith's hypothisis states that an undergraduate's belief in a
+As we all know, Weinersmith's hypothesis states that an undergraduate's belief in a
 higher power fluctuates with respect to their scientific education in a sinusoidal
 pattern (Weinersmith, 2010 \cite{weinersmith:education}).
 
-Let's formally state the shape of these two matricies,
-$\shape{B} = \shape{X} = \left< 3,5 \right>$. (Throughout this work, I'll be using
+For a simplified model of this, lets then say that another matrix $B$ represents the
+belief each of our undergraduates has in a higher power, their BHP if you will.
+
+Let's formally state the shape of these two matrices,
+$\shape{B} = \shape{X} = \left< 3,5 \right>$.\footnote{Throughout this work, I'll be using
 $\shape{M}$ to denote the shape of $M$ rather than the determinate because, frankly, it
-is just comes up more frequently.)
+is just comes up more frequently and determinants aren't simple enough to deserve that
+brief of notation when it comes to multimatrices.}
 Each element of $B$ will be the sine of the corresponding element of
 $X$. That is, \[B_{r,c} = \sin(X_{r,c})\]
 Which I'll write more simply as, \[B = \sin(X)\]
@@ -140,7 +166,7 @@ Which I'll write more simply as, \[B = \sin(X)\]
 Now, I would call the derivative of any element of $B$ with respect to any element
 of $X$ a partial derivative of that function. Since
 $\partial B_{r_1, c_1}/\partial X_{r_2, c_2}$ is defined as the rate of change of
-\textit{one} undergraduate's BPH with respect to \textit{one}
+\textit{one} undergraduate's BHP with respect to \textit{one}
 undergraduate's education level - it only represents a change to part of the whole
 system. 
 We can calculate this partial derivative easily enough,
@@ -158,16 +184,16 @@ scientific education level but does not change with respect to other students'
 scientific education. No mater how much I teach Jane about photosynthesis, I'm
 not going to change Joe's mind about divine mysteries.
 
-This can also be writen more simply using Kronecker deltas \cite{wiki:kronecker},
-which should make one feel particularly intellegent as Kronecker deltas were used
+This can also be written more simply using Kronecker deltas \cite{wiki:kronecker},
+which should make one feel particularly intelligent as Kronecker deltas were used
 by Einstein (and presumably someone named Kronecker) \cite{wiki:einstein}.
 \[
 \frac{\partial B_{r_1,c_1}}{\partial X_{r_2,c_2}} = 
 \cos (X_{r_2, c_2}) \delta_{r_1 r_2} \delta_{c_1 c_2}
 \]
 
-But what about the complete deriative?
-What sort of mathmatical object would represent the entire derivative
+But what about the complete derivative?
+What sort of mathematical object would represent the entire derivative
 of $B$ with respect to $X$?
 I need a mathematical object which perfectly
 encapsulates the rate of change of \textit{all} the undergraduates' beliefs in a
@@ -177,7 +203,7 @@ and my current toolkit doesn't work!
 \[\frac{dB}{dX} = \mbox{ ? }\]
 
 If this were a function that mapped a vector to a scalar, you might say that the
-complete derivate was the gradient. But in this case, our function's output is more
+complete derivative was the gradient. But in this case, our function's output is more
 than a simple scalar and even our dependent variable is more complex than a vector.
 
 By looking at the partial derivatives, we can come to some understanding of the
@@ -186,12 +212,12 @@ element has its own partial derivative, so it makes sense that the total size
 of the complete derivative should be the product of the size of $B$ and the size
 of $X$.
 
-And so, the size of the complete derivate would be,
+And so, the size of the complete derivative would be,
 \[
 \size\left(\frac{dB}{dX}\right) = \size(B) \size(X)
 \]
 Perhaps we could even let this help us define the `shape' of the complete
-derivative. Note that there seem to be four independent indicies to each element
+derivative. Note that there seem to be four independent indices to each element
 of this matrix, namely $r_1$, $c_1$, $r_2$, and $c_2$.
 And since a complete derivative would need to be composed of partial derivatives
 it would make sense to just smush the shapes of the input matrix and the output
@@ -206,7 +232,7 @@ Where $\oplus$ is the concatenate operator.
 The ordering here is arbitrary. There is no reason why the dimensionality of
 of the independent variable \textit{needs} to be concatenated to the right of the
 dimensionality of the output. What's important is that the dimensionality of
-both output and indepenedent variable are preserved and that our notation is
+both output and independent variable are preserved and that our notation is
 consistent.
 
 Let us declare this to
@@ -214,16 +240,16 @@ be our convention. I've typeset it in \LaTeX ~therefore it can no longer be
 changed. Those are the rules that I've just made up and I'm backing them up with
 dozens more pages of incoherent rambling.
 
-So anyways, our total derivate is a multidimensional object with four indicies.
+So anyways, our total derivative is a multidimensional object with four indices.
 Suppose we try to pull a single partial derivative from this complete derivative,
-what could our notation look like? Four underscript indicies would be unwieldy,
+what could our notation look like? Four underscript indices would be unwieldy,
 so maybe something like this:
 \[
 \frac{dB}{dX}[1,2,3,4] = \frac{\partial B_{1,2}}{\partial X_{3,4}}
 \]
 
 And since we're defining our own notation, let's go wild and reference our original
-matricies in a similar manner:
+matrices in a similar manner:
 \[
 \frac{dB}{dX}[1,2,3,4] = \frac{\partial B[1,2]}{\partial X[3,4]}
 \]
@@ -233,13 +259,13 @@ a multidimensional matrix. It has four dimensions of indices, rather than just
 a row and column but each uniquely indexed cell in this object may have a
 unique value, just like a standard two dimensional matrix.
 
-Programmers might call this object a `tensor' but mathematitians might
+Programmers might call this object a `tensor' but mathematicians might
 scream at those same programmers, ``WE ALREADY HAVE A DEFINITION OF A TENSOR! DIE!''
 And the ensuing war might wipe out most of the eastern seaboard and would
 certainly not be conductive to a reasonable discussion. To avoid such a
 confrontation I'll be using the incredibly imaginative term `multimatrix'. 
 
-Let's define this bit of notation formaly.
+Let's define this bit of notation formally.
 
 \begin{definition}[Multimatrix]
 A multimatrix $M$ is a multidimensional object that has some shape,
@@ -252,18 +278,18 @@ is a valid index of $M$ if and only if each value of $\bar{v}$ is less than or e
 to the value of it's corresponding index in $\vec{v}$.
 That is, $\forall i: 1 \le \bar{v}_i \le \vec{v}_i$.
 
-We can further simplify that notation for our set of valid indicies. Let's say we have
+We can further simplify that notation for our set of valid indices. Let's say we have
 some $\vec{v} \in \mathbb{N}^n$ that defines the shape of some matrix. Then we'll
-define the set of valid indicies of that matrix to be $\Dim(\vec{v})$. 
+define the set of valid indices of that matrix to be $\Dim(\vec{v})$. 
 
 Each value of $M$ is a real value, so we'll define the set of all real valued
-multidimensional matricies with shape $\vec{v}$ as $\mathbb{R}^{\vec{v}}$.
+multidimensional matrices with shape $\vec{v}$ as $\mathbb{R}^{\vec{v}}$.
 
 We'll use the notation $M[\bar{v}]$ to reference any individual scalar value of $M$
-at indicies $\bar{v} \in \Dim(\shape{M})$. 
+at indices $\bar{v} \in \Dim(\shape{M})$. 
 \end{definition}
 
-That's a huge informtion dump so look at an example.
+That's a huge information dump so look at an example.
 
 \begin{example}
 Let $M$ be one of these newfangled `multimatrix' things. According to our
@@ -300,7 +326,7 @@ And this,
 \end{example}
 
 \begin{definition}[Scalar Filled Multimatrices]
-For convenience, I'll often refer to multimatricies filled with a single value,
+For convenience, I'll often refer to multimatrices filled with a single value,
 $s \in \mathbb{R}$,
 using the notation $s^{\vec{x}}$ where $\vec{x}$ is some multimatrix shape. So that
 $\shape{s^{\vec{x}}} = \vec{x}$ and for all $\bar{x} \in \Dim(\vec{x})$,
@@ -326,8 +352,8 @@ Left as an exercise for the reader (Exercise \ref{dim_set_ind_concat_ex}).
 \section{Defining the Derivative}
 
 Going back to our original motivating problem, we (that is to say, myself and the voices
-in my head whom I reference as to give my writing the percieved authority
-of more than one author) can express our derivative notation thusly,
+in my head whom I reference as to give my writing the perceived authority
+of more than one author) can express our derivative notation thus,
 
 \begin{definition}[Multimatrix on Multimatrix Derivative]
 \label{mm_derivative}
@@ -388,11 +414,11 @@ x &\in \mathbb{R} \\
 \]
 \end{definition}
 
-Ok, that's neat and all but what does that actually mean? Can we answer our motivating 
+OK, that's neat and all but what does that actually mean? Can we answer our motivating 
 question?
 \[\frac{dB}{dX} = ? \]
 Well... sort of. We have to abuse the notation a little and say that $B$ and $X$ are
-just multimatricies with 2 dimensions. Then we can say that the total derivative
+just multimatrices with 2 dimensions. Then we can say that the total derivative
 of $B$ with respect to $X$ is a multimatrix with shape $\shape{B} \oplus \shape{X}$,
 whose elements we can define as,
 \[\forall \bar{b} \in \Dim(\shape{B}), \bar{x} \in \Dim(\shape{X}):\]
@@ -411,7 +437,7 @@ chapter ahead), that'll look like this:
 \]
 
 But that single line will require defining multimatrix multiplication and
-a mysterious, and possibly dangerious, entity call a cubic identity, $\Ident^3(\shape{X})$.
+a mysterious, and possibly dangerous, entity call a cubic identity, $\Ident^3(\shape{X})$.
 
 \section{Exercises}
 
@@ -457,7 +483,7 @@ you'll be dead.'' - Mr. Peanutbutter (BoJack Horseman Season 1, Episode 12
 
 \section{Defining Multiplication}
 
-The multiplication of traditional matricies is often considered a rather confusing
+The multiplication of traditional matrices is often considered a rather confusing
 proposition, especially when one first encounters it.
 
 After seeing the method used in practice, one slowly comes to understand the
@@ -467,25 +493,24 @@ fight against the darkness.
 
 Multimatrix multiplication is much the same.
 
-Just to review, for two matricies $A$ and $B$, multipication is only defined
+Just to review, for two matrices $A$ and $B$, multiplication is only defined
 for $A \times B = C$ if $A$ has the same number of columns as $B$ has rows.
 That is, if $\shape{A} = \left< r_a, c_a \right>$ and $\shape{B} = \left< r_b, c_b \right>$
 then $A \times B$ is valid if and only if $c_a = r_b$. And furthermore,
-the remaining dimensions of $A$ and $B$ define the diminsions of $C$,
+the remaining dimensions of $A$ and $B$ define the dimensions of $C$,
 $\shape{C} = \left< r_a, c_b \right>$. Each element of $C$ is a sum of the product of
 every combination of the corresponding row of $A$ and the corresponding column of
 $B$,
 
 \[ C[r_c, c_c] = \sum_{\forall i} A[r_c, i] B[i, c_c] \]
 
-Easily done. The hard part isn't doing the calculation. The hard part getting over
-your naive belief that mathematical operations should be rooted in some concrete
-concept rather than ``this is the way it's done because it makes the equations
-work.''
+Easily done. The hard part isn't doing the calculation. The hard part is reframing the
+damn problem in your head as its geometric or `systems of equations' equivalent so that
+the operation is at least somewhat intuitive.
 
-So now consider how we would multiply two matricies $A$ and $B$ if they had more
-than two dimensions. Let's use a concrete example to make the problems more
-structurally sound.
+So now consider how we would multiply two matrices $A$ and $B$ if they had more
+than two dimensions. Which doesn't really leverage either of those intuitive
+approaches. Let's use a concrete example to make the problems more structurally sound.
 
 Let $\shape{A} = \left<5,7,7\right>$ and $\shape{B} = \left<7,7,2,4\right>$.
 First of all, can we even multiply the two together? Hm... maybe? $\shape{A}$ ends with
@@ -500,10 +525,10 @@ additional dimension, leaving us with $\left<5, 2, 4\right> = \shape{A \times B}
 But the first definition looks like it could still be useful! It could let us cover 
 two dimensional matrix multiplication completely within our definition. This second
 definition seems more... er... multidimensional... but it also seems to
-arbitrarily depend on the shape of the two matricies.
+arbitrarily depend on the shape of the two matrices.
 
 What we really need is an operation which covers both lines of reasoning. To do
-so, we need to compleately abandon conventional algebras, and indeed any hope of
+so, we need to completely abandon conventional algebras, and indeed any hope of
 returning to sanity. We need... a ternary operator.
 
 I would argue that there shall always be some component of, 
@@ -513,15 +538,15 @@ an infinite number of types of multiplication, with a new operator, $\mmult{n}$ 
 $\shape{A \mmult{1} B} = \left<5, 7, 7, 2, 4\right>$ and 
 $\shape{A \mmult{2} B} = \left<5, 2, 4\right>$.
 
-But the shape is only a small component of the multipliation  operation. Let's
+But the shape is only a small component of the multiplication  operation. Let's
 just jump into the formal definition and I'll explain with an example:
 
 \begin{definition}[Multimatrix Multiplication]
 \label{mm_mult}
-Let $A$ and $B$ be multimatricies such that $\shape{A} = \vec{a} \oplus \vec{c}$,
+Let $A$ and $B$ be multimatrices such that $\shape{A} = \vec{a} \oplus \vec{c}$,
 $\shape{B} = \vec{c} \oplus \vec{b}$, and $\shape{\vec{c}} = n$ with
-$n \in \{0\} \cup \mathbb{N}$. We shall call $n$ the 'size' or the 'width'
-or the 'overlap' of the multiplication operation.
+$n \in \{0\} \cup \mathbb{N}$. We shall call $n$ the `size' or the `width'
+or the `overlap' of the multiplication operation.
 The shape of the result is defined, $\shape{A \mmult{n} B} = \vec{a} \oplus \vec{b}$
 and the value of the result is defined,
 \[
@@ -536,7 +561,7 @@ and the value of the result is defined,
 \begin{example}
 Let $\shape{A} = \left<2, 3, 2\right>$ and $\shape{B} = \left<3, 2, 2\right>$. I would
 define their values in a three dimensional grid but I fear that my three dimensional
-\LaTeX skills aren't up to the task (and three dimensional monitors are quite hard to
+\LaTeX~ skills aren't up to the task (and three dimensional monitors are quite hard to
 come by). So here is where we leave behind nice graphical representations of
 things and I'll just define the elements of $A$ and $B$ in the tables below.
 \begin{table}[h!]
@@ -613,9 +638,9 @@ $\bar{x}_1$ & $\bar{x}_2$ & $(A \mmult{2} B)[\bar{x}]$ & = & = \\
 \end{example}
 \newpage
 
-It's important to notice that this operation is identital to standard
+It's important to notice that this operation is identical to standard
 matrix multiplication for two dimensional multimatrices. For instance,
-if $A$ and $B$ are two dimensional multimatricies with shapes
+if $A$ and $B$ are two dimensional multimatrices with shapes
 $\shape{A} = \left<l_a, r_a\right>$ and $\shape{B} = \left<l_b, r_b\right>$
 their product $A \mmult{1} B$ is valid if and only if $r_a = l_b$ and
 the result is of shape $\shape{A \mmult{1} B} = \left<l_a, r_b\right>$.
@@ -636,7 +661,7 @@ not (usually) communicative. And it is only weakly associative. That sounds like
 nonsense, and indeed it is, but I shall prove it to you.
 
 Multimatrix multiplication may not even make sense dimensionally when you move
-around parentheses. Take for example multimatricies $A$, $B$, and $C$ such that,
+around parentheses. Take for example multimatrices $A$, $B$, and $C$ such that,
 $\shape{A} = \left<5,3,2\right>$,
 $\shape{B} = \left<2,7\right>$, and
 $\shape{C} = \left<3,7,2\right>$ where you should be able to see that
@@ -648,7 +673,7 @@ $B \mmult{2} C$ is an invalid operation.
 
 But even when the dimensional analysis makes sense, multimatrix multiplication
 may not be associative (Honestly, how could you be so naive?). 
-Take, for example, multimatricies $A$, $B$, and $C$ such
+Take, for example, multimatrices $A$, $B$, and $C$ such
 that $\shape{A} = \left<2,2,2,2\right>$, $\shape{B} = \left<2,2,2\right>$, and
 $\shape{C} = \left<2,2,2,2\right>$. Let,
 \[
@@ -701,25 +726,25 @@ So,
 \]
 But, $B \mmult{2} C = 0^{\left<2,2,2\right>}$ so $A \mmult{2} (B \mmult{2} C) = 0^{\left<2,2,2\right>}$
 Which goes to show that even though both $(A \mmult{2} B) \mmult{2} C$ and
-$A \mmult{2} (B \mmult{2} C)$ are valid calculations which result in multimatrixes
+$A \mmult{2} (B \mmult{2} C)$ are valid calculations which result in multimatrices
 of the same dimensionality, they are not equal so multiplicative associativity
 doesn't hold. It also goes to show that your intuition is bad and you should feel bad.
 
-However, there are a broad catagory of cases where associativity \textit{does} hold:
+However, there are a broad category of cases where associativity \textit{does} hold:
 
 \begin{theorem}[Associativity of Multimatrix Multiplication]
 \label{mm_associativity}
-Let $A$, $B$, and $C$ be multimatricies and $m$ and $n$ in
+Let $A$, $B$, and $C$ be multimatrices and $m$ and $n$ in
 $\{0\} \cup \mathbb{N}$.
 If both operations $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$
 are valid dimensionally and $m+n \le \shape{\shape{B}}$, then,
 \[ (A \mmult{m} B) \mmult{n} C = A \mmult{m} (B \mmult{n} C) \]
 \end{theorem}
 \begin{proof}
-Let $A$, $B$, and $C$ be matricies such that the calculations
+Let $A$, $B$, and $C$ be matrices such that the calculations
 $(A \mmult{m} B) \mmult{n} C$ and $A \mmult{m} (B \mmult{n} C)$ are both valid
 and $m + n \le \shape{\shape{B}}$.
-Then the following must be true by the definiton of multimatrix multiplication
+Then the following must be true by the definition of multimatrix multiplication
 (Def. \ref{mm_mult}).
 
 Since $A \mmult{m} B$ is defined, there exist vectors $\vec{a}, \vec{m},$ and
@@ -751,9 +776,9 @@ So,
 \[ \shape{(A \mmult{m} B) \mmult{n} C} = \shape{A \mmult{m} (B \mmult{n} C)} \]
 Which is necessary, but not sufficient, for our proof.
 
-Looking at each element of the result matricies, let $j$ and $k$ be the values
+Looking at each element of the result matrices, let $j$ and $k$ be the values
 of some parallel cells in $(A \mmult{m} B) \mmult{n} C$ and
-$A \mmult{m} (B \mmult{n} C)$ respectively. Then for some indicies of those cells,
+$A \mmult{m} (B \mmult{n} C)$ respectively. Then for some indices of those cells,
 $\bar{a} \oplus \bar{b} \oplus \bar{c} \in
 \Dim(\vec{a} \oplus \vec{b} \oplus \vec{c})$,
 \begin{align*}
@@ -795,7 +820,7 @@ values must be equal.
 \end{proof}
 
 Along the same vein, it's also true that there is a consistent time when
-multimatrix multiplication is communicative - when both multimatricies are
+multimatrix multiplication is communicative - when both multimatrices are
 the same shape and the multiplication is combining them completely into a
 scalar by combining their full width.
 
@@ -816,18 +841,18 @@ results in a zero dimensional multimatrix - a multimatrix with one element which
 
 \section{Multiplicative Identities}
 
-Multiplicative identities for multimatricies depend on the shape of the
-multimatrix they are being multiplied against, just as for regular matricies.
+Multiplicative identities for multimatrices depend on the shape of the
+multimatrix they are being multiplied against, just as for regular matrices.
 However, the multiplicative identity also greatly depends on the size of
 the particular multiplication operation. Making a confusing and frightening
-situation even more so, like loosing a troup of clowns in children's cancer ward.
+situation even more so, like loosing a troupe of clowns in children's cancer ward.
 
 \begin{definition}[Multimatrix Identities]
 \label{mm_mult_ident}
 Let us define $\Ident^n(\vec{v})$ as the $n^{\text{th}}$ order identity with base shape
 $\vec{v}$. This $\Ident^n(\vec{v})$ is a multimatrix with shape,
 \[ \shape{\Ident^n(\vec{v})} = \bigoplus_{i = 1}^n \vec{v}  = n * \vec{v} \]
-That is, it's shape is $n$ successive concatinations of $\vec{v}$.
+That is, it's shape is $n$ successive concatenations of $\vec{v}$.
 Let each element of $\Ident^n(\vec{v})$ is defined as,
 \[ \forall \bar{v_1}, \bar{v_2}, \ldots, \bar{v_n} \text{ each in } \Dim(\vec{v}) \]
 \[ \bigoplus_{i = 1}^n \bar{v_i} = \bar{v_I} \]
@@ -853,7 +878,7 @@ to a multiplication operation.
 
 \begin{theorem}[Multimatrix Multiplicative Identity]
 \label{mm_ident}
-For all multimaticies, $A$, and all vectors, $\vec{m}$ and $\vec{n}$,  on which
+For all multimatrices, $A$, and all vectors, $\vec{m}$ and $\vec{n}$,  on which
 these operations are valid,
 \[
  A \mmult{\shape{\vec{m}}} \Ident^2(\vec{m}) = A
@@ -932,13 +957,13 @@ alternate definition of $\Ident^2$.
 \begin{corollary}[Multiplicative Identity Implication]
 \label{mm_ident_imp}
 If there is a matrix $X$ of shape $\vec{x} \oplus \vec{x}$ such that
-for all matricies, $A$, for which the operation is defined,
+for all matrices, $A$, for which the operation is defined,
 
 \[A \mmult{\shape{\vec{x}}} X = A \]
 
 Then $X = \Ident^2(\vec{x})$.
 
-Or if for all matricies, $B$, for which the operation is defined,
+Or if for all matrices, $B$, for which the operation is defined,
 
 \[X \mmult{\shape{\vec{x}}} B = B \]
 
@@ -947,7 +972,7 @@ Then, again, $X = \Ident^2(\vec{x})$.
 \begin{proof}
 Let $X$ be a matrix of shape $\vec{x} \oplus \vec{x}$. 
 \begin{ppart}
-If for all multimatrixes, $A$, on which $A \mmult{\shape{\vec{x}}} X$ is defined, 
+If for all multimatrices, $A$, on which $A \mmult{\shape{\vec{x}}} X$ is defined, 
 $A \mmult{\shape{\vec{x}}} X = A$ this implies that, in the case of $A = \Ident^2(\vec{x})$,
 
 \begin{align*}
@@ -957,7 +982,7 @@ $A \mmult{\shape{\vec{x}}} X = A$ this implies that, in the case of $A = \Ident^
 \end{align*}
 \end{ppart}
 \begin{ppart}
-If for all multimatrixes, $B$, on which $X \mmult{\shape{\vec{x}}} B$ is defined, 
+If for all multimatrices, $B$, on which $X \mmult{\shape{\vec{x}}} B$ is defined, 
 $X \mmult{\shape{\vec{x}}} B = B$ this implies that, in the case of $B = \Ident^2(\vec{x})$,
 
 \begin{align*}
@@ -985,7 +1010,7 @@ $\shape{X \mmult{k \shape{\vec{x}}} \Ident^n(\vec{x})} = (n-k) * \vec{x}$.
 Let $\bar{x}_1, \bar{x}_2 \ldots \bar{x}_{n-k}$ each be index vectors in $\Dim(\vec{x})$,
 for simplicity denoted as,
 \[ \bar{x}_I = \bigoplus_{i=1}^{n-k} \bar{x}_i \]
-We'll also need a similarly denoted $\bar{y}_1 \ldots \bar{y}_k$ for the free indicies of
+We'll also need a similarly denoted $\bar{y}_1 \ldots \bar{y}_k$ for the free indices of
 the sum below and that shall also be represented as,
 \[ \bar{y}_J = \bigoplus_{j=1}^{k} \bar{y}_j \]
 Then we know that,
@@ -994,7 +1019,7 @@ Then we know that,
   = \sum_{\forall \bar{y}_J} X[\bar{y}_J] \Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I]
 \]
 Notice that $\Ident^n(\vec{x})[\bar{y}_J \oplus \bar{x}_I] = \Ident^n(\vec{x})[\bar{x}_I \oplus \bar{y}_J]$
-since the sub index vectors will always either be equal or not equal, $1$ or $0$, their order doesnt matter.
+since the sub index vectors will always either be equal or not equal, $1$ or $0$, their order doesn't matter.
 So,
 \begin{align*}
   \left(X \mmult{k \shape{\vec{x}}} \Ident^n(\vec{x}) \right)[\bar{x}_I]
@@ -1109,7 +1134,7 @@ and,
 Let $\bar{x}_1, \bar{x}_2 \ldots  \bar{x}_{n-m}$ each in $\Dim(\vec{x})$ and let
 \[\bigoplus_{i = 1}^{n-m} \bar{x}_i = \bar{x}_I \]
 In the sum below, let $\bar{y}_1, \bar{y}_2 \ldots \bar{y}_m$ each in $\Dim(\vec{x})$ be the
-free indicies denoted,
+free indices denoted,
 \[\bigoplus_{j = 1}^m \bar{y}_j = \bar{y}_J \]
 Then,
 \begin{align*}
@@ -1132,7 +1157,7 @@ Then,
 Let $\bar{x}_1, \bar{x}_2 \ldots \bar{x}_{n-m}$ each in $\Dim(\vec{x})$ and let
 \[\bigoplus_{i = 1}^{n-m} \bar{x}_i = \bar{x}_I \]
 In the sum below, let $\bar{y}_1, \bar{y}_2 \ldots \bar{y}_m$ each in $\Dim(\vec{x})$ be the
-free indicies denoted,
+free indices denoted,
 \[\bigoplus_{j = 1}^m \bar{y}_j = \bar{y}_J \]
 Then,
 \begin{align*}
@@ -1153,7 +1178,7 @@ Then,
 \end{ppart}
 \end{proof}
 
-Multimatrix identities also tend to cancel eachother out when multiplied by
+Multimatrix identities also tend to cancel each other out when multiplied by
 multiples of their base shape lengths.
 
 \begin{landscape}
@@ -1163,7 +1188,7 @@ where $m > k$ and $n > k$,
 \[ \Ident^m(\vec{x}) \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) = \Ident^{m+n-2k}(\vec{x}) \]
 \end{theorem}
 \begin{proof}
-Consider that for some indicies vectors
+Consider that for some indices vectors
 $\bar{a}_1, \bar{a}_2 \ldots \bar{a}_{m-k}$
 and $\bar{b}_1, \bar{b}_2 \ldots \bar{b}_{n-k}$ where each
 $\bar{a_i} \in \Dim(\vec{x})$ and each $\bar{b_i} \in \Dim(\vec{x})$.
@@ -1171,7 +1196,7 @@ Now let,
 \[ \bigoplus_{i=1}^{m-k} \bar{a}_i = \bar{a}_I \]
 and,
 \[ \bigoplus_{j=1}^{n-k} \bar{b}_j = \bar{b}_J \]
-In the sums below we'll let $\bar{c}_1, \bar{c}_2 \ldots \bar{c}_k$ be free indicies
+In the sums below we'll let $\bar{c}_1, \bar{c}_2 \ldots \bar{c}_k$ be free indices
 each in $\Dim(\vec{x})$ and denote,
 \[ \bigoplus_{l = 1}^k \bar{c}_l = \bar{c}_K \]
 
@@ -1255,7 +1280,7 @@ Which is exactly equal the result we were looking for,
 A final useful theorem (definition?) happens to involve 0 overlap multiplication.
 You'll notice that I very carefully constructed my definition to allow for this
 definition (theorem?). Does it still count as a theorem if it only works because
-I tweeked the definition of multimatrix multiplication to make it fit? I feel
+I tweaked the definition of multimatrix multiplication to make it fit? I feel
 a bit like Tommy Wiseau writing my own sex scene into the script... twice... God,
 what a tool.
 
@@ -1287,7 +1312,7 @@ and $\bar{b} \in \Dim(\vec{b}):$
 Given a multimatrix, $X$, you might ask, ``What is the multiplicative inverse of $X$?''
 And I would have to tell you that your question is not well formed. Do you mean left multiplication
 or right multiplication? Multiplication by what width? It's not clear which of these specifications
-is even required: consider that multiplication is not communicative for regular 2d matricies but
+is even required: consider that multiplication is not communicative for regular 2d matrices but
 those have simple multiplicative inverses (if an inverse exists). 
 
 So let's clarify what we can.
@@ -1369,6 +1394,7 @@ This is also true in the case where $M = \Ident^2(\vec{m})$. In which case,
 \end{proof}
 
 \begin{theorem}[Shape of Inverses]
+\label{inverse_shape}
 If $\RMult[n,Y]$ is an inverse of $\RMult[m,X]$ where $\shape{X} = \vec{m} \oplus \vec{x}$ and
 $\shape{\vec{m}} = m$ then $n \le \shape{\shape{X}}-m$.
 
@@ -1448,7 +1474,7 @@ Therefore $\LMult[n,Y]$ is an inverse of $\LMult[m,X]$.
 \end{proof}
  
 This is all well and good, but I'm sure what you really want to know is how to find a multiplicative inverse.
-It seams increadibly complicated until you realize that there is a way to relate any multimatrix multiplication
+It seams incredibly complicated until you realize that there is a way to relate any multimatrix multiplication
 to a 2d matrix multiplication. We'll first need to define a special function:
 
 \begin{definition}[Indexing Function]
@@ -1467,57 +1493,22 @@ And then inverse function takes an integer and returns a vector in $\Dim(\vec{x}
     \right\rfloor + 1
 \]
 Where $\Idx[\vec{x}]^{-1}(n)[i]$ is the $i$th value of the vector output of $\Idx[\vec{x}]^{-1}(n)$.
-Also, $\remainder$ is the remainder function.
+And where, $\remainder$ is the remainder function.
+That is, for integers $a$, $b$, and $c$, $\remainder(a,b) = c$ if and only if $0 \le c < b$
+and there exists an integer $m$ such that $a = mb + c$.
 \end{definition}
 
 \begin{landscape}
 Let's prove those properties of the indexing function before moving on. If we prove that the inverse function
-really is an inverse, then that implies the function is one-to-one. So let's just do that:
+really is an inverse, then that implies the function is one-to-one. So let's start with that:
 
 \begin{proof}
-Let $\bar{x} \in \Dim(\vec{x})$ and let $k$ be any index of $\bar{x}$.
-
-\begin{align*}
-  \Idx[\vec{x}]^{-1}(\Idx[\vec{x}](\bar{x}))[k] &= 
-  \left\lfloor
-    \frac{\remainder\left(
-      \sum_{1 \le i \le \shape{\vec{x}}} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
-      , \prod_{1 \le m \le k} \vec{x}[m]\right)}
-    {\prod_{1 \le n < k} \vec{x}[n]}
-  \right\rfloor + 1 \\
-  &=
-  \left\lfloor
-    \frac{\remainder\left(
-      \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
-      , \prod_{1 \le m \le k} \vec{x}[m]\right)}
-    {\prod_{1 \le n < k} \vec{x}[n]}
-  \right\rfloor + 1 \\
-  &=
-  \left\lfloor
-    \frac{
-      \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
-    }
-    {\prod_{1 \le n < k} \vec{x}[n]}
-  \right\rfloor + 1 \\
-  &=
-  \left\lfloor
-    \frac{
-      \sum_{1 \le i < k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
-    }
-    {\prod_{1 \le n < k} \vec{x}[n]}
-    +
-    (\bar{x}[k]-1)
-  \right\rfloor + 1 \\
-  &= \bar{x}[k]-1+1 \\
-  &= \bar{x}[k]
-\end{align*}
-
-A couple of leaps of logic there rely on the fact that 
+For this proof, we'll need to know that, for all $\bar{x} \in \Dim(\vec{x})$,
 \[
   \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
   < \prod_{1 \le m \le k} \vec{x}[m]
 \]
-Which is true because
+Which follows from this logic,
 \begin{align*}
   \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right)
   &< \prod_{1 \le m \le k} \vec{x}[m] \\
@@ -1534,21 +1525,86 @@ Which is true because
   - \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
   - 1
   &< \prod_{1 \le m \le k} \vec{x}[m] \\
-  \left( \prod_{1 \le j \le k} \vec{x}[j] \right)-1
+  \left( \prod_{1 \le j < k+1} \vec{x}[j] \right)
+  + \sum_{1 \le (i-1) < k} \left( \prod_{1 \le j < (i-1)+1} \vec{x}[j] \right)
+  - \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  - 1
+  &< \prod_{1 \le m \le k} \vec{x}[m] \\
+  \left( \prod_{1 \le j \le k} \vec{x}[j] \right)
   + \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
   - \sum_{1 < i \le k} \left( \prod_{1 \le j < i} \vec{x}[j] \right)
+  -1
   &< \prod_{1 \le m \le k} \vec{x}[m] \\
   \left( \prod_{1 \le j \le k} \vec{x}[j] \right)-1
   &< \prod_{1 \le m \le k} \vec{x}[m]
 \end{align*}
-Note in the 4th step there that $\bar{x}[i] \le \vec{x}[i]$ so replacing it with $\vec{x}[i]$
+Note that, in the 3rd step, $\bar{x}[i] \le \vec{x}[i]$ so replacing it with $\vec{x}[i]$
 will not increase the maximum value.
 
-So, that concludes the proof. Since the inverse works for any index of $\bar{x}$ we know that the inverse works to restore the
+
+Now, let $\bar{x} \in \Dim(\vec{x})$ and let $k$ be any index of $\bar{x}$.
+Then lets apply the indexing function and its inverse to $\bar{x}$ and see if we get
+back $\bar{x}$. Firstly,
+
+\begin{align*}
+  \Idx[\vec{x}]^{-1}(\Idx[\vec{x}](\bar{x}))[k] &= 
+  \left\lfloor
+    \frac{\remainder\left(
+      \sum_{1 \le i \le \shape{\vec{x}}} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+      , \prod_{1 \le m \le k} \vec{x}[m]\right)}
+    {\prod_{1 \le n < k} \vec{x}[n]}
+  \right\rfloor + 1 \\
+  &=
+  \left\lfloor
+    \frac{\remainder\left(
+      \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+      , \prod_{1 \le m \le k} \vec{x}[m]\right)}
+    {\prod_{1 \le n < k} \vec{x}[n]}
+  \right\rfloor + 1
+\end{align*}
+Because $\prod_{1 \le j < i} \vec{x}[j]$ is a multiple of $\prod_{1 \le m \le k} \vec{x}[m]$
+when $i > k$ so those terms in the sum will not affect the output of that $\remainder$ operation.
+And since $0 \le \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) < \prod_{1 \le m \le k} \vec{x}[m]$,
+we can drop that $\remainder$ operation entirely.
+\begin{align*}
+  \Idx[\vec{x}]^{-1}(\Idx[\vec{x}](\bar{x}))[k] &= 
+  \left\lfloor
+    \frac{
+      \sum_{1 \le i \le k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+    }
+    {\prod_{1 \le n < k} \vec{x}[n]}
+  \right\rfloor + 1 \\
+  &=
+  \left\lfloor
+    \frac{
+      \sum_{1 \le i < k} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+    }
+    {\prod_{1 \le n < k} \vec{x}[n]}
+    +
+    (\bar{x}[k]-1)
+  \right\rfloor + 1 \\
+\end{align*}
+Then with a small change we can use our earlier lemma again to show that the
+residue under that floor function is non negative and less than 1 and things move swiftly from there,
+\begin{align*}
+  \Idx[\vec{x}]^{-1}(\Idx[\vec{x}](\bar{x}))[k] &= 
+  \left\lfloor
+    \frac{
+      \sum_{1 \le i \le k-1} \left( (\bar{x}[i]-1) \prod_{1 \le j < i} \vec{x}[j] \right) 
+    }
+    {\prod_{1 \le n \le k-1} \vec{x}[n]}
+  \right\rfloor
+  +(\bar{x}[k]-1)+1 \\
+  &= 0+\bar{x}[k]-1+1 \\
+  &= \bar{x}[k]
+\end{align*}
+
+Which wraps up the proof. Since the inverse works for any value $k$ of $\bar{x}$ we know that the inverse works to restore the
 whole of the vector. Thus, $\Idx[\vec{x}]^{-1}$ is indeed the inverse of $\Idx[\vec{x}]$.
 \end{proof}
 
-TODO:exposition 
+We'll also need to know how to concatenate vectors under this indexing function for later proofs.
+By which I mean we'll need the following theorem.
 
 \begin{theorem}[Index of Concatenated Vectors]
 Let $\vec{a}$ and $\vec{b}$ be any two vectors of natural numbers. Then for all $\bar{a} \in \Dim(\vec{a})$
@@ -1581,12 +1637,16 @@ and $\bar{b} \in \Dim(\vec{b})$:
 \end{proof}
 
 Now you might be wondering what that indexing function has to do with inverting
-multimatricies. I said before that it we would need to show how the multiplication
-of two multimatricies can be converted into an equivelent multiplication of two
-2d matricies. Here's how that's done,
+multimatrices. I said before that it we would need to show how the multiplication
+of two multimatrices can be converted into an equivalent multiplication of two
+2d matrices. But the relevant theorem can actually be stated even more generally.
 
 \begin{theorem}[Reshaping Multimatrix Multiplication]
-Let $A$ and $B$ be two multimatricies of shapes $\shape{A} = \vec{a} \oplus \vec{c}$ and
+Any multimatrix multiplication problem can be reshaped into a new multimatrix
+multiplication problem so long as the total number of elements in each of the multimatrices
+is preserved.
+
+Formally, let $A$ and $B$ be two multimatrices of shapes $\shape{A} = \vec{a} \oplus \vec{c}$ and
 $\shape{B} = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting in the $\shape{\vec{c}}$
 width multiplication of $A$ and $B$, that is,
 \[ A \mmult{\shape{\vec{c}}} B = C \]
@@ -1595,7 +1655,7 @@ $\shape{\Dim(\vec{a})} = \shape{\Dim(\vec{x})}$,
 $\shape{\Dim(\vec{b})} = \shape{\Dim(\vec{y})}$,
 and 
 $\shape{\Dim(\vec{c})} = \shape{\Dim(\vec{z})}$.
-Then for multimatricies $X$, $Y$, and $Z$ defined such that,
+Then for multimatrices $X$, $Y$, and $Z$ defined such that,
 \[\forall i : 0 \le i < \size(A) \]
 \[ X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i)] = A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i)] \]
 
@@ -1612,7 +1672,7 @@ it is true that,
 \[ X \mmult{\shape{\vec{z}}} Y = Z \]
 \end{theorem}
 \begin{proof}
-Let $A$ and $B$ be two multimatricies of shapes $\shape{A} = \vec{a} \oplus \vec{c}$ and
+Let $A$ and $B$ be two multimatrices of shapes $\shape{A} = \vec{a} \oplus \vec{c}$ and
 $\shape{B} = \vec{c} \oplus \vec{b}$, and let $C$ be the multimatrix resulting from,
 \[ A \mmult{\shape{\vec{c}}} B = C \]
 
@@ -1621,7 +1681,7 @@ $\shape{\Dim(\vec{a})} = \shape{\Dim(\vec{x})}$,
 $\shape{\Dim(\vec{b})} = \shape{\Dim(\vec{y})}$,
 and 
 $\shape{\Dim(\vec{c})} = \shape{\Dim(\vec{z})}$.
-And let multimatricies $X$, $Y$, and $Z$ be defined such that,
+And let multimatrices $X$, $Y$, and $Z$ be defined such that,
 \[\forall i : 0 \le i < \size(A) \]
 \[ X[\Idx[\vec{x} \oplus \vec{z}]^{-1}(i)] = A[\Idx[\vec{a} \oplus \vec{c}]^{-1}(i)] \]
 
@@ -1682,39 +1742,178 @@ Then if you let $\bar{x} = \Idx[\vec{x}](i_a)$ and $\bar{y} = \Idx[\vec{y}](i_b)
 \end{proof}
 \end{landscape}
 
-Therefore for any $\RMult(m,X)$ you can potentially find an inverse with
-multiplication width $n \le \shape{\shape{X}}-m$ by simply reshaping the problem into
-one using standard two dimensional matricies wich already has thoroughly
-explored methods for solving.
+Therefore for any $\RMult(m,X)$ or $\LMult(m,X)$ you can find an inverse (if one exists)
+by simply reshaping the problem into one using standard two dimensional matrices.
+A problem which already has thoroughly explored methods for solving.
+
 For example, to find an $\RMult(n,Y)$ which is the inverse of $\RMult(m,X)$
 you'd reshape $X \mmult{n} Y = \Ident^2(\vec{m})$ into $A \mmult{1} B = \Ident^2(\left<\size(\Dim(\vec{m}))\right>)$
 where $\shape{A} = \left<\size(\Dim(\vec{m} \oplus \vec{x_l})), \size(\Dim(\vec{x_r}))\right>$
 and   $\shape{B} = \left<\size(\Dim(\vec{x_r})),  \size(\Dim(\vec{y}))\right>$.
-Then solve for $B$ and return the problem to the original shape to get $Y$.
+Then solve for $B$. And when we return the problem to the original shape, we get $Y$.
 
-%todo: give example
+\begin{example}
+Lets find all the inverses of $X \mmult{2} A$ where $\shape{A} = <2,2,2,2>$ and
+its values are given by this table:
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{c c c c | c}
+$\bar{a}[1]$ & $\bar{a}[2]$ & $\bar{a}[3]$ & $\bar{a}[4]$ & $A[\bar{a}]$ \\
+\hline
+1           & 1           & 1           & 1           & -1 \\
+2           & 1           & 1           & 1           & 2 \\
+1           & 2           & 1           & 1           & 0 \\
+2           & 2           & 1           & 1           & 0 \\
+
+1           & 1           & 2           & 1           & 1 \\
+2           & 1           & 2           & 1           & 0.5 \\
+1           & 2           & 2           & 1           & 0 \\
+2           & 2           & 2           & 1           & 0 \\
+
+1           & 1           & 1           & 2           & 0 \\
+2           & 1           & 1           & 2           & 0 \\
+1           & 2           & 1           & 2           & -1 \\
+2           & 2           & 1           & 2           & 2 \\
+
+1           & 1           & 2           & 2           & 0 \\
+2           & 1           & 2           & 2           & 0 \\
+1           & 2           & 2           & 2           & 1 \\
+2           & 2           & 2           & 2           & 0.5
+\end{tabular}
+\end{center}
+\end{table}
+Then by theorem \ref{inverse_shape} we know that the inverses will be of the form,
+$X \mmult{2} A \mmult{2} B$ or $X \mmult{2} A \mmult{1} C$ for multimatrices
+$B$ or $C$ if they exist.
+
+Let's try solving $A \mmult{2} B = \Ident^2(\left<2,2\right>)$ first to get $B$.
+We can first tell that $\shape{B} = \left<2,2,2,2\right>$ based on the shape of $A$ and
+the shape of the RHS.
+This problem can then be reshaped to the following 2d problem,
+
+TODO: what the fuck these numbers are wrong.
+\[
+\left[
+  \begin{array}{c c c c}
+    -1 & 0 & 2 & 0 \\ 
+    0 & -1 & 0 & 2 \\
+    1 & 0 & 0.5 & 0 \\
+    0 & 1 & 0 & 0.5
+  \end{array}
+\right]
+B' =
+\left[
+  \begin{array}{c c c c}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    0 & 0 & 0 & 1
+  \end{array}
+\right]
+\]
+Which, once solved, yields,
+\[
+B' =
+\left[
+  \begin{array}{c c c c}
+    -1/5 & 0 & 2/5 & 0 \\
+    0 & -1/5 & 0 & 2/5 \\
+    4/5 & 0 & 2/5 & 0 \\
+    0 & 4/5 & 0 & 2/5
+  \end{array}
+\right]
+\]
+Therefore $B$ is,
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{c c c c | c}
+$\bar{b}[1]$ & $\bar{b}[2]$ & $\bar{b}[3]$ & $\bar{b}[4]$ & $B[\bar{b}]$ \\
+\hline
+1           & 1           & 1           & 1           & -1/5 \\
+1           & 1           & 1           & 2           & 0 \\
+1           & 1           & 2           & 1           & 2/5 \\
+1           & 1           & 2           & 2           & 0 \\
+1           & 2           & 1           & 1           & 0 \\
+1           & 2           & 1           & 2           & -1/5 \\
+1           & 2           & 2           & 1           & 0 \\
+1           & 2           & 2           & 2           & 2/5 \\
+2           & 1           & 1           & 1           & 4/5 \\
+2           & 1           & 1           & 2           & 0 \\
+2           & 1           & 2           & 1           & 2/5 \\
+2           & 1           & 2           & 2           & 0 \\
+2           & 2           & 1           & 1           & 0 \\
+2           & 2           & 1           & 2           & 4/5 \\
+2           & 2           & 2           & 1           & 0 \\
+2           & 2           & 2           & 2           & 2/5 
+\end{tabular}
+\end{center}
+\end{table}
+
+Now to solve for $C$ in $A \mmult{1} C = \Ident^2(\left<2,2\right>0$ we know
+that $\shape{C} = \left<2,2\right>$.
+And if we reshape the problem we get,
+
+\[
+\left[
+  \begin{array}{c c}
+    -1 & 2 \\
+    0 & 0 \\
+    1 & 0.5 \\
+    0 & 0 \\
+    0 & 0 \\
+    -1 & 2 \\
+    0 & 0 \\
+    1 & 0.5
+  \end{array}
+\right]
+C
+=
+\left[
+  \begin{array}{c c}
+    1 & 0 \\
+    0 & 0 \\
+    0 & 1 \\
+    0 & 0 \\
+    0 & 0 \\
+    1 & 0 \\
+    0 & 0 \\
+    0 & 1
+  \end{array}
+\right]
+\]
+And through some miracle (or author fiat) this actually has a solution,
+\[
+  C =
+  \left[
+    \begin{array}{c c}
+      -1/5 & 4/5 \\
+      2/5 & 2/5
+    \end{array}
+  \right]
+\]
+\end{example}
 
 \section{Hadamard Product}
 
 What the hell is a `Hadamard product'? The Hadamard product \cite{wiki:hadamard}
-of two matricies is how one would actually expect matrix multiplication to work.
+of two matrices is how one would actually expect matrix multiplication to work.
 
-In short, if two matricies, $A$ and $B$ have the same shape,
+In short, if two matrices, $A$ and $B$ have the same shape,
 \[ \shape{A} = \shape{B} = \left<r,c\right> \]
 Then their Hadamard product, $A \bullet B$, is the same shape and each element
 is just the product of the corresponding elements of $A$ and $B$. That is,
 \[ (A \bullet B)[r,c] = A[r,c] B[r,c] \]
 
-This seems to extend quite naturally into the world of multimatricies.
+This seems to extend quite naturally into the world of multimatrices.
 But hold on - there's a catch. While the Hadamard product only logically applies
-to regular matricies when their shapes are exactly equal, there are case where
-the Hadamard product can easily be applied to differently shaped multimatricies,
+to regular matrices when their shapes are exactly equal, there are case where
+the Hadamard product can easily be applied to differently shaped multimatrices,
 they just need to have overlapping portions of their shape vectors, just as
 with multimatrix multiplication.
 
 \begin{definition}[Multimatrix Hadamard Product]
 \label{multi_had_prod}
-Let $A$ and $B$ be multimatricies such that $\shape{A} = \vec{a} \oplus \vec{c}$
+Let $A$ and $B$ be multimatrices such that $\shape{A} = \vec{a} \oplus \vec{c}$
 and $\shape{B} = \vec{c} \oplus \vec{b}$. Also let $c = \shape{\vec{c}}$.
 Then, the multimatrix Hadamard product, $A \dmult{c} B$, is a multimatrix
 such that,
@@ -1742,7 +1941,7 @@ And for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
 TODO: exposition
 
 \begin{theorem}[Hadamard Product Associativity]
-Let $A$, $B$, and $C$ be multimatrixes such that $\shape{A} = \vec{a} \oplus \vec{m}$,
+Let $A$, $B$, and $C$ be multimatrices such that $\shape{A} = \vec{a} \oplus \vec{m}$,
 $\shape{B} = \vec{m} \oplus \vec{b} \oplus \vec{n}$ and $\shape{C} = \vec{n} \oplus \vec{c}$,
 where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$.
 Then $(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
@@ -1807,7 +2006,7 @@ For any $\bar{x} \in \Dim(\vec{x})$,
 
 \begin{theorem}[Cubic Identity Multiplication]
 \label{hada_cubic}
-If $A$ and $B$ are multimatrixes of shaep, $\shape{A} = \vec{a} \oplus \vec{x}$
+If $A$ and $B$ are multimatrices of shape, $\shape{A} = \vec{a} \oplus \vec{x}$
 and $\shape{B} = \vec{x} \oplus \vec{b}$ respectively. Then,
 \[ A \mmult{\shape{\vec{x}}} \Ident^3(\vec{x}) \mmult{\shape{\vec{x}}} B = A \dmult{\shape{\vec{x}}} B \]
 \end{theorem}
@@ -1826,7 +2025,7 @@ For all $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and $\bar{x} \
 \section{Exercises}
 
 \begin{exercise}
-Let $A$, $B$, and $C$ be multimatricies such that $\shape{A} = \left<1,2,3\right>$,
+Let $A$, $B$, and $C$ be multimatrices such that $\shape{A} = \left<1,2,3\right>$,
 $\shape{B} = \left<3,1,2\right>$ and $\shape{C} = \left<3,2,1\right>$. For each of these
 multiplications determine if it is valid, and if so, what the resulting
 shape would be:
@@ -1897,7 +2096,7 @@ the elements of $X$, that is, for all $\bar{v} \in \Dim(\shape{X})$
 What is $dY/dX$?
 \end{exercise}
 
-\chapter{Other Operations With Multimatricies}
+\chapter{Other Operations With Multimatrices}
 
 \begin{displayquote}
 ``You can't just start a section with a subsection heading. At least put a quote
@@ -1919,12 +2118,12 @@ In other words, multiplying $A$ by a scalar $s$ simply multiplies each of
 it's elements by that scalar.
 \end{definition}
 
-But actually, you'll find that scalars can be modeled equally well by multricies
+But actually, you'll find that scalars can be modeled equally well by matrices
 with the shape $\left<\right>$. It works with multiplication and derivatives. Look:
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Multiplication Equivalence]
 \label{s_mm_mult_equiv}
-For any multiplication operation defined between multimatricies and scalars,
+For any multiplication operation defined between multimatrices and scalars,
 the scalar may be replaced by an equivalent empty-shaped multimatrix whose
 single value is that of the scalar.
 
@@ -1955,7 +2154,7 @@ So $sA = As$. Also,
 	&= (S \mmult{0} A)[\bar{a}] \\
 \end{align*}
 So, $sA = S \mmult{0} A$.
-Finally, by similiar reasoning,
+Finally, by similar reasoning,
 \begin{align*}
 	(sA)[\bar{a}]
 	&= (s)A[\bar{a}] \\
@@ -1978,7 +2177,7 @@ It wasn't until I noticed this that I began to suspect that the same might be tr
 of the derivative rules.
 A quick check confirmed that the dimensionality worked out and it seems intuitive
 that we would always be able to treat scalars
-as empty-shape multimatricies but let's canonize it.
+as empty-shape multimatrices but let's canonize it.
 
 \begin{theorem}[Empty Shape Multimatrix and Scalar Domain Derivative Equivalence]
 \label{s_mm_domain_equiv}
@@ -1997,7 +2196,7 @@ Let $\bar{f} \in \Dim(\vec{f})$ then for $F(x)[\vec{f}] = G(X)[\vec{f}]$.
 Since $\partial F(x)[\vec{f}] / \partial x$ is defined as the rate of
 change of $F(x)[\vec{f}]$ with respect to $x$, it stands to reason that,
 $\partial F(X[\left<\right>])[\vec{f}] / \partial X[\left<\right>]$ is
-equivalent by definition. By are given $G(X) = F(X[\left<\right>])$ we
+equivalent by definition. By our given $G(X) = F(X[\left<\right>])$ we
 can then also say that,
 \[
 \frac{ \partial F(X[\left<\right>])[\vec{f}] }{ \partial X[\left<\right>] }
@@ -2051,9 +2250,9 @@ Let $A, B, C \in \mathbb{R}^{\vec{x}}$. If
 Then
 \[ \forall \bar{x} \in \Dim(\vec{x}):
    C[\bar{x}] = A[\bar{x}] + B[\bar{x}] \]
-In other words, adding two multimatricies (which must be of the same shape) results
+In other words, adding two multimatrices (which must be of the same shape) results
 in a multimatrix of the same shape with elements which are the sum of the corresponding
-elements of the added multimatricies.
+elements of the added multimatrices.
 \end{definition}
 
 Multimatrix subtraction is defined as the inverse of multimatrix addition.
@@ -2063,11 +2262,11 @@ Let $A, B \in \mathbb{R}^{\vec{x}}$. Then,
 \[ (A + B) - B = A \]
 \end{definition}
 
-The following should be obvious, condesendingly so,
+The following should be obvious, condescendingly so,
 
 \begin{theorem}[Equivalent Addition for Subtraction]
 \label{eq_add_sub_thm}
-For any multimatricies $A$ and $B$ where $\shape{A} = \shape{B}$,
+For any multimatrices $A$ and $B$ where $\shape{A} = \shape{B}$,
 \[ A - B = A + (-1)B \]
 \end{theorem}
 \begin{proof}
@@ -2198,7 +2397,7 @@ And,
 We call $l$ the index of transpose.
 \end{definition}
 
-Here's an example - get out your crayons and follow along.
+Here's an example:
 
 \begin{example}
 Let's construct some multimatrix, $M$, with a shape:
@@ -2208,10 +2407,10 @@ multimatrix:
 \[ \shape{\Tran(M, 1)} = \left<2,7,5,9,3\right> \]
 And... how about the third:
 \[ \shape{\Tran(M, 3)} = \left<5,9,3,2,7\right> \]
-You can see, it's as though I cut off the front of the shape vector and transfered
+You can see, it's as though I cut off the front of the shape vector and transferred
 it to the end of the vector.
 
-You do the same thing with indicies. So,
+You do the same thing with indices. So,
 \[ M[1,2,3,4,5] = \Tran(M, 3)[4,5,1,2,3] \]
 \end{example}
 
@@ -2233,15 +2432,14 @@ That is, a value $0 \le \remainder(n, \shape{\shape{X}}) < \shape{\shape{X}}$ su
 integer $k$ where, $n = k\shape{\shape{X}} + \remainder(n, \shape{\shape{X}})$.
 \end{definition}
 
-This extension is consisent with the prevous definition because, for any
+This extension is consistent with the previous definition because, for any
 index of transpose, $l$, that would be covered by the original definition,
 $0 \le l \le \shape{\shape{X}}$, you can see that, in all but one case $\remainder(l, \shape{\shape{X}}) = l$.
 The exception, $l = \shape{\shape{X}}$ is covered by showing that
 $\remainder(\shape{\shape{X}}, \shape{\shape{X}}) = 0$ and $\Tran(X, 0) = \Tran(X, \shape{\shape{X}})$. 
 
-Thus, we (by which I mean \textit{me} since \textit{you} certainly haven't done any
-of the work) have shown a natural equivalent class \cite{book:abstract} of transpose
-operations. On multimatricies with a shape of some length $n$ there are $n$ unique
+Thus, we have shown a natural equivalent class \cite{book:abstract} of transpose
+operations. On multimatrices with a shape of some length $n$ there are $n$ unique
 transpose; $\Tran(X, i)$ for all $0 \le i < n$. All other transposes are equivalent
 to one of these base transposes by our extended definition.
 
@@ -2250,7 +2448,7 @@ isomorphic \cite{book:abstract} to a more manageable group.
 
 \begin{theorem}[Isomorphism of Transpostion and Modular Integers]
 \label{tran_int_iso}
-Let $\mathbb{T}_n$ be the set of possible transpositions on multimatricies with
+Let $\mathbb{T}_n$ be the set of possible transpositions on multimatrices with
 shapes of length $n$. Let $\circ$ be the operation of composition. Then
 $(\mathbb{T}_n, \circ)$ is a group which is isomorphic to the group of
 integers mod $n$ under addition. That is,
@@ -2259,16 +2457,16 @@ integers mod $n$ under addition. That is,
 \begin{proof}
 I'll need to tackle this proof in two parts. First I'll need to show that
 that set of transpositions is a group under composition, then I'll need to
-provide a one-to-one and onto map that preseves the respective group operations
+provide a one-to-one and onto map that preserves the respective group operations
 between transpositions and integers mod $n$.
 
 \begin{ppart}
-To begin, I'll show that the set of all transpositions on multimatricies 
+To begin, I'll show that the set of all transpositions on multimatrices 
 with shapes of length $n$ form a group under composition.
 
 Let's look at the composition of some two transposes on a multimatrix.
 So, let $A$ be a multimatrix with shape of length $n$. Now let $x$ and $y$
-be indicies of transpositions. Then what is $\Tran(\Tran(A, x), y)$?
+be indices of transpositions. Then what is $\Tran(\Tran(A, x), y)$?
 To apply the the first transpose we need to break $\shape{A}$ into two vectors,
 so let $\shape{A} = \vec{l} \oplus \vec{r}$ where $\shape{\vec{l}} = x$.
 
@@ -2321,7 +2519,7 @@ Continuing our definition of transposition,
   A[\bar{a} \oplus \bar{b} \oplus \bar{c}]
 \end{align*}
 
-See now that this composit operation is also a transposition, $\Tran(A, z)$ where,
+See now that this composite operation is also a transposition, $\Tran(A, z)$ where,
 $z = \shape{\vec{a} \oplus \vec{b}}$.
 So by definition,
 \begin{align*}
@@ -2372,7 +2570,7 @@ Continuing our definition of transposition,
   A[\bar{a} \oplus \bar{b} \oplus \bar{c}]
 \end{align*}
 
-See now that this composit operation is also a transposition, $\Tran(A, z)$ where,
+See now that this composite operation is also a transposition, $\Tran(A, z)$ where,
 $z = \shape{\vec{a}}$.
 So by definition,
 \begin{align*}
@@ -2392,8 +2590,8 @@ And,
 \end{align*}
 \end{case}
 
-So I've shown that in both cases, the composit function of two transposes is
-itself a transpose. So transposes of multimatrcies of shape of length $n$ are
+So I've shown that in both cases, the composite function of two transposes is
+itself a transpose. So transposes of multimatrices of shape of length $n$ are
 a closed group under composition.
 \end{ppart}
 
@@ -2408,11 +2606,11 @@ with index of transposition $i$ that is in $\mathbb{T}_n$''.
 
 So let's just define $\phi$.
 \[ \phi(\Tran_i) = i \]
-Done. I'm a genious.
+Done. I'm a genius.
 
-Ok, the hard part is showing that it preserves the group operations.
+OK, the hard part is showing that it preserves the group operations.
 Let's go back to our example in the first part of this proof. Let $A$ be
-any multimatrix with shape length $n$. Then let there be two transpositons
+any multimatrix with shape length $n$. Then let there be two transpositions
 $\Tran_x$ and $\Tran_y$ which we'll apply in series. First remember that
 to define $\Tran_x$ we needed to divide $\shape{A}$ into $\shape{A} = \vec{l} \oplus \vec{r}$
 where $\shape{\vec{l}} = x$. Then we'd say that
@@ -2440,7 +2638,7 @@ And note that,
 \[ x = \shape{\vec{a}} \]
 \[ y = \shape{\vec{b}} \]
 
-And we showed that the composit $\Tran_z = \Tran_y \circ \Tran_x$ was such
+And we showed that the composite $\Tran_z = \Tran_y \circ \Tran_x$ was such
 that,
 \[ z = \shape{\vec{a} \oplus \vec{b}} \]
 
@@ -2474,7 +2672,7 @@ And note that,
 \[ x = \shape{\vec{a} \oplus \vec{b}} \]
 \[ y = \shape{\vec{c} \oplus \vec{a}} \]
 
-And we showed that the composit $\Tran_z = \Tran_y \circ \Tran_x$ was such
+And we showed that the composite $\Tran_z = \Tran_y \circ \Tran_x$ was such
 that,
 \[ z = \shape{\vec{a}} \]
 
@@ -2563,7 +2761,7 @@ shape vector. Then for any integer $k$,
 \[ \Tran(\Ident^n(\vec{x}), k\shape{\vec{x}}) = \Ident^n(\vec{x}) \]
 \end{theorem}
 \begin{proof}
-Consider that for some ordered set of indicies
+Consider that for some ordered set of indices
 $\{\bar{x}_1, \bar{x}_2, \ldots \bar{x}_n\} = X$ such that for each
 $\bar{x}_i$ it is true that $\bar{x}_i \in \Dim(\vec{x})$.
 Let $X'$ be some ordered permutation of $X$, then we can reason that,
@@ -2599,7 +2797,7 @@ Therefore
 $\Tran(\Ident^n(\vec{x}), k\shape{\vec{x}}) = \Ident^n(\vec{x})$
 \end{proof}
 
-The above theorem is useful whenever you come accross a transpose of a
+The above theorem is useful whenever you come across a transpose of a
 multimatrix identity.
 
 Another useful theorem for whenever you need to change the order of
@@ -2661,7 +2859,7 @@ TODO: exposition here
 \begin{theorem}[Communicativity of Addition and Transposition]
 \label{com_add_tran_thm}
 Let $x$ be in $\mathbb{N} \cup \{0\}$ and let $A$ and $B$ be
-multimatricies such that $\shape{A} = \shape{B}$ and $\Tran(A, x)$ is defined.
+multimatrices such that $\shape{A} = \shape{B}$ and $\Tran(A, x)$ is defined.
 Then,
 \[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
 \end{theorem}
@@ -2685,7 +2883,7 @@ Prove Theorem \ref{com_add_tran_thm} which is that,
 
 \begin{exercise}
 Let $A$ be a multimatrix such that $\shape{A} = <1,2,3,4,5>$,
-Find the shape of the following trasnposes:
+Find the shape of the following transposes:
 \begin{enumerate}
 \item $\shape{\Tran(A, 3)} = ?$
 \item $\shape{\Tran(A, 4)} = ?$
@@ -2749,7 +2947,7 @@ $\shape{X} = \vec{l} \oplus \vec{r}$
 
 \begin{theorem}[Right Multiplicative Derivative]
 \label{right_mult_derivative}
-Let $A$ and $X$ be multimatricies such that $A \mmult{n} X$ is
+Let $A$ and $X$ be multimatrices such that $A \mmult{n} X$ is
 defined. Then,
 \[ \frac{d(A \mmult{n} X)}{dX} = A \mmult{n} \Ident^2(\shape{X}) \]
 \end{theorem}
@@ -3571,8 +3769,8 @@ depend on $W_j$. So we can just use the chain rule and the right multiplicative 
     \mmult{\shape{\shape{L_i}}}
     \left(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} \Ident^2(\shape{W_i})\right)
 \]
-Now will a little manipulation, keeping in mind how identies are sometimes commutative (Thm. \ref{ident_commute})
-and how cubic identities collapse into hadamard products (Thm. \ref{hada_cubic}),
+Now will a little manipulation, keeping in mind how identities are sometimes commutative (Thm. \ref{ident_commute})
+and how cubic identities collapse into Hadamard products (Thm. \ref{hada_cubic}),
 \begin{align*}
   \frac{dL_i}{dW_{j=i}}
   &=
@@ -3662,14 +3860,18 @@ left multiplicative rule to find that,
 (Star Trek Deep Space Nine, Season 4. Episode 1 \& 2 \cite{stds9})
 \end{displayquote}
 
+We all know how matrix multiplication can be done by partitions.
+This chapter explains how that extends to multimatrices.
+So first, let's define some notion of multimatrix partitions and how multimatrices can be put together to form
+larger multimatrices. It's not quite so easy as with regular 2d matrices so we'll even have to be formal
+about how we bring them together:
+
 \begin{definition}[Multimatrix Concatenation]
-Let $A$ and $B$ be multimatricies of shape $\shape{A} = \vec{a}$ and
+Let $A$ and $B$ be multimatrices of shape $\shape{A} = \vec{a}$ and
 $\shape{B} = \vec{b}$ respectively. Then if, for all $i \ne n$,
 $\vec{a}[i] = \vec{b}[i]$, the following operation is valid,
 \[ A \mconcat{n} B \]
-In layman's terms, this is the operation of stacking two similar multimatricies on top of or to the side of one another.
-It's just complicated by this being an opperation in multiple dimensions.
-Formally we'll say that, 
+And results in a multimatrix such that,
 \[ \shape{\shape{A \mconcat{n} B}} = \shape{\shape{A}} = \shape{\shape{B}} \]
 \[
   \shape{A \mconcat{n} B}[i] = \left\{
@@ -3679,7 +3881,7 @@ Formally we'll say that,
   \end{array}
  \right.
 \]
-And for all sub index metricies $\bar{l}$ and $\bar{r}$ of lengths $\shape{\bar{l}} = n-1$ and $\shape{\bar{r}} = \shape{\shape{A}}-n$ respectively,
+And for all sub index vectors $\bar{l}$ and $\bar{r}$ of lengths $\shape{\bar{l}} = n-1$ and $\shape{\bar{r}} = \shape{\shape{A}}-n$ respectively,
 and natural number $j \in [1,\vec{a}[n]+\vec{b}[n]]$ such that $\bar{l} \oplus \left<j\right> \oplus \bar{r} \in \Dim(\shape{A \mconcat{n} B})$,
 \[
   \left(A \mconcat{n} B\right)[\bar{l} \oplus \left<j\right> \oplus \bar{r}] = \left\{
@@ -3689,6 +3891,8 @@ and natural number $j \in [1,\vec{a}[n]+\vec{b}[n]]$ such that $\bar{l} \oplus \
   \end{array}
  \right.
 \]
+In layman's terms, this is the operation of stacking two similar multimatrices on top of or to the side of one another.
+It's just complicated by this being an operation in multiple dimensions.
 \end{definition}
 
 \begin{definition}[Multimatrix Partitions]
@@ -3714,9 +3918,230 @@ And for all $\bar{l} \in \Dim(\vec{l})$, $\bar{r} \in \Dim(\vec{r})$, and $j \in
 \[ \Part_2(M, n, k)[\bar{l} \oplus \left<j\right> \oplus \bar{r}] = M[\bar{l} \oplus \left<j+k\right> \oplus \bar{r}] \]
 \end{definition}
 
-\begin{theorem}[Multiplication Over Concatenation Rules]
-Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+\begin{theorem}[Multiplication Over Concatenation Rule 1]
+Let $A$, $B$, and $C$ be multimatrices, and let $m$ and $n$ be
+natural numbers where $0 < m < n$. 
+If either of the following computations  is valid, then it is equivalent to the other:
+\[ C \mmult{m} \left(A \mconcat{n} B\right) = \left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right) \]
+\end{theorem}
+\begin{landscape}
+\begin{proof}
+Let $A$, $B$, and $C$ be multimatrices, and let $m$ and $n$ be
+natural numbers where $0 < m < n$. 
 
+\begin{ppart}
+Suppose $C \mmult{m} \left(A \mconcat{n} B\right)$ is a valid computation.
+Then $\shape{C} = \vec{c} \oplus \vec{m}$ and $\shape{A \mconcat{n} B} = \vec{m} \oplus \vec{v}$
+for some vectors $\vec{c}$, $\vec{m}$, and $\vec{v}$ where $\shape{\vec{m}} = m$.
+Also $\shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r}$, and $\shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r}$
+for some vectors $\vec{l}$ and $\vec{r}$ where $\shape{\vec{l}} = n-1$ and some natural numbers $a$ and $b$.
+And since $m < n$ it follows that $\shape{\vec{m}} \le \shape{\vec{l}}$ so we can split up $\vec{l}$ thus,
+$\vec{l} = \vec{m} \oplus \vec{e}$ for some $\vec{e}$. Which results in the following shapes,
+\[ \shape{A} = \vec{m} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{m} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+\[ \shape{C} = \vec{c} \oplus \vec{m} \]
+Let's also note that $\shape{\vec{e}} = n-1-m = n-m-1$ which will be important in the last section of the proof.
+And shows that both $C \mmult{m} A$ and $C \mmult{m} B$ are valid operations where,
+\[ \shape{C \mmult{m} A} = \vec{c} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{C \mmult{m} B} = \vec{c} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+Where $\shape{\vec{c} \oplus \vec{e}} = \shape{\shape{C}}-m + n-1-m = \shape{\shape{C}}+n-2m-1$,
+so \[ \left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right) \] is a valid computation.
+\end{ppart}
+
+\begin{ppart}
+Suppose $\left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right)$ is a valid computation.
+Then $\shape{C \mmult{m} A} = \vec{f} \oplus \left<a\right> \oplus \vec{r}$ and
+$\shape{C \mmult{m} B} = \vec{f} \oplus \left<b\right> \oplus \vec{r}$ for some
+vectors $\vec{f}$ and $\vec{r}$ where $\shape{\vec{f}} = \shape{\shape{C}}+n-2m-1$ and where $a$ and $b$ are some natural numbers.
+We can also see that $\shape{C} = \vec{c} \oplus \vec{m}$, $\shape{A} = \vec{m} \oplus \vec{a}$, and $\shape{B} = \vec{m} \oplus \vec{b}$
+for some vectors $\vec{a}$, $\vec{b}$, $\vec{c}$, and $\vec{m}$ where $\shape{\vec{m}} = m$.
+Now note that, $\shape{C \mmult{m} A} = \vec{c} \oplus \vec{a}$ and $\shape{C \mmult{m} B} = \vec{c} \oplus \vec{b}$.
+Therefore, 
+\[ \vec{f} \oplus \left<a\right> \oplus \vec{r} = \vec{c} \oplus \vec{a} \]
+\[ \vec{f} \oplus \left<b\right> \oplus \vec{r} = \vec{c} \oplus \vec{b} \]
+Since $\shape{\vec{c}} = \shape{\shape{C}}-m$ and 
+$\shape{\vec{f}} = \shape{\shape{C}}+n-2m-1 = \shape{\shape{C}}-m+(n-m-1)$,
+and we know that $m < n$ so $n-m-1 \ge 0$ it follows that $\shape{\vec{c}} \le \shape{\vec{f}}$
+so we can split up $\vec{f}$ thus, $\vec{f} = \vec{c} \oplus \vec{e}$ for some $\vec{e}$.
+Where,
+\[ \shape{\vec{e}} = \shape{\vec{f}}-\shape{\vec{c}} = \shape{\shape{C}}+n-2m-1 - (\shape{\shape{C}}-m) = n-m-1 \]
+That leaves us with,
+\[ \shape{C \mmult{m} A} = \vec{c} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} = \vec{c} \oplus \vec{a}\]
+\[ \shape{C \mmult{m} B} = \vec{c} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} = \vec{c} \oplus \vec{b}\]
+Therefore,
+\[ \vec{a} = \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \vec{b} = \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+And so,
+\[ \shape{A} = \vec{m} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{m} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+\[ \shape{C} = \vec{c} \oplus \vec{m} \]
+Since $\shape{\vec{m} \oplus \vec{e}} = m+n-m-1 = n-1$, we know that $A \mconcat{n} B$ is valid and,
+\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r} \]
+And so, $C \mmult{m} \left(A \mconcat{n} B\right)$ is also valid.
+\end{ppart}
+
+\begin{ppart}
+In either of the above cases we were able to breakdown the shapes of our matrices thus,
+\[ \shape{A} = \vec{m} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{B} = \vec{m} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+\[ \shape{C} = \vec{c} \oplus \vec{m} \]
+Where $\shape{\vec{m}} = m$ and $\shape{\vec{e}} = n-m-1$
+
+So,
+\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r} \]
+\[ \shape{C \mmult{m} \left(A \mconcat{n} B\right)} = \vec{c} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r} \]
+\[ \shape{C \mmult{m} A} = \vec{c} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
+\[ \shape{C \mmult{m} B} = \vec{c} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
+\[ \shape{\left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right)} = \vec{c} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r} \]
+
+Now for all vectors, $\bar{c} \in \Dim(\vec{c})$, $\bar{e} \in \Dim(\vec{e})$, and $\bar{r} \in \Dim(\vec{r})$,
+\begin{align*}
+  \left(C \mmult{m} \left(A \mconcat{n} B\right)\right)[\bar{c} \oplus \bar{e} \oplus \left<i\right> \oplus \bar{r}]
+  &= \sum_{\forall \bar{m} \in \Dim(\vec{m})} C[\bar{c} \oplus \bar{m}] \left(A \mconcat{n} B\right)[\bar{m} \oplus \bar{e} \oplus \left<i\right> \oplus \bar{r}] \\
+  &= \left\{
+    \begin{array}{ll}
+      \sum_{\forall \bar{m}} C[\bar{c} \oplus \bar{m}] A[\bar{m} \oplus \bar{e} \oplus \left<i\right> \oplus \bar{r}]
+      & \mbox{if } i \le a \\
+      \sum_{\forall \bar{m}} C[\bar{c} \oplus \bar{m}] B[\bar{m} \oplus \bar{e} \oplus \left<i-a\right> \oplus \bar{r}]
+      & \mbox{if } i > a
+    \end{array}
+  \right. \\
+  &= \left\{
+    \begin{array}{ll}
+      \left(C \mmult{m} A\right)[\bar{c} \oplus \bar{e} \oplus \left<i\right> \oplus \bar{r}]
+      & \mbox{if } i \le a \\
+      \left(C \mmult{m} B\right)[\bar{c} \oplus \bar{e} \oplus \left<i-a\right> \oplus \bar{r}]
+      & \mbox{if } i > a
+    \end{array}
+  \right. \\
+  &= \left(\left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right)\right)[\bar{c} \oplus \bar{e} \oplus \left<i\right> \oplus \bar{r}]
+\end{align*}
+\end{ppart}
+
+\end{proof}
+
+\begin{theorem}[Multiplication Over Concatenation Rule 2]
+Let $A$, $B$, and $C$ be multimatrices, and let $m$ and $n$ be
+natural numbers where $0 < n \le m$. 
+If either of the following computations is valid, then it is equivalent to the other:
+\[
+  C \mmult{m} \left(A \mconcat{n} B\right)
+  =
+  \left( C_1 \mmult{m} A \right) + 
+  \left( C_2 \mmult{m} B \right)
+\]
+\[ \Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) = \left\{ C_1, C_2 \right\} \]
+\end{theorem}
+\begin{proof}
+Let $A$, $B$, and $C$ be multimatrices, and let $m$ and $n$ be
+natural numbers where $0 < n \le m$. 
+
+\begin{ppart}
+Suppose $C \mmult{m} \left(A \mconcat{n} B\right)$ is a valid computation.
+Then $\shape{C} = \vec{c} \oplus \vec{m}$ and $\shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d}$ for
+some vectors $\vec{c}$, $\vec{m}$, and $\vec{d}$ where $\shape{\vec{m}} = m$.
+We also know $\shape{A} = \vec{l} \oplus \left< a \right> \oplus \vec{r}$ and
+$\shape{B} = \vec{l} \oplus \left< b \right> \oplus \vec{r}$
+for some vectors $\vec{l}$ and  $\vec{r}$ and some natural numbers $a$ and $b$ where
+$\shape{\vec{l}} = n-1$.
+And since $n \le m$ it follows that $\shape{\vec{l}}+1 \le \shape{\vec{m}}$.
+Now remember that,
+\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} = \vec{l} \oplus \left< a+b \right> \oplus \vec{r} \]
+Therefore we can break up $\vec{m}$ into $\vec{l} \oplus \left< a+b \right> \oplus \vec{e}$ for some
+$\vec{e}$ and say that,
+\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left< a+b \right> \oplus \vec{e} \oplus \vec{f} \]
+\[ \shape{A} = \vec{l} \oplus \left< a \right> \oplus \vec{e} \oplus \vec{f} \]
+\[ \shape{B} = \vec{l} \oplus \left< b \right> \oplus \vec{e} \oplus \vec{f} \]
+For some $\vec{f}$ and,
+\[ \shape{C} = \vec{c} \oplus \vec{l} \oplus \left< a+b \right> \oplus \vec{e} \]
+So we can partition $C$ thus,
+\[ \Part(C, \shape{\vec{c} \oplus \vec{l}}+1, a) = \left\{ C_1, C_2 \right\} \]
+\[ \shape{C_1} = \vec{c} \oplus \vec{l} \oplus \left< a \right> \oplus \vec{e} \]
+\[ \shape{C_2} = \vec{c} \oplus \vec{l} \oplus \left< b \right> \oplus \vec{e} \]
+Note that $\shape{A}[n] = a$ and $\shape{\vec{c}} = \shape{\shape{C}}-m$ so,
+\[ \Part(C, \shape{\vec{c} \oplus \vec{l}}+1, a) = \Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) \]
+And because,
+\[ \shape{\vec{m}} = \shape{\vec{l} \oplus \left< a+b \right> \oplus \vec{e}} =
+   \shape{\vec{l} \oplus \left< a \right> \oplus \vec{e}} = \shape{\vec{l} \oplus \left< b \right> \oplus \vec{e}} = m \]
+It also follows that each of these are valid operations,
+\[ C_1 \mmult{m} A \]
+\[ C_2 \mmult{m} B \]
+Where,
+\[ \shape{C_1 \mmult{m} A} = \vec{c} \oplus \vec{f} \]
+\[ \shape{C_2 \mmult{m} B} = \vec{c} \oplus \vec{f} \]
+And since the shapes are equal, we can also perform the following operation,
+\[ \left(C_1 \mmult{m} A\right) + \left(C_2 \mmult{m} B\right) \]
+\end{ppart}
+
+\begin{ppart}
+Suppose $\left(C_1 \mmult{m} A\right) + \left(C_2 \mmult{m} B\right)$ is a valid operation
+where $\Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) = \left\{ C_1, C_2 \right\}$.
+Therefore $\shape{C_1 \mmult{m} A} = \shape{C_2 \mmult{m} B}$ and,
+\[ \shape{C_1} = \vec{c}_1 \oplus \vec{m}_1 \]
+\[ \shape{A} = \vec{m}_1 \oplus \vec{a} \]
+\[ \shape{C_2} = \vec{c}_2 \oplus \vec{m}_2 \]
+\[ \shape{B} = \vec{m}_2 \oplus \vec{b} \]
+For some shape vectors $\vec{c}_1$, $\vec{c}_2$, $\vec{m}_1$, $\vec{m}_2$, $\vec{a}$, and $\vec{b}$ where $\shape{\vec{m}_1} = \shape{\vec{m}_2} = m$.
+And because that addition is valid we also know that,
+\[ \vec{c}_1 \oplus \vec{a} = \vec{c}_2 \oplus \vec{b} \]
+And since $C_1$ and $C_2$ are partitions of $C$, their shapes are the same size, i.e. $\shape{\shape{C_1}} = \shape{\shape{C_2}}$.
+Therefore $\shape{\vec{c}_1} = \shape{\vec{c}_2}$ so the division between $\vec{c}_1$ and $\vec{a}$ and between
+$\vec{c}_2$ and $\vec{b}$ are in the same relative location. Which means that
+we can simplify by stating that,
+\[ \shape{C_1} = \vec{c} \oplus \vec{m}_1 \]
+\[ \shape{A} = \vec{m}_1 \oplus \vec{f} \]
+\[ \shape{C_2} = \vec{c} \oplus \vec{m}_2 \]
+\[ \shape{B} = \vec{m}_2 \oplus \vec{f} \]
+For some new vectors $\vec{c}$ and $\vec{f}$ such that $\vec{c}_1 = \vec{c}_2 = \vec{c}$ and $\vec{a} = \vec{b} = \vec{f}$.
+
+Now because of the concatenation constraint we know that,
+$\shape{C} = \vec{d} \oplus \left< a+b \right> \oplus \vec{e}$ for some vectors $\vec{d}$ and $\vec{e}$ and
+natural numbers $a$ and $b$ where $\shape{\vec{d}} = \shape{\shape{C}}-m+n-1$ and $a = \shape{A}[n]$.
+And further, we know that,
+\[ \shape{C_1} = \vec{d} \oplus \left< a \right> \oplus \vec{e} \]
+\[ \shape{C_2} = \vec{d} \oplus \left< b \right> \oplus \vec{e} \]
+\[ \shape{C} = \vec{d} \oplus \left< a+b \right> \oplus \vec{e} \]
+Where $\shape{\vec{e}} = \shape{\shape{C}}-(\shape{\shape{C}}-m+n-1+1) = m-n$.
+Note that $\shape{\vec{c}} = \shape{\shape{C}}-m$ so we can also say that $\shape{\vec{l}} = \shape{\vec{c}}+n-1$
+So we can divide $\vec{d}$ thus, $\vec{d} = \vec{c} \oplus \vec{l}$ for some vector $\vec{l}$ where $\shape{\vec{l}} = n-1$.
+Then,
+\[ \shape{C_1} = \vec{c} \oplus \vec{m}_1 = \vec{c} \oplus \vec{l} \oplus \left< a \right> \oplus \vec{e} \]
+\[ \shape{C_2} = \vec{c} \oplus \vec{m}_2 = \vec{c} \oplus \vec{l} \oplus \left< b \right> \oplus \vec{e} \]
+So we know that, $\vec{m}_1 = \vec{l} \oplus \left< a \right> \oplus \vec{e}$ and $\vec{m}_2 = \vec{l} \oplus \left< b \right> \oplus \vec{e}$
+which means that,
+\[ \shape{A} = \vec{l} \oplus \left< a \right> \oplus \vec{e} \oplus \vec{f} \]
+\[ \shape{B} = \vec{l} \oplus \left< b \right> \oplus \vec{e} \oplus \vec{f} \]
+And since $\shape{\vec{l}} = n-1$ the operation $A \mconcat{n} B$ is valid and,
+\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left< a+b \right> \oplus \vec{e} \oplus \vec{f} \]
+And since,
+\[ \shape{C} = \vec{c} \oplus \vec{l} \oplus \left< a+b \right> \oplus \vec{e} \]
+Where $\shape{\vec{l} \oplus \left<a+b\right> \oplus \vec{e}} = n-1 + 1 + m-n = m$ so the final operation $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid.
+\end{ppart}
+
+\begin{ppart}
+In either of the above cases, we can divide our given matrices thus,
+\[ \shape{A} = \vec{l} \oplus \left< a \right> \oplus \vec{e} \oplus \vec{f} \]
+\[ \shape{B} = \vec{l} \oplus \left< b \right> \oplus \vec{e} \oplus \vec{f} \]
+\[ \shape{C_1} = \vec{c} \oplus \vec{l} \oplus \left< a \right> \oplus \vec{e} \]
+\[ \shape{C_2} = \vec{c} \oplus \vec{l} \oplus \left< b \right> \oplus \vec{e} \]
+With,
+\[ \shape{C \mmult{m} \left(A \mconcat{n} B\right)} = \shape{\left(C_1 \mmult{m} A\right) + \left(C_2 \mmult{m} B\right)} = \vec{c} \oplus \vec{f} \]
+Let $\bar{c} \in \Dim(\vec{c})$ and $\bar{f} \in \Dim(\vec{f})$ then,
+\begin{align*}
+  \left(C \mmult{m} \left(A \mconcat{n} B\right)\right)[\bar{c} \oplus \bar{f}]
+  &=
+    \sum_{\forall \bar{l} \in \Dim(\vec{l}), k \in [1,a+b], \bar{e} \in \Dim(\vec{e})}
+      C[\bar{c} \oplus \bar{l} \oplus \left<k\right> \oplus \bar{e}]
+      \left(A \mconcat{n} B\right)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{f}]
+\end{align*}
+\end{ppart}
+
+\end{proof}
+
+\end{landscape}
+
+
+\begin{theorem}[Bla]
 For any natural number $m$ where $m < n$,
 if and only if $C$ is a multimatrix for which $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid then,
 \[ C \mmult{m} \left(A \mconcat{n} B\right) = \left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right) \]
@@ -3747,11 +4172,11 @@ then for multimatrices $C_1$ and $C_2$ defined by,
 \end{theorem}
 \begin{proof}
 \begin{ppart}
-Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+Let $A$ and $B$ be multimatrices where $A \mconcat{n} B$ is valid. 
 Let $m$ be a natural number where $m < n$, and let $C$ be a multimatrix where
 $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid.
 
-Since $A \mconcat{n} B$ is valid, we can describe the shapes of $A$ and $B$ thusly,
+Since $A \mconcat{n} B$ is valid, we can describe the shapes of $A$ and $B$ thus,
 \[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
 \[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
 Where $a$ and $b$ are both natural numbers, $\shape{\vec{l}} = n-1$, and
@@ -3761,7 +4186,7 @@ $\shape{\vec{r}} = \shape{\shape{A}} - n$. So,
 Now, because $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid, we know that
 there is some division in the shape of $C$ such that,
 \[ \shape{C} = \vec{c} \oplus \vec{m} \]
-For some shape vetors $\vec{c}$ and $\vec{m}$ where $\shape{\vec{m}} = m$ and
+For some shape vectors $\vec{c}$ and $\vec{m}$ where $\shape{\vec{m}} = m$ and
 $\shape{\vec{c}} = \shape{\shape{C}}-m$
 We also know that there exists some similar subdivision of $\shape{A \mconcat{n} B}$.
 \[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} \]
@@ -3827,7 +4252,7 @@ and $\Dim(\vec{r})$ respectively and $k \in [1,a+b]$, then,
 TODO: Prove the converse.
 \end{ppart}
 \begin{ppart}
-Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+Let $A$ and $B$ be multimatrices where $A \mconcat{n} B$ is valid. 
 Let $m$ be a natural number where $m \le \shape{\shape{A}}-n$
 and $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid.
 Then there exit shape vectors $\vec{l}$ and $\vec{r}$ and integers $a$ and $b$ such that,
@@ -3851,7 +4276,7 @@ Now since $m \le \shape{\shape{A}}-n$ we can partition $\vec{r}$ like this,
 
 \[ \vec{r} = \vec{e} \oplus \vec{m} \]
 
-So we can use that repartion in our original shape definitions,
+So we can use that repartition in our original shape definitions,
 
 \[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{e} \oplus \vec{m} \]
 \[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{e} \oplus \vec{m} \]
@@ -3912,11 +4337,11 @@ TODO: Prove the converse.
 \end{ppart}
 
 \begin{ppart}
-Let $A$ and $B$ be multimatricies where $A \mconcat{n} B$ is valid. 
+Let $A$ and $B$ be multimatrices where $A \mconcat{n} B$ is valid. 
 Let $m$ be a natural number where $m \ge n$, and let $C$ be a multimatrix where
 $C \mmult{m} (A \mconcat{n} B)$ is valid.
 
-Then we can partition the shapes of $A$ and $B$ thusly,
+Then we can partition the shapes of $A$ and $B$ thus,
 
 \[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
 \[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
@@ -3924,14 +4349,14 @@ Then we can partition the shapes of $A$ and $B$ thusly,
 
 Where $\shape{\vec{l}} = n-1$. 
 
-We can also partiton the shapes of $C$ and $(A \mconcat{n} B)$ like this,
+We can also partition the shapes of $C$ and $(A \mconcat{n} B)$ like this,
 
 \[ \shape{C} = \vec{c} \oplus \vec{m} \]
 \[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} \]
 
 Where $\shape{\vec{m}} = m$. Now since $m \ge n$ we can know that
 $\shape{\vec{m}} \ge \shape{\vec{l} \oplus \left<a+b\right>}$ 
-so $\vec{m}$ encompases $\vec{l}$, the $n$'th index and potentially part of $\vec{r}$.
+so $\vec{m}$ encompasses $\vec{l}$, the $n$'th index and potentially part of $\vec{r}$.
 There for if we partition $\vec{r}$ like this,
 
 \[ \vec{r} = \vec{p} \oplus \vec{q} \]
@@ -3976,7 +4401,7 @@ $\shape{X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}]} = \vec{s}$
 
 \begin{theorem}[Wildcard Multiplication]
 TODO:generalize
-Let $A$ and $X$ be multimatrixes of shape $\shape{A} = \vec{a} \oplus \vec{x}$ and $\shape{X} = \vec{x}$ respectively.
+Let $A$ and $X$ be multimatrices of shape $\shape{A} = \vec{a} \oplus \vec{x}$ and $\shape{X} = \vec{x}$ respectively.
 Then $A[\bar{a} \oplus *^{\vec{x}}] \mmult{\shape{\vec{x}}} X = (A \mmult{\shape{\vec{x}}} X)[\bar{a}]$.
 \end{theorem}
 \begin{proof}
@@ -4214,16 +4639,16 @@ Chain Rule
 \begin{landscape}
 \section{2d Derivatives with Fast Fourier Transforms}
 
-According to wikipedia \cite{wiki:fourier}, if $f(x)$ is an absolutely continuous differentiable function, and both $f$ and its derivative $f'$ are integrable. Then the Fourier transform of the derivative is given by
+According to Wikipedia \cite{wiki:fourier}, if $f(x)$ is an absolutely continuous differentiable function, and both $f$ and its derivative $f'$ are integrable. Then the Fourier transform of the derivative is given by
 \[ \hat{f'}(\xi) = 2 \pi i \xi \hat{f}(\xi) \]
 
 What that means in practice is that we can approximate the derivative of a sequence, or in our case a multimatrix, using a FFT.
-The method I'm using comes from a youtube series by Steve Brunton \cite{youtube:fourier} which I've found to be particularly helpful.
+The method I'm using comes from a YouTube series by Steve Brunton \cite{youtube:fourier} which I've found to be particularly helpful.
 
-We'll define a function, $\FFT(X) = F$, and it's inverse, $\IFFT(F) = X$ as the fast fourier transform of $X$ and it's inverse of $F$.
+We'll define a function, $\FFT(X) = F$, and it's inverse, $\IFFT(F) = X$ as the fast Fourier transform of $X$ and it's inverse of $F$.
 Specifically, we'll let $X$ be a multimatrix of shape $\shape{X} = \left<N\right>$ where $N = 2^p$ for some $p>1$.
 And we'll let $F$ be a multimatrix representing a similar shape of complex numbers, $\shape{F} = \left<N, 2\right>$ where $F[k,1]$ is
-the real componenet and $F[k,2]$ is the imaginary component. So,
+the real component and $F[k,2]$ is the imaginary component. So,
 
 \[ \FFT(X)[k,1] = \sum_{n=1}^{N} X[n] \cos\left(\frac{2 \pi (k-1)(n-1)}{N}\right) \]
 \[ \FFT(X)[k,2] = -\sum_{n=1}^{N} X[n] \sin\left(\frac{2 \pi (k-1)(n-1)}{N}\right) \]
@@ -4278,15 +4703,15 @@ Therefore the solution to $\Tran(A,a) \mmult{a} E = 0$ for $E$ will be the one t
 \end{align*}
 
 This brings to mind the fact that multimatrices themselves form a vector space. Basically, for any shape $\vec{x}$
-there is an associated vector space of multimatrices $R^{\vec{x}}$. And I haven't yet explictly stated that. Need to do
-that because I'm pretty sure that's necesary for the shortest path being the one that's orthoganal.
+there is an associated vector space of multimatrices $R^{\vec{x}}$. And I haven't yet explicitly stated that. Need to do
+that because I'm pretty sure that's necessary for the shortest path being the one that's orthogonal.
 
 I think need to prove, in the abstract, that if you have a vector field $F$
 and a distance metric $d(u,v)$ and a bilinear form \cite{wiki:bilinear}, $b(u,v)$, such that
 \[ v \bot u \iff b(u,v) = 0 \]
 Then for any $v \in F$ and any sub field $f \subset F$, for all $u \in f$,
 \[ (v-u) \bot u \iff \forall u' \in f - \{u\} : d(u', v) < d(u,v) \]
-That is, $u$ is the closest vector in $f$ to $v$ if and only if it is the orthoganal project of $v$ onto $f$.
+That is, $u$ is the closest vector in $f$ to $v$ if and only if it is the orthogonal project of $v$ onto $f$.
 
 \chapter{Scratch}
 

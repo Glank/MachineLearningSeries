@@ -144,10 +144,12 @@ std::string DebugString(const MMatrixInterface* m);
 std::string DebugString(const std::vector<int>& v);
 
 void Copy(const MMatrixInterface* m, MMatrixInterface* out);
+void Reshape(const MMatrixInterface* m, MMatrixInterface* out);
 
 // Inverts the given matrix on the n'th pivot.
 // The input m is destoryed in this process.
-void Invert(int n, MMatrixInterface* m, MMatrixInterface* out);
+// Returns true if the input was successfuly inverted, false otherwise.
+bool Invert(int n, MMatrixInterface* m, MMatrixInterface* out);
 
 }  // namespace mmatrix
 
