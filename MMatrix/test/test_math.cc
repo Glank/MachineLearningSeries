@@ -269,20 +269,20 @@ void TestIdentityContraction() {
 void InverseExample() {
   DenseMMatrix a({4,4});
   a.set({0,0}, -1);
-  a.set({0,1}, 2);
-  a.set({0,2}, 1);
-  a.set({0,3}, 0);
   a.set({1,0}, 0);
-  a.set({1,1}, -1);
-  a.set({1,2}, 0);
-  a.set({1,3}, 1);
-  a.set({2,0}, 2);
-  a.set({2,1}, 0);
-  a.set({2,2}, 0.5);
-  a.set({2,3}, 0);
+  a.set({2,0}, 1);
   a.set({3,0}, 0);
-  a.set({3,1}, 2);
+  a.set({0,1}, 0);
+  a.set({1,1}, -1);
+  a.set({2,1}, 0);
+  a.set({3,1}, 1);
+  a.set({0,2}, 2);
+  a.set({1,2}, 0);
+  a.set({2,2}, 0.5);
   a.set({3,2}, 0);
+  a.set({0,3}, 0);
+  a.set({1,3}, 2);
+  a.set({2,3}, 0);
   a.set({3,3}, 0.5);
 
   DenseMMatrix inv({4,4});
@@ -301,41 +301,42 @@ void InverseExample() {
 }
 
 void InverseExampleCheck() {
+  std::cout << "InverseExampleCheck..." << std::endl;
   DenseMMatrix a({2,2,2,2});
-  a.set({0,0,0,0}, 2);
-  a.set({0,0,0,1}, -2);
-  a.set({0,0,1,0}, 0);
-  a.set({0,0,1,1}, 2);
-  a.set({0,1,0,0}, -2);
-  a.set({0,1,0,1}, 0);
-  a.set({0,1,1,0}, -1);
-  a.set({0,1,1,1}, 1);
+  a.set({0,0,0,0}, -1);
   a.set({1,0,0,0}, 0);
-  a.set({1,0,0,1}, -1);
-  a.set({1,0,1,0}, 1);
-  a.set({1,0,1,1}, 0);
-  a.set({1,1,0,0}, 1);
-  a.set({1,1,0,1}, -2);
+  a.set({0,1,0,0}, 1);
+  a.set({1,1,0,0}, 0);
+  a.set({0,0,1,0}, 0);
+  a.set({1,0,1,0}, -1);
+  a.set({0,1,1,0}, 0);
   a.set({1,1,1,0}, 1);
-  a.set({1,1,1,1}, -2);
+  a.set({0,0,0,1}, 2);
+  a.set({1,0,0,1}, 0);
+  a.set({0,1,0,1}, 0.5);
+  a.set({1,1,0,1}, 0);
+  a.set({0,0,1,1}, 0);
+  a.set({1,0,1,1}, 2);
+  a.set({0,1,1,1}, 0);
+  a.set({1,1,1,1}, 0.5);
 
   DenseMMatrix b({2,2,2,2});
-  b.set({0,0,0,0}, 1/6.);
-  b.set({0,0,0,1}, -1/3.);
-  b.set({0,0,1,0}, -1/3.);
-  b.set({0,0,1,1}, 0);
-  b.set({0,1,0,0}, -1/6.);
-  b.set({0,1,0,1}, -1/3.);
+  b.set({0,0,0,0}, -0.2);
+  b.set({1,0,0,0}, 0);
+  b.set({0,1,0,0}, 0.4);
+  b.set({1,1,0,0}, 0);
+  b.set({0,0,1,0}, 0);
+  b.set({1,0,1,0}, -0.2);
   b.set({0,1,1,0}, 0);
-  b.set({0,1,1,1}, -1/3.);
-  b.set({1,0,0,0}, -1/6.);
-  b.set({1,0,0,1}, -1/3.);
-  b.set({1,0,1,0}, 1);
-  b.set({1,0,1,1}, -1/3.);
-  b.set({1,1,0,0}, 1/6.);
+  b.set({1,1,1,0}, 0.4);
+  b.set({0,0,0,1}, 0.8);
+  b.set({1,0,0,1}, 0);
+  b.set({0,1,0,1}, 0.4);
   b.set({1,1,0,1}, 0);
-  b.set({1,1,1,0}, 1/3.);
-  b.set({1,1,1,1}, -1/3.);
+  b.set({0,0,1,1}, 0);
+  b.set({1,0,1,1}, 0.8);
+  b.set({0,1,1,1}, 0);
+  b.set({1,1,1,1}, 0.4);
 
   DenseMMatrix out({2,2,2,2});
   Multiply(2,&a,&b,&out);
@@ -389,6 +390,8 @@ void InverseExampleConstruction() {
   cinv.set({1,1}, 1/2.);
   DenseMMatrix out({2,2,2,2});
   
+  // Out = Ident^2<2,2> x{1} C^-1
+  // Out x{1} C = Ident^<2,2>
   Multiply(1, ident.get(), &cinv, &out);
   
   for (int d = 0; d < 2; d++) {
@@ -400,10 +403,12 @@ void InverseExampleConstruction() {
       }
     }
   }
-  DenseMMatrix reshaped({4,4});
+  std::cout << "reshaped:" << std::endl;
+  std::vector<int> shape = {4,4};
+  DenseMMatrix reshaped(shape);
   Reshape(&out, &reshaped);
-  for (int r = 0; r < 4; r++) {
-    for (int c = 0; c < 4; c++) {
+  for (int r = 0; r < shape[0]; r++) {
+    for (int c = 0; c < shape[1]; c++) {
       std::cout << reshaped.get({r,c}) << "  ";
     }
     std::cout << std::endl;
@@ -414,7 +419,7 @@ void InverseExampleConstruction() {
 
   DenseMMatrix cMat({2,2});
   Invert(1, &cinv2, &cMat);
-
+  std::cout << "cMat:" << std::endl;
   DenseMMatrix ck({2,2});
   Multiply(1, &cMat, &cinv, &ck);
   for (int r = 0; r < 2; r++) {
@@ -428,17 +433,15 @@ void InverseExampleConstruction() {
 }
 
 int main() {
-  /*
   TestAssociativity();
   TestCommunicativity();
   TestIdentity();
   TestSelfDerivative();
   TestElementwiseDerivative();
   TestIdentityContraction();
-  */
-  InverseExampleConstruction();
-  InverseExample();
   InverseExampleCheck();
+  //InverseExampleConstruction();
+  //InverseExample();
   //InverseExample2();
   std::cout << "All tests pass." << std::endl;
   return 0;

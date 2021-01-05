@@ -455,6 +455,36 @@ void TestHMultiply() {
   }
 }
 
+void TestReshape() {
+  std::cout << "TestReshape..." << std::endl;
+  DenseMMatrix a({2,2,2,2});
+  a.set({0,0,0,0}, 0);
+  a.set({1,0,0,0}, 1);
+  a.set({0,1,0,0}, 2);
+  a.set({1,1,0,0}, 3);
+  a.set({0,0,1,0}, 4);
+  a.set({1,0,1,0}, 5);
+  a.set({0,1,1,0}, 6);
+  a.set({1,1,1,0}, 7);
+  a.set({0,0,0,1}, 8);
+  a.set({1,0,0,1}, 9);
+  a.set({0,1,0,1}, 10);
+  a.set({1,1,0,1}, 11);
+  a.set({0,0,1,1}, 12);
+  a.set({1,0,1,1}, 13);
+  a.set({0,1,1,1}, 14);
+  a.set({1,1,1,1}, 15);
+  
+  DenseMMatrix b({4,4});
+  Reshape(&a, &b);
+  for (int r = 0; r < b.shape()[0]; r++) {
+    for (int c = 0; c < b.shape()[1]; c++) {
+      std::cout << b.get({r,c}) << "  ";
+    }
+    std::cout << std::endl;
+  }
+}
+
 int main() {
   TestToFromVIndex();
   TestDenseMMatrixGetSet();
@@ -469,6 +499,7 @@ int main() {
   TestConcat();
   TestInverse();
   TestHMultiply();
+  //TestReshape();
   // Requires instrumenting matrix multiplication
   //ManualTestSparseSwitch();
   std::cout << "All tests pass." << std::endl;
