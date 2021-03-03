@@ -78,6 +78,10 @@
 \newcommand{\dmult}[1]{\text{\raisebox{1ex}{$\underset{#1}{\,\bullet\,}$}}}
 \newcommand{\mconcat}[1]{\text{\raisebox{1ex}{$\underset{#1}{\oplus}$}}}
 \newcommand{\shape}[1]{\left|#1\right|}
+\newcommand{\transpose}[2]{{#1}^{\{#2\}}}
+
+\let\oldemptyset\emptyset
+\let\emptyset\varnothing
 
 \newcommand{\shrug}[1][]{%
 \begin{tikzpicture}[baseline,x=0.8\ht\strutbox,y=0.8\ht\strutbox,line width=0.125ex,#1]
@@ -378,17 +382,19 @@ multimatrix to another. You might have a function from a multimatrix to a
 scalar (such as summing up all the values of a multimatrix), or from a scalar
 to a multimatrix (such as filling a multimatrix with a single scalar value).
 
-We can define the total derivative for those cases as well.
+We can define the total derivative for those cases as well if we model scalar
+values as multimatrices of empty shapes. That leads to the following definitions,
 
 \begin{definition}[Scalar on Multimatrix Derivative]
 \label{sm_derivative}
 Let $f(X)$ be some function from $\mathbb{R}^{\vec{x}}$ to $\mathbb{R}$.
-The complete derivative of $f$ with respect to $X$ is therefore in
+As we can model $f$ as a multimatrix of shape $\left<\right>$,
+the complete derivative of $f$ with respect to $X$ is therefore in
 $\mathbb{R}^{\vec{x}}$. That is,
 \begin{align*}
-f(X) &\in \mathbb{R} \\
+\shape{f(X)} &= \left<\right> \\
 \shape{X} &= \vec{x} \\
-\shape{\frac{df}{dX}} &= \vec{x}
+\shape{\frac{df}{dX}} &= \vec{x} \oplus \left<\right> = \vec{x}
 \end{align*}
 \[
 \forall \bar{x} \in \Dim(\vec{x}):
@@ -400,12 +406,13 @@ f(X) &\in \mathbb{R} \\
 \begin{definition}[Multimatrix on Scalar Derivative]
 \label{ms_derivative}
 Let $F(x)$ be some function from $\mathbb{R}$ to $\mathbb{R}^{\vec{f}}$.
-The complete derivative of $F$ with respect to $X$ is therefore in
+As we can model $x$ as a multimatrix of shape $\left<\right>$,
+the complete derivative of $F$ with respect to $x$ is therefore in
 $\mathbb{R}^{\vec{f}}$. That is,
 \begin{align*}
 \shape{F(x)} &= \vec{f} \\
-x &\in \mathbb{R} \\
-\shape{\frac{dF}{dx}} &= \vec{f}
+\shape{x} &= \left<\right> \\
+\shape{\frac{dF}{dx}} &= \left<\right> \oplus \vec{f} = \vec{f}
 \end{align*}
 \[
 \forall \bar{f} \in \Dim(\vec{f}):
@@ -505,11 +512,11 @@ $B$,
 \[ C[r_c, c_c] = \sum_{\forall i} A[r_c, i] B[i, c_c] \]
 
 Easily done. The hard part isn't doing the calculation. The hard part is reframing the
-damn problem in your head as its geometric or `systems of equations' equivalent so that
-the operation is at least somewhat intuitive.
+damn thing in your head as a geometric transformation or as part of some
+systems of equations to make the operation more intuitive.
 
 So now consider how we would multiply two matrices $A$ and $B$ if they had more
-than two dimensions. Which doesn't really leverage either of those intuitive
+than two dimensions. Which doesn't really seem to leverage either of those intuitive
 approaches. Let's use a concrete example to make the problems more structurally sound.
 
 Let $\shape{A} = \left<5,7,7\right>$ and $\shape{B} = \left<7,7,2,4\right>$.
@@ -555,6 +562,11 @@ and the value of the result is defined,
 \sum_{\forall \bar{c} \in \Dim(\vec{c})}
   A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}]
 \]
+
+The operator $\mmult{n}$ will also be used directly on shape vectors to denote
+what would happen to those shape vectors under the multimatrix multiplication operation.
+Thus, for any vectors $\vec{a}$, $\vec{b}$, and $\vec{c}$,
+\[ (\vec{a} \oplus \vec{c}) \mmult{\shape{\vec{c}}} (\vec{c} \oplus \vec{b}) = \vec{a} \oplus \vec{b} \]
 \end{definition}
 
 \newpage
@@ -607,7 +619,7 @@ $\bar{b}_1$ & $\bar{b}_2$ & $\bar{b}_3$ & $B[\bar{b}]$ \\
 \end{table}
 
 Given $\shape{A}$ and $\shape{B}$, and by our definition of multimatrix multiplication,
-you can see that $\shape{A \mmult{2} B} = \left<2, 2\right>$. And the values of the
+you can see that $\shape{A \mmult{2} B} = \left<2,3,2\right> \mmult{2} \left<3,2,2\right> = \left<2, 2\right>$. And the values of the
 resulting multimatrix are defined:
 
 \begin{table}[h!]
@@ -643,7 +655,8 @@ matrix multiplication for two dimensional multimatrices. For instance,
 if $A$ and $B$ are two dimensional multimatrices with shapes
 $\shape{A} = \left<l_a, r_a\right>$ and $\shape{B} = \left<l_b, r_b\right>$
 their product $A \mmult{1} B$ is valid if and only if $r_a = l_b$ and
-the result is of shape $\shape{A \mmult{1} B} = \left<l_a, r_b\right>$.
+the result is of shape,
+\[ \shape{A \mmult{1} B} = \left<l_a, r_a\right> \mmult{1} \left<l_b, r_b\right> = \left<l_a, r_b\right> \]
 And of course, the value at each index
 $\left<l_c, r_c\right> \in \Dim(\shape{A \mmult{1} B})$ is,
 \[
@@ -653,6 +666,10 @@ $\left<l_c, r_c\right> \in \Dim(\shape{A \mmult{1} B})$ is,
   A[l_c, x] B[x, r_c]
 \]
 All of which would be the same if this was regular matrix multiplication.
+
+TODO: explain how this type of multiplication works as a system of equations
+
+TODO: explain how this type of multiplication works geometrically
 
 \section{Rules of Multimatrix Multiplication}
 
@@ -1353,7 +1370,7 @@ Note that those inverses are defined as sets of operations, not individual opera
 You'll see why in a bit but to clear up any early confusion you should note that multimatrix
 multiplicative inverses aren't unique. For example, $\RMult[2,\Ident^2(\left<2,2\right>)]$ has
 two multiplicative inverse I can think of off the top of my head;
-$\RMult[2,\Ident^2(\left<2,2\right)]$ or
+$\RMult[2,\Ident^2(\left<2,2\right>)]$ or
 $\RMult[1,\Ident^2(\left<2\right>)]$.
 
 \begin{theorem}[Relation of Inverse to Identity]
@@ -1971,55 +1988,269 @@ And for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
 \[ (A \dmult{0} B)[\bar{a} \oplus \bar{b}] = A[\bar{a}] B[\bar{b}] = (A \mmult{0} B)[\bar{a} \oplus \bar{b}] \]
 \end{proof}
 
-TODO: exposition
+The Hadamard product, like the regular product, is only sometimes associative. Consider, for example,
+the case where $\shape{A} = \left< 3, 2 \right>$, $\shape{B} = \left< 2 \right>$, and $\shape{C} = \left<2, 3\right>$.
+Then $(A \dmult{1} B) \dmult{2} C$ is valid but $A \dmult{1} (B \dmult{2} C)$ is not because
+$B \dmult{2} C$ doesn't work.
 
 \begin{theorem}[Hadamard Product Associativity]
-Let $A$, $B$, and $C$ be multimatrices such that $\shape{A} = \vec{a} \oplus \vec{m}$,
-$\shape{B} = \vec{m} \oplus \vec{b} \oplus \vec{n}$ and $\shape{C} = \vec{n} \oplus \vec{c}$,
-where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$.
-Then $(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
+Let $A$, $B$, and $C$ be multimatrices and $m$ and $n$ integers such that
+$m \le \shape{\shape{B}}$ and $n \le \shape{\shape{B}}$.
+Then if either $(A \dmult{m} B) \dmult{n} C$ or $A \dmult{m} (B \dmult{n} C)$ is valid,
+the other is also valid and
+\[ (A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C) \]
 \end{theorem}
 \begin{proof}
-For all $\bar{a} \in \Dim(\vec{a})$, etc,
+\begin{ppart}
+Let $A$, $B$, and $C$ be multimatrices and $m$ and $n$ integers
+$m \le \shape{\shape{B}}$ and $n \le \shape{\shape{B}}$ such that
+$(A \dmult{m} B) \dmult{n} C$ is valid.
+We can therefore construct the following shape vectors from the definition of the Hadamard product.
+\[ \shape{A \dmult{m} B} = \vec{a} \oplus \vec{m} \oplus \vec{b} \]
+\[ \shape{A} = \vec{a} \oplus \vec{m} \]
+\[ \shape{B} = \vec{m} \oplus \vec{b} \]
+\[ \shape{(A \dmult{m} B) \dmult{n} C} = \vec{l} \oplus \vec{n} \oplus \vec{c} \]
+\[ \shape{A \dmult{m} B} = \vec{l} \oplus \vec{n} \]
+\[ \shape{C} = \vec{n} \oplus \vec{c} \]
+Where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$. 
+Then since $\vec{a} \oplus \vec{m} \oplus \vec{b} = \vec{l} \oplus \vec{n}$ we can divide this further into two
+separate cases.
+\begin{case} $\shape{\vec{b}} \ge \shape{\vec{n}}$
+
+Then we can divide $\vec{b}$ into $\vec{b} = \vec{b}_c \oplus \vec{n}$
+Therefore,
+\[ \shape{B} = \vec{m} \oplus \vec{b}_c \oplus \vec{n} \]
+\[ \shape{A \dmult{m} B} = \vec{a} \oplus \vec{m} \oplus \vec{b}_c \oplus \vec{n} = \vec{l} \oplus \vec{n} \]
+\[ \vec{l} = \vec{a} \oplus \vec{m} \oplus \vec{b}_c \]
+\[ \shape{(A \dmult{m} B) \dmult{n} C} = \vec{a} \oplus \vec{m} \oplus \vec{b}_c \oplus \vec{n} \oplus \vec{c} \]
+So, $B \dmult{n} C$ is valid and,
+\[ \shape{B \dmult{n} C} = \vec{m} \oplus \vec{b}_c \oplus \vec{n} \oplus \vec{c} \]
+Which means that $A \dmult{m} (B \dmult{n} C)$ is also valid and,
+\[ \shape{A \dmult{m} (B \dmult{n} C)} = \vec{a} \oplus \vec{m} \oplus \vec{b}_c \oplus \vec{n} \oplus \vec{c} \]
+
+Now consider that for all $\bar{a}$, $\bar{m}$, $\bar{b}_c$, $\bar{n}$, and $\bar{c}$ in
+$\Dim(\vec{a})$, $\Dim(\vec{m})$, $\Dim(\vec{b}_c)$, $\Dim(\vec{n})$ and $\Dim(\vec{c})$ respectively,
 \begin{align*}
-((A \dmult{m} B) \dmult{n} C)[\bar{a} \oplus \bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}]
-  &= (A \dmult{m} B)[\bar{a} \oplus \bar{m} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
-  &= (A[\bar{a} \oplus \bar{m}] B[\bar{m} \oplus \bar{b} \oplus \bar{n}]) C[\bar{n} \oplus \bar{c}] \\
-  &= A[\bar{a} \oplus \bar{m}] (B[\bar{m} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}]) \\
-  &= A[\bar{a} \oplus \bar{m}] (B \dmult{n} C)[\bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}] \\
-  &= (A \dmult{m} (B \dmult{n} C))[\bar{a} \oplus \bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}]
+  ((A \dmult{m} B) \dmult{n} C)[\bar{a} \oplus \bar{m} \oplus \bar{b}_c \oplus \bar{n} \oplus \bar{c}]
+  &=
+  (A \dmult{m} B)[\bar{a} \oplus \bar{m} \oplus \bar{b}_c \oplus \bar{n}]C[\bar{n} \oplus \bar{c}] \\
+  &=
+  A[\bar{a} \oplus \bar{m}]B[\bar{m} \oplus \bar{b}_c \oplus \bar{n}]C[\bar{n} \oplus \bar{c}] \\
+  &=
+  A[\bar{a} \oplus \bar{m}](B \dmult{n} C)[\bar{m} \oplus \bar{b}_c \oplus \bar{n} \oplus \bar{c}] \\
+  &=
+  (A \dmult{m} (B \dmult{n} C))[\bar{a} \oplus \bar{m} \oplus \bar{b}_c \oplus \bar{n} \oplus \bar{c}]
 \end{align*}
+
+So in this case, $(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
+\end{case}
+\begin{case} $\shape{\vec{b}} < \shape{\vec{n}}$
+
+Then we can divide $\vec{n}$ into $\vec{n} = \vec{n}_l \oplus \vec{b}$.
+So,
+\begin{align*}
+  \vec{a} \oplus \vec{m} \oplus \vec{b} &= \vec{l} \oplus \vec{n}_l \oplus \vec{b} \\
+  \vec{a} \oplus \vec{m} &= \vec{l} \oplus \vec{n}_l
+\end{align*}
+
+Then because we have the constraint that $n \le \shape{\shape{B}}$
+\begin{align*}
+  n &\le \shape{\shape{B}} \\
+  \shape{\vec{n}} &\le \shape{\vec{m} \oplus \vec{b}} \\
+  \shape{\vec{n}_l \oplus \vec{b}} &\le \shape{\vec{m} \oplus \vec{b}} \\
+  \shape{\vec{n}_l} &\le \shape{\vec{m}}
+\end{align*}
+
+And so $\vec{m}$ can be divided into $\vec{m} = \vec{m}_l \oplus \vec{n}_l$,
+resulting in,
+\[ \shape{B} = \vec{m}_l \oplus \vec{n}_l \oplus \vec{b} = \vec{m}_l \oplus \vec{n} \]
+So $B \dmult{n} C$ is a valid operation and,
+\[ \shape{B \dmult{n} C} = \vec{m_l} \oplus \vec{n} \oplus \vec{c} = \vec{m} \oplus \vec{b} \oplus \vec{c} \]
+Which further shows that $A \dmult{m} (B \dmult{n} C)$ is also a valid operation and,
+\begin{align*}
+  \vec{a} \oplus \vec{m} &= \vec{l} \oplus \vec{n}_l \\
+  \vec{a} \oplus \vec{m}_l \oplus \vec{n}_l &= \vec{l} \oplus \vec{n}_l \\
+  \vec{a} \oplus \vec{m}_l &= \vec{l}
+\end{align*}
+So,
+\begin{align*}
+  \shape{(A \dmult{m} B) \dmult{n} C}
+  &= \vec{l} \oplus \vec{n} \oplus \vec{c} \\
+  &= \vec{a} \oplus \vec{m}_l \oplus \vec{n}_l \oplus \vec{b} \oplus \vec{c} \\
+  &= \shape{A \dmult{m} (B \dmult{n} C)}
+\end{align*}
+
+Now consider that for all $\bar{a}$, $\bar{m}_l$, $\bar{n}_l$, $\bar{b}$, and $\bar{c}$ in
+$\Dim(\vec{a})$, $\Dim(\vec{m}_l)$, $\Dim(\vec{n}_l)$, $\Dim(\vec{b})$ and $\Dim(\vec{c})$ respectively,
+\begin{align*}
+  ((A \dmult{m} B) \dmult{n} C)[\bar{a} \oplus \bar{m}_l \oplus \bar{n}_l \oplus \bar{b} \oplus \bar{c}]
+  &=
+  (A \dmult{m} B)[\bar{a} \oplus \bar{m}_l \oplus \bar{n}_l \oplus \bar{b}] C[\bar{n}_l \oplus \bar{b} \oplus \bar{c}] \\
+  &=
+  A[\bar{a} \oplus \bar{m}_l \oplus \bar{n}_l] B[\bar{m}_l \oplus \bar{n}_l \oplus \bar{b}] C[\bar{n}_l \oplus \bar{b} \oplus \bar{c}] \\
+  &=
+  A[\bar{a} \oplus \bar{m}_l \oplus \bar{n}_l] (B \dmult{n} C)[\bar{m}_l \oplus \bar{n}_l \oplus \bar{b} \oplus \bar{c}] \\
+  &=
+  (A \dmult{m} (B \dmult{n} C))[\bar{a} \oplus \bar{m}_l \oplus \bar{n}_l \oplus \bar{b} \oplus \bar{c}]
+\end{align*}
+So in this case, $(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
+\end{case}
+\end{ppart}
+\begin{ppart}
+Let $A$, $B$, and $C$ be multimatrices and $m$ and $n$ integers
+$m \le \shape{\shape{B}}$ and $n \le \shape{\shape{B}}$ such that
+$A \dmult{m} (B \dmult{n} C)$ is valid.
+
+We can therefore construct the following shape vectors from the definition of the Hadamard product.
+\[ \shape{B \dmult{n} C} =  \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+\[ \shape{B} =  \vec{b} \oplus \vec{n} \]
+\[ \shape{C} =  \vec{n} \oplus \vec{c} \]
+\[ \shape{A \dmult{m} (B \dmult{n} C)} =  \vec{a} \oplus \vec{m} \oplus \vec{r} \]
+\[ \shape{A} =  \vec{a} \oplus \vec{m} \]
+\[ \shape{B \dmult{n} C} =  \vec{m} \oplus \vec{r} \]
+
+Where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$. 
+Then since $\vec{b} \oplus \vec{n} \oplus \vec{c} = \vec{m} \oplus \vec{r}$ we can divide this further into two
+separate cases.
+
+\setcounter{case}{0}
+\begin{case} $\shape{\vec{b}} \ge \shape{\vec{m}}$
+
+In this case we can split up $\vec{b}$ into $\vec{b} = \vec{m} \oplus \vec{b}_c$. Then,
+\[ \shape{B} = \vec{m} \oplus \vec{b}_c \oplus \vec{n} \]
+\[ \shape{B \dmult{n} C} = \vec{m} \oplus \vec{b}_c \oplus \vec{n} \oplus \vec{c} = \vec{m} \oplus \vec{r} \]
+\[ \vec{r} = \vec{b}_c \oplus \vec{n} \oplus \vec{c} \]
+\[ \shape{A \dmult{m} (B \dmult{n} C)} = \vec{a} \oplus \vec{m} \oplus \vec{b}_r \oplus \vec{n} \oplus \vec{c} \]
+
+Which means that $A \dmult{m} B$ is valid and,
+\[ \shape{A \dmult{m} B} = \vec{a} \oplus \vec{m} \oplus \vec{b}_c \oplus \vec{n} \]
+Which means that $(A \dmult{m} B) \dmult{n} C$ is also valid and,
+\[ \shape{(A \dmult{m} B) \dmult{n} C} = \vec{a} \oplus \vec{m} \oplus \vec{b}_c \oplus \vec{n} \oplus \vec{c} \]
+
+Now by the same argument as part 1, case 1, it follows that $A \dmult{m} (B \dmult{n} C) = (A \dmult{m} B) \dmult{n} C$.
+\end{case}
+\begin{case} $\shape{\vec{b}} < \shape{\vec{m}}$
+
+Then we can divide $\vec{m}$ into $\vec{m} = \vec{b} \oplus \vec{m}_r$.
+So,
+\begin{align*}
+  \vec{b} \oplus \vec{n} \oplus \vec{c} &= \vec{b} \oplus \vec{m}_r \oplus \vec{r} \\
+  \vec{n} \oplus \vec{c} &= \vec{m}_r \oplus \vec{r}
+\end{align*}
+
+Then because we have the constraint that $m \le \shape{\shape{B}}$
+\begin{align*}
+  m &\le \shape{\shape{B}} \\
+  \shape{\vec{m}} &\le \shape{\vec{b} \oplus \vec{n}} \\
+  \shape{\vec{b} \oplus \vec{m}_r} &\le \shape{\vec{b} \oplus \vec{n}} \\
+  \shape{\vec{m}_r} &\le \shape{\vec{n}}
+\end{align*}
+
+And so $\vec{n}$ can be divided into $\vec{n} = \vec{m}_r \oplus \vec{n}_r$,
+resulting in,
+\[ \shape{B} = \vec{b} \oplus \vec{m}_r \oplus \vec{n}_r = \vec{m} \oplus \vec{n}_r \]
+So $A \dmult{m} B$ is a valid operation and,
+\[ \shape{A \dmult{m} B} = \vec{a} \oplus \vec{m} \oplus \vec{n}_r = \vec{a} \oplus \vec{b} \oplus \vec{n} \]
+Which further shows that $(A \dmult{m} B) \dmult{n} C$ is also a valid operation and,
+\begin{align*}
+  \vec{n} \oplus \vec{c} &= \vec{m}_r \oplus \vec{r} \\
+  \vec{m}_r \oplus \vec{n}_r \oplus \vec{c} &= \vec{m}_r \oplus \vec{r} \\
+  \vec{n}_r \oplus \vec{c} &= \vec{r}
+\end{align*}
+So,
+\begin{align*}
+  \shape{A \dmult{m} (B \dmult{n} C)}
+  &= \vec{a} \oplus \vec{m} \oplus \vec{r} \\
+  &= \vec{a} \oplus \vec{b} \oplus \vec{m}_r \oplus \vec{n}_r \oplus \vec{c} \\
+  &= \shape{(A \dmult{m} B) \dmult{n} C}
+\end{align*}
+
+Now consider that for all $\bar{a}$, $\bar{b}$, $\bar{m}_r$, $\bar{n}_r$, and $\bar{c}$ in
+$\Dim(\vec{a})$, $\Dim(\vec{b})$, $\Dim(\vec{m}_r)$, $\Dim(\vec{n}_r)$ and $\Dim(\vec{c})$ respectively,
+\begin{align*}
+  (A \dmult{m} (B \dmult{n} C))[\bar{a} \oplus \bar{b} \oplus \bar{m}_r \oplus \bar{n}_r \oplus \bar{c}]
+  &= A[\bar{a} \oplus \bar{b} \oplus \bar{m}_r] (B \dmult{n} C)[\bar{b} \oplus \bar{m}_r \oplus \bar{n}_r \oplus \bar{c}] \\
+  &= A[\bar{a} \oplus \bar{b} \oplus \bar{m}_r] B[\bar{b} \oplus \bar{m}_r \oplus \bar{n}_r] C[\bar{m}_r \oplus \bar{n}_r \oplus \bar{c}] \\
+  &= (A \dmult{m} B)[\bar{a} \oplus \bar{b} \oplus \bar{m}_r \oplus \bar{n}_r] C[\bar{m}_r \oplus \bar{n}_r \oplus \bar{c}] \\
+  &= ((A \dmult{m} B) \dmult{n} C)[\bar{a} \oplus \bar{b} \oplus \bar{m}_r \oplus \bar{n}_r \oplus \bar{c}]
+\end{align*}
+
+So $A \dmult{m} (B \dmult{n} C) = (A \dmult{m} B) \dmult{n} C$.
+\end{case}
+\end{ppart}
+Which concludes the proof, as it is now shown that in both directions when $m \le \shape{\shape{B}}$ and $n \le \shape{\shape{B}}$,
+$(A \dmult{m} B) \dmult{n} C = A \dmult{m} (B \dmult{n} C)$.
 \end{proof}
 
 TODO: exposition
 
-\begin{theorem}[Equivalent Hadamard Product and Multiplication Chains]
-When $X_1 \ldots X_{m-1}$ are all in $\mathbb{R}^{\vec{x}}$ and
-$\shape{X_m} = \vec{x} \oplus \vec{r}$ for any $\vec{r}$,
-\[
-  (((\Ident^n(\vec{x})
-  \mmult{\shape{\vec{x}}} X_1) \mmult{\shape{\vec{x}}} X_2) \mmult{\shape{\vec{x}}} X_3)
-  \ldots X_m
-  =
-  \Ident^{n-m}(\vec{x})
-  \dmult{\shape{\vec{x}}} X_1 \dmult{\shape{\vec{x}}} X_2 \dmult{\shape{\vec{x}}} X_3
-  \ldots X_m
-\]
-And when $X_2 \ldots X_m$ are all in $\mathbb{R}^{\vec{x}}$ and
-$\shape{X_1} = \vec{l} \oplus \vec{x}$ for any $\vec{l}$,
-\[
-  X_1 \mmult{\shape{\vec{x}}} (X_2 \mmult{\shape{\vec{x}}} (X_3
-  \ldots (X_m \mmult{\shape{\vec{x}}} 
-  \Ident^n(\vec{x}))))
-  =
-  X_1 \dmult{\shape{\vec{x}}} X_2 \dmult{\shape{\vec{x}}} X_3
-  \ldots X_m \dmult{\shape{\vec{x}}} 
-  \Ident^{n-m}(\vec{x})
-\]
+\begin{theorem}[Identity Multiplication and Hadamard Reductions]
+Consider $\shape{X} = (k * \vec{x}) \oplus \vec{r}$ for any vectors $\vec{x}$ and $\vec{r}$
+and natural number $k$. And let $n \ge k$. Then,
+\[ \Ident^n(\vec{x}) \mmult{k\shape{\vec{x}}} X = \Ident^{n-k}(\vec{x}) \dmult{k\shape{\vec{x}}} X \]
+
+Or when $\shape{X} = \vec{l} \oplus (k * \vec{x})$ for any vectors $\vec{x}$ and $\vec{l}$
+and natural number $k$. And let $n \ge k$. Then,
+\[ X \mmult{k\shape{\vec{x}}} \Ident^n(\vec{x}) = X \dmult{k\shape{\vec{x}}} \Ident^{n-k}(\vec{x}) \]
 \end{theorem}
+\begin{landscape}
 \begin{proof}
-TODO 
+\begin{ppart}
+Let $\shape{X} = (k * \vec{x}) \oplus \vec{r}$ for any vectors $\vec{x}$ and $\vec{r}$
+and natural number $k$. And let $n > k$.
+Then let all $\bar{r} \in \Dim(\vec{r})$ and all $\bar{x}_i \in \Dim(\vec{x})$ for $1 \le i \le n-k$ and let
+$\bar{c}_{[a,b]}$ denote the following in general,
+\[ \bar{c}_{[a,b]} = \bigoplus_{i \in [a,b]} \bar{c}_i \]
+\begin{align*}
+  \left(\Ident^n(\vec{x}) \mmult{\shape{\vec{x}}} X\right)[\bar{x}_{[1,n-k]} \oplus \bar{r}]
+  =& \sum_{\forall \bar{c}_j \in \Dim(\vec{x}), j \in [n-k+1, n]} \Ident^n(\vec{x})[\bar{x}_{[1,n-k]} \oplus \bar{c}_{[n-k+1,n]}] X[\bar{c}_{[n-k+1,n]} \oplus \bar{r}] \\
+  =& \Ident^n(\vec{x})[\bar{x}_{[1,n-k]} \oplus (k * \bar{x}_1)] X[(k * \bar{x}_1) \oplus \bar{r}] \\
+  &+ \sum_{\forall \bar{c}_j, \bar{c}_j \ne \bar{x}_1}
+    \Ident^n(\vec{x})[\bar{x}_{[1,n-k]} \oplus \bar{c}_{[n-k+1,n]}] X[\bar{c}_{[n-k+1,n]} \oplus \bar{r}] \\
+  =& \Ident^{n-k}(\vec{x})[\bar{x}_{[1,n-k]}] X[(k * \bar{x}_1) \oplus \bar{r}]
+    + \sum_{\forall \bar{c}_j, \bar{c}_j \ne \bar{x}_1}
+    (0) X[\bar{c}_{[n-k+1,n]} \oplus \bar{r}] \\
+  =& \Ident^{n-k}(\vec{x})[\bar{x}_{[1,n-k]}] X[(k * \bar{x}_1) \oplus \bar{r}] \\
+  =& 
+    \left\{
+      \begin{array}{ll}
+        X[(k * \bar{x}_1) \oplus \bar{r}] & \mbox{if } \forall i \in [2,n-k] : \bar{x}_i = \bar{x}_1 \\
+        0 & \mbox{otherwise}
+      \end{array}
+    \right. \\
+  =& \Ident^{n-k}(\vec{x})[\bar{x}_{[1,n-k]}] X[\bar{x}_{[1,n-k]} \oplus \bar{r}] \\
+  =& \left(\Ident^{n-k}(\vec{x}) \dmult{k\shape{\vec{x}}} X\right)[\bar{x}_{[1,n-k]} \oplus \bar{r}]
+\end{align*}
+So $\Ident^n(\vec{x}) \mmult{\shape{\vec{x}}} X = \Ident^{n-k}(\vec{x}) \dmult{k\shape{\vec{x}}} X$.
+\end{ppart}
+\begin{ppart}
+Let $\shape{X} = \vec{l} \oplus (k * \vec{x})$ for any vectors $\vec{x}$ and $\vec{l}$
+and natural number $k$. And let $n > k$.
+Then let all $\bar{l} \in \Dim(\vec{l})$ and all $\bar{x}_i \in \Dim(\vec{x})$ for $k+1 \le i \le n$ and let
+$\bar{c}_{[a,b]}$ denote the following in general,
+\[ \bar{c}_{[a,b]} = \bigoplus_{i \in [a,b]} \bar{c}_i \]
+\begin{align*}
+  \left(X \mmult{\shape{\vec{x}}} \Ident^n(\vec{x})\right)[\bar{l} \oplus \bar{x}_{[k+1,n]}]
+  =& \sum_{\forall \bar{c}_j \in \Dim(\vec{x}), j \in [1, k]} X[\bar{l} \oplus \bar{c}_{[1,k]}] \Ident^n(\vec{x})[\bar{c}_{[1,k]} \oplus \bar{x}_{[k+1,n]}] \\
+  =& X[\bar{l} \oplus (k*\bar{x}_{k+1})] \Ident^n(\vec{x})[(k*\bar{x}_{k+1}) \oplus \bar{x}_{[k+1,n]}] \\
+   & +\sum_{\forall \bar{c}_j \ne \bar{x}_{k+1}} X[\bar{l} \oplus \bar{c}_{[1,k]}] \Ident^n(\vec{x})[\bar{c}_{[1,k]} \oplus \bar{x}_{[k+1,n]}] \\
+  =& X[\bar{l} \oplus (k*\bar{x}_{k+1})] \Ident^{n-k}(\vec{x})[\bar{x}_{[k+1,n]}]
+     +\sum_{\forall \bar{c}_j \ne \bar{x}_{k+1}} X[\bar{l} \oplus \bar{c}_{[1,k]}] (0) \\
+  =& X[\bar{l} \oplus (k*\bar{x}_{k+1})] \Ident^{n-k}(\vec{x})[\bar{x}_{[k+1,n]}] \\
+  =& 
+    \left\{
+      \begin{array}{ll}
+        X[\bar{l} \oplus (k * \bar{x}_{k+1})] & \mbox{if } \forall i \in [k+2,n] : \bar{x}_i = \bar{x}_{k+1} \\
+        0 & \mbox{otherwise}
+      \end{array}
+    \right. \\
+  =& X[\bar{l} \oplus \bar{x}_{[k+1,n]}] \Ident^{n-k}(\vec{x})[\bar{x}_{[k+1,n]}] \\
+  =& \left(X \dmult{k\shape{\vec{x}}} \Ident^{n-k}(\vec{x})\right)[\bar{l} \oplus \bar{x}_{[k+1,n]}]
+\end{align*}
+So $X \mmult{\shape{\vec{x}}} \Ident^n(\vec{x}) = X \dmult{k\shape{\vec{x}}} \Ident^{n-k}(\vec{x})$.
+\end{ppart}
 \end{proof}
+\end{landscape}
 
 TODO: exposition
 
@@ -2036,6 +2267,124 @@ For any $\bar{x} \in \Dim(\vec{x})$,
   &= (B \dmult{\shape{\vec{x}}} A)[\bar{x}]
 \end{align*}
 \end{proof}
+
+TODO: When are Hadamard products and regular products associative?
+
+\begin{theorem}[Associativity of Mixed Hadamard and Regular Products]
+Consider multimatrices $A$, $B$, and $C$ and non-negative integers $n$ and $m$
+such that $m+n \le \shape{\shape{B}}$.
+
+If either $(A \mmult{m} B) \dmult{n} C$ or $A \mmult{m} (B \dmult{n} C)$ is
+valid, then the other is also valid and,
+\[ (A \mmult{m} B) \dmult{n} C = A \mmult{m} (B \dmult{n} C) \]
+
+If either $(A \dmult{n} B) \mmult{m} C$ or $A \dmult{n} (B \mmult{m} C)$ is
+valid, then the other is also valid and,
+\[ (A \dmult{n} B) \mmult{m} C = A \dmult{n} (B \mmult{m} C) \]
+\end{theorem}
+\begin{proof}
+\begin{ppart}
+Let $A$, $B$, and $C$ be multimatrices and let $n$ and $m$ be non-negative integers that $m+n \le \shape{\shape{B}}$.
+Then let it be true that either $(A \mmult{m} B) \dmult{n} C$ or $A \mmult{m} (B \dmult{n} C)$ is valid.
+Since $0 < m$, $0 < n$, and $m + n \le \shape{\shape{B}}$, we know we can divide $\shape{B}$ thusly,
+\[ \shape{B} = \vec{m} \oplus \vec{b} \oplus \vec{n} \]
+Where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$.
+
+\begin{case} $(A \mmult{m} B) \dmult{n} C$ is valid.
+
+By our definitions of multiplication,
+\[ \shape{A \mmult{m} B} = \vec{a} \oplus \vec{b} \oplus \vec{n} \]
+\[ \shape{A} = \vec{a} \oplus \vec{m} \]
+\[ \shape{(A \mmult{m} B) \dmult{n} C} = \vec{a} \oplus \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+\[ \shape{C} = \vec{n} \oplus \vec{c} \]
+For some vectors $\vec{a}$ and $\vec{c}$. 
+Therefore $B \dmult{n} C$ is valid and,
+\[ \shape{B \dmult{n} C} = \vec{m} \oplus \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+So, $A \mmult{m} (B \dmult{n} C)$ is valid and,
+\[ \shape{A \mmult{m} (B \dmult{n} C)} = \shape{(A \mmult{m} B) \dmult{n} C} = \vec{a} \oplus \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+\end{case}
+\begin{case} $A \mmult{m} (B \dmult{n} C)$ is valid.
+
+By our definitions of multiplication,
+\[ \shape{B \dmult{n} C} = \vec{m} \oplus \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+\[ \shape{C} = \vec{n} \oplus \vec{c} \]
+\[ \shape{A \mmult{m} (B \dmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+\[ \shape{A} = \vec{a} \oplus \vec{m} \]
+For some vectors $\vec{a}$ and $\vec{c}$. 
+Therefore $A \mmult{m} B$ is valid and,
+\[ \shape{A \mmult{m} B} = \vec{a} \oplus \vec{b} \oplus \vec{n} \]
+So, $(A \mmult{m} B) \dmult{n} C$ is valid and,
+\[ \shape{(A \mmult{m} B) \dmult{n} C} = \shape{A \mmult{m} (B \dmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{n} \oplus \vec{c} \]
+\end{case}
+
+So in either case, the validity of the one implies the validity of the other. And with, conveniently, the same shape breakdown.
+
+Now, for all $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, $\bar{n} \in \Dim(\vec{n})$, and $\bar{c} \in \Dim(\vec{c})$,
+\begin{align*}
+  \left((A \mmult{m} B) \dmult{n} C\right)[\bar{a} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}]
+  &= (A \mmult{m} B)[\bar{a} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &= \left(\sum_{\forall \bar{m} \in \Dim(\vec{m})} A[\bar{a} \oplus \bar{m}] B[\bar{m} \oplus \bar{b} \oplus \bar{n}]\right) C[\bar{n} \oplus \bar{c}] \\
+  &= \sum_{\forall \bar{m}} A[\bar{a} \oplus \bar{m}] B[\bar{m} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  &= \sum_{\forall \bar{m}} A[\bar{a} \oplus \bar{m}] (B \dmult{n} C)[\bar{m} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}] \\
+  &= \left(A \mmult{m} (B \dmult{n} C)\right)[\bar{a} \oplus \bar{b} \oplus \bar{n} \oplus \bar{c}]
+\end{align*}
+
+So $(A \mmult{m} B) \dmult{n} C = A \mmult{m} (B \dmult{n} C)$.
+\end{ppart}
+\setcounter{case}{0}
+Let $A$, $B$, and $C$ be multimatrices and let $n$ and $m$ be non-negative integers that $m+n \le \shape{\shape{B}}$.
+Then let it be true that either $(A \dmult{n} B) \mmult{m} C$ or $A \dmult{n} (B \mmult{m} C)$ is valid.
+Since $0 < m$, $0 < n$, and $m + n \le \shape{\shape{B}}$, we know we can divide $\shape{B}$ thusly,
+\[ \shape{B} = \vec{n} \oplus \vec{b} \oplus \vec{m} \]
+Where $\shape{\vec{m}} = m$ and $\shape{\vec{n}} = n$.
+
+\begin{case} $(A \dmult{n} B) \mmult{m} C$ is valid.
+
+By our definitions of multiplication,
+\[ \shape{A \dmult{n} B} = \vec{a} \oplus \vec{n} \oplus \vec{b} \oplus \vec{m} \]
+\[ \shape{A} = \vec{a} \oplus \vec{n} \]
+\[ \shape{(A \dmult{n} B) \mmult{m} C} = \vec{a} \oplus \vec{n} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{C} = \vec{m} \oplus \vec{c} \]
+For some vectors $\vec{a}$ and $\vec{c}$. 
+Therefore $B \mmult{m} C$ is valid and,
+\[ \shape{B \mmult{m} C} = \vec{n} \oplus \vec{b} \oplus \vec{c} \]
+So, $A \dmult{n} (B \mmult{m} C)$ is valid and,
+\[ \shape{A \dmult{n} (B \mmult{m} C)} = \shape{(A \dmult{n} B) \mmult{m} C} = \vec{a} \oplus \vec{n} \oplus \vec{b} \oplus \vec{c} \]
+\end{case}
+\begin{case} $A \dmult{n} (B \mmult{m} C)$ is valid.
+
+By our definitions of multiplication,
+\[ \shape{B \mmult{m} C} = \vec{n} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{C} = \vec{m} \oplus \vec{c} \]
+\[ \shape{A \dmult{n} (B \mmult{m} C)} = \vec{a} \oplus \vec{n} \oplus \vec{b} \oplus \vec{c} \]
+\[ \shape{A} = \vec{a} \oplus \vec{n} \]
+For some vectors $\vec{a}$ and $\vec{c}$. 
+Therefore $A \dmult{n} B$ is valid and,
+\[ \shape{A \dmult{n} B} = \vec{a} \oplus \vec{n} \oplus \vec{b} \]
+So, $(A \dmult{n} B) \mmult{m} C$ is valid and,
+\[ \shape{(A \dmult{n} B) \mmult{m} C} = \shape{A \dmult{n} (B \mmult{m} C)} = \vec{a} \oplus \vec{n} \oplus \vec{b} \oplus \vec{c} \]
+\end{case}
+
+So in either case, the validity of the one implies the validity of the other. And with, conveniently, the same shape breakdown.
+
+Now, for all $\bar{a} \in \Dim(\vec{a})$, $\bar{n} \in \Dim(\vec{n})$, $\bar{b} \in \Dim(\vec{b})$, and $\bar{c} \in \Dim(\vec{c})$,
+\begin{align*}
+  \left((A \dmult{n} B) \mmult{m} C\right)[\bar{a} \oplus \bar{n} \oplus \bar{b} \oplus \bar{c}]
+  &=
+  \sum_{\forall \bar{m} \in \Dim(\vec{m})} (A \dmult{n} B)[\bar{a} \oplus \bar{n} \oplus \bar{b} \oplus \bar{m}] C[\bar{m} \oplus \bar{n}] \\
+  &=
+  \sum_{\forall \bar{m}} A[\bar{a} \oplus \bar{n}] B[\bar{n} \oplus \bar{b} \oplus \bar{m}] C[\bar{m} \oplus \bar{n}] \\
+  &=
+  A[\bar{a} \oplus \bar{n}] \sum_{\forall \bar{m}} B[\bar{n} \oplus \bar{b} \oplus \bar{m}] C[\bar{m} \oplus \bar{n}] \\
+  &=
+  A[\bar{a} \oplus \bar{n}] (B \mmult{m} C)[\bar{n} \oplus \bar{b} \oplus \bar{n}] \\
+  &= \left( A \dmult{n} (B \mmult{m} C) \right)[\bar{a} \oplus \bar{n} \oplus \bar{b} \oplus \bar{n}]
+\end{align*}
+
+So $(A \dmult{n} B) \mmult{m} C = A \dmult{n} (B \mmult{m} C)$.
+\end{proof}
+
+TODO: Exposition: I think the following follows from the associativity of mixed products and contraction of identities
 
 \begin{theorem}[Cubic Identity Multiplication]
 \label{hada_cubic}
@@ -2422,12 +2771,12 @@ the cut happens in the shape vector.
 
 \begin{definition}[Multimatrix Transposition]
 \label{tran_def}
-Let $\shape{X} = \vec{l} \oplus \vec{r}$ where $\shape{\vec{l}} = l$ and $\shape{\vec{r}} = r$
-\[ \shape{\Tran(X, l)} = \vec{r} \oplus \vec{l} \]
+Let $\shape{X} = \vec{a} \oplus \vec{b}$ where $\shape{\vec{a}} = a$,
+\[ \shape{\transpose{X}{a}} = \vec{b} \oplus \vec{a} \]
 And,
-\[ \forall \bar{l} \in \Dim(\vec{l}), \bar{r} \in \Dim(\vec{r}) : \]
-\[ \Tran(X, l)[\bar{r} \oplus \bar{l}] = X[\bar{l} \oplus \bar{r}] \]
-We call $l$ the index of transpose.
+\[ \forall \bar{a} \in \Dim(\vec{a}), \bar{b} \in \Dim(\vec{b}) : \]
+\[ \transpose{X}{a}[\bar{b} \oplus \bar{a}] = X[\bar{a} \oplus \bar{b}] \]
+We call $a$ the index of transpose.
 \end{definition}
 
 Here's an example:
@@ -2437,14 +2786,14 @@ Let's construct some multimatrix, $M$, with a shape:
 \[ \shape{M} = \left<3,2,7,5,9\right> \]
 Then lets take the first transpose of that
 multimatrix:
-\[ \shape{\Tran(M, 1)} = \left<2,7,5,9,3\right> \]
+\[ \shape{\transpose{M}{1}} = \left<2,7,5,9,3\right> \]
 And... how about the third:
-\[ \shape{\Tran(M, 3)} = \left<5,9,3,2,7\right> \]
+\[ \shape{\transpose{M}{3}} = \left<5,9,3,2,7\right> \]
 You can see, it's as though I cut off the front of the shape vector and transferred
 it to the end of the vector.
 
 You do the same thing with indices. So,
-\[ M[1,2,3,4,5] = \Tran(M, 3)[4,5,1,2,3] \]
+\[ M[1,2,3,4,5] = \transpose{M}{3}[4,5,1,2,3] \]
 \end{example}
 
 However, you'll see cases in later chapters of multimatrix transposes where
@@ -2459,7 +2808,7 @@ it just requires a bit of modular arithmetic.
 \begin{definition}[Multimatrix Transpose Extension]
 \label{tran_ext}
 For any multimatrix, the following transposes are equivalent,
-\[ \Tran(X, n) = \Tran(X, \remainder(n, \shape{\shape{X}})) \]
+\[ \transpose{X}{n} = \transpose{X}{\remainder(n, \shape{\shape{X}})} \]
 Where $\remainder(n, \shape{\shape{X}})$ is the remainder of $n$ divided by $\shape{\shape{X}}$.
 That is, a value $0 \le \remainder(n, \shape{\shape{X}}) < \shape{\shape{X}}$ such that there exists an
 integer $k$ where, $n = k\shape{\shape{X}} + \remainder(n, \shape{\shape{X}})$.
@@ -2469,11 +2818,11 @@ This extension is consistent with the previous definition because, for any
 index of transpose, $l$, that would be covered by the original definition,
 $0 \le l \le \shape{\shape{X}}$, you can see that, in all but one case $\remainder(l, \shape{\shape{X}}) = l$.
 The exception, $l = \shape{\shape{X}}$ is covered by showing that
-$\remainder(\shape{\shape{X}}, \shape{\shape{X}}) = 0$ and $\Tran(X, 0) = \Tran(X, \shape{\shape{X}})$. 
+$\remainder(\shape{\shape{X}}, \shape{\shape{X}}) = 0$ and $\transpose{X}{0} = \transpose{X}{\shape{\shape{X}}}$. 
 
 Thus, we have shown a natural equivalent class \cite{book:abstract} of transpose
 operations. On multimatrices with a shape of some length $n$ there are $n$ unique
-transpose; $\Tran(X, i)$ for all $0 \le i < n$. All other transposes are equivalent
+transpose; $\transpose{X}{i}$ for all $0 \le i < n$. All other transposes are equivalent
 to one of these base transposes by our extended definition.
 
 To make use of this equivalence, we need to first show how these classes are
@@ -2499,29 +2848,29 @@ with shapes of length $n$ form a group under composition.
 
 Let's look at the composition of some two transposes on a multimatrix.
 So, let $A$ be a multimatrix with shape of length $n$. Now let $x$ and $y$
-be indices of transpositions. Then what is $\Tran(\Tran(A, x), y)$?
+be indices of transpositions. Then what is $\transpose{\transpose{A}{x}}{y}$?
 To apply the the first transpose we need to break $\shape{A}$ into two vectors,
 so let $\shape{A} = \vec{l} \oplus \vec{r}$ where $\shape{\vec{l}} = x$.
 
 Then,
-\[ \shape{\Tran(A, x)} = \vec{r} \oplus \vec{l} \]
+\[ \shape{\transpose{A}{x}} = \vec{r} \oplus \vec{l} \]
 And for all
 $\bar{l} \in \Dim(\vec{l})$ and $\bar{r} \in \Dim(\vec{r})$,
-\[ \Tran(A, x)[\bar{r} \oplus \bar{l}] = A[\bar{l} \oplus \bar{r}] \]
+\[ \transpose{A}{x}[\bar{r} \oplus \bar{l}] = A[\bar{l} \oplus \bar{r}] \]
 
-Now to apply a transposition with index of transposition $y$ to $\Tran(A,x)$
-we need to break up $\shape{\Tran(A,x)}$ into two vector, such as
-$\shape{\Tran(A,x)} = \vec{l}' \oplus \vec{r}'$.
+Now to apply a transposition with index of transposition $y$ to $\transpose{A}{x}$
+we need to break up $\shape{\transpose{A}{x}}$ into two vector, such as
+$\shape{\transpose{A}{x}} = \vec{l}' \oplus \vec{r}'$.
 
-Since we've already shown that $\shape{\Tran(A,x)} = \vec{r} \oplus \vec{l}$
+Since we've already shown that $\shape{\transpose{A}{x}} = \vec{r} \oplus \vec{l}$
 we end up with two conceptual splits of that shape vector that need to
 be reconciled.
 
 \begin{case} $\shape{\vec{l}'} \le \shape{\vec{r}}$
 
-Then we can divide $\shape{\Tran(A,x)}$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
+Then we can divide $\shape{\transpose{A}{x}}$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
 such that
-\[ \shape{\Tran(A,x)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\transpose{A}{x}} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
 \[ \vec{l}' = \vec{b} \]
 \[ \vec{r}' = \vec{c} \oplus \vec{a} \]
 \[ \vec{r} = \vec{b} \oplus \vec{c} \]
@@ -2534,9 +2883,9 @@ So we can then say,
 \[ \shape{A} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 
 And since,
-\[ \shape{\Tran(\Tran(A, x), y)} = \vec{r}' \oplus \vec{l}' \]
+\[ \shape{\transpose{\transpose{A}{x}}{y}} = \vec{r}' \oplus \vec{l}' \]
 It follows that,
-\[ \shape{\Tran(\Tran(A, x), y)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\transpose{\transpose{A}{x}}{y}} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
 
 Now, let $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and
 $\bar{c} \in \Dim(\vec{c})$. Notice that because of Theorem 
@@ -2545,37 +2894,37 @@ $\bar{b} \oplus \bar{c} \in \Dim(\vec{r})$.
 
 Continuing our definition of transposition,
 \begin{align*}
-  \Tran(\Tran(A, x), y)[\bar{c} \oplus \bar{a} \oplus \bar{b}]
+  \transpose{\transpose{A}{x}}{y}[\bar{c} \oplus \bar{a} \oplus \bar{b}]
   &=
-  \Tran(A, x)[\bar{b} \oplus \bar{c} \oplus \bar{a}] \\
+  \transpose{A}{x}[\bar{b} \oplus \bar{c} \oplus \bar{a}] \\
   &=
   A[\bar{a} \oplus \bar{b} \oplus \bar{c}]
 \end{align*}
 
-See now that this composite operation is also a transposition, $\Tran(A, z)$ where,
+See now that this composite operation is also a transposition, $\transpose{A}{z}$ where,
 $z = \shape{\vec{a} \oplus \vec{b}}$.
 So by definition,
 \begin{align*}
-  \shape{\Tran(A, z)}
+  \shape{\transpose{A}{z}}
   &=
   \vec{c} \oplus \vec{b} \oplus \vec{a} \\
   &=
-  \shape{\Tran(\Tran(A, x), y)}  
+  \shape{\transpose{\transpose{A}{x}}{y}}  
 \end{align*}
 And,
 \begin{align*}
-  \Tran(A, z)[\bar{c} \oplus \bar{a} \oplus \bar{b}]
+  \transpose{A}{z}[\bar{c} \oplus \bar{a} \oplus \bar{b}]
   &=
   A[\bar{a} \oplus \bar{b} \oplus \bar{c}] \\
   &=
-  \Tran(\Tran(A, x), y)[\bar{c} \oplus \bar{a} \oplus \bar{b}]
+  \transpose{\transpose{A}{x}}{y}[\bar{c} \oplus \bar{a} \oplus \bar{b}]
 \end{align*}
 \end{case}
 
 \begin{case} $\shape{\vec{l}'} > \shape{\vec{r}}$
-Then we can divide $\shape{\Tran(A,x)}$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
+Then we can divide $\shape{\transpose{A}{x}}$ into three vectors, $\vec{a}$, $\vec{b}$, and $\vec{c}$
 such that
-\[ \shape{\Tran(A,x)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\transpose{A}{x}} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
 \[ \vec{l}' = \vec{c} \oplus \vec{a} \]
 \[ \vec{r}' = \vec{b} \]
 \[ \vec{r} = \vec{c} \]
@@ -2585,9 +2934,9 @@ So we can then say,
 \[ \shape{A} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
 
 And since,
-\[ \shape{\Tran(\Tran(A, x), y)} = \vec{r}' \oplus \vec{l}' \]
+\[ \shape{\transpose{\transpose{A}{x}}{y}} = \vec{r}' \oplus \vec{l}' \]
 It follows that,
-\[ \shape{\Tran(\Tran(A, x), y)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\transpose{\transpose{A}{x}}{y}} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
 
 Now, let $\bar{a} \in \Dim(\vec{a})$, $\bar{b} \in \Dim(\vec{b})$, and
 $\bar{c} \in \Dim(\vec{c})$. Notice that because of Theorem 
@@ -2596,30 +2945,30 @@ $\bar{a} \oplus \bar{b} \in \Dim(\vec{l})$.
 
 Continuing our definition of transposition,
 \begin{align*}
-  \Tran(\Tran(A, x), y)[\bar{b} \oplus \bar{c} \oplus \bar{a}]
+  \transpose{\transpose{A}{x}}{y}[\bar{b} \oplus \bar{c} \oplus \bar{a}]
   &=
-  \Tran(A, x)[\bar{c} \oplus \bar{a} \oplus \bar{b}] \\
+  \transpose{A}{x}[\bar{c} \oplus \bar{a} \oplus \bar{b}] \\
   &=
   A[\bar{a} \oplus \bar{b} \oplus \bar{c}]
 \end{align*}
 
-See now that this composite operation is also a transposition, $\Tran(A, z)$ where,
+See now that this composite operation is also a transposition, $\transpose{A}{z}$ where,
 $z = \shape{\vec{a}}$.
 So by definition,
 \begin{align*}
-  \shape{\Tran(A, z)}
+  \shape{\transpose{A}{z}}
   &=
   \vec{b} \oplus \vec{c} \oplus \vec{a} \\
   &=
-  \shape{\Tran(\Tran(A, x), y)}  
+  \shape{\transpose{\transpose{A}{x}}{y}}  
 \end{align*}
 And,
 \begin{align*}
-  \Tran(A, z)[\bar{b} \oplus \bar{c} \oplus \bar{a}]
+  \transpose{A}{z}[\bar{b} \oplus \bar{c} \oplus \bar{a}]
   &=
   A[\bar{a} \oplus \bar{b} \oplus \bar{c}] \\
   &=
-  \Tran(\Tran(A, x), y)[\bar{b} \oplus \bar{c} \oplus \bar{a}]
+  \transpose{\transpose{A}{x}}{y}[\bar{b} \oplus \bar{c} \oplus \bar{a}]
 \end{align*}
 \end{case}
 
@@ -2631,7 +2980,7 @@ a closed group under composition.
 \begin{ppart}
 In this last part, I'll define a bijective map
 $\phi: \mathbb{T}_n \to \mathbb{Z}_n$ for which
-\[ \phi(\Tran_y \circ \Tran_x) = \phi(\Tran(y)) + \phi(\Tran(x)) \]
+\[ \phi(\Tran_y \circ \Tran_x) = \phi(\Tran_y) + \phi(\Tran_x) \]
 Which is the definition of an isomorphism.
 
 Note that I'm letting $\Tran_i$ be a shorthand for ``a transposition
@@ -2647,10 +2996,10 @@ any multimatrix with shape length $n$. Then let there be two transpositions
 $\Tran_x$ and $\Tran_y$ which we'll apply in series. First remember that
 to define $\Tran_x$ we needed to divide $\shape{A}$ into $\shape{A} = \vec{l} \oplus \vec{r}$
 where $\shape{\vec{l}} = x$. Then we'd say that
-\[ \shape{\Tran(A, x)} = \vec{r} \oplus \vec{l} \]
-Then to further apply $\Tran(\Tran(A, x), y)$ we need to divide $\shape{\Tran(A,x)}$
+\[ \shape{\transpose{A}{x}} = \vec{r} \oplus \vec{l} \]
+Then to further apply $\transpose{\transpose{A}{x}}{y}$ we need to divide $\shape{\transpose{A}{x}}$
 into,
-\[ \shape{\Tran(A, x)} = \vec{l}' \oplus \vec{r}' \]
+\[ \shape{\transpose{A}{x}} = \vec{l}' \oplus \vec{r}' \]
 Where $\shape{\vec{l}'} = y$.
 That leads to two cases,
 
@@ -2665,8 +3014,8 @@ And in this case we showed that we needed to split up $\shape{A}$ into,
 \[ \vec{l} = \vec{a} \]
 
 So that,
-\[ \shape{\Tran(A, x)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
-\[ \shape{\Tran(\Tran(A, x), y)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\transpose{A}{x}} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\transpose{\transpose{A}{x}}{y}} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
 And note that,
 \[ x = \shape{\vec{a}} \]
 \[ y = \shape{\vec{b}} \]
@@ -2699,8 +3048,8 @@ And in this case we showed that we needed to split up $\shape{A}$ into,
 \[ \vec{l} = \vec{a} \oplus \vec{b} \]
 
 So that,
-\[ \shape{\Tran(A, x)} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
-\[ \shape{\Tran(\Tran(A, x), y)} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
+\[ \shape{\transpose{A}{x}} = \vec{c} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{\transpose{\transpose{A}{x}}{y}} = \vec{b} \oplus \vec{c} \oplus \vec{a} \]
 And note that,
 \[ x = \shape{\vec{a} \oplus \vec{b}} \]
 \[ y = \shape{\vec{c} \oplus \vec{a}} \]
@@ -2736,23 +3085,23 @@ an isomorphism is but is several chapters into a hobby math book. It means that.
 \begin{corollary}[Stacked Transpose]
 For any multimatrix $A$ whose shape is $n$ long (an $n$ dimensional multimatrix
 in other words), it is always true that
-\[ \Tran(\Tran(A, x),y) = \Tran(A, \remainder(x+y,n)) \]
+\[ \transpose{\transpose{A}{x}}{y} = \transpose{A}{\remainder(x+y,n)} \]
 \end{corollary}
 
 \begin{example}
 Let's take a look at a concrete example. Say we have a
 multimatrix $A$ who's shape is $\left<11, 3, 7, 5\right>$. 
 Then see that,
-\[ \shape{\Tran(A, 2)} = \left<7, 5, 11, 3\right> \]
+\[ \shape{\transpose{A}{2}} = \left<7, 5, 11, 3\right> \]
 And applying another transpose,
-\[ \shape{\Tran(\Tran(A, 2), 3)} = \left<3, 7, 5, 11\right> \]
+\[ \shape{\transpose{\transpose{A}{2}}{3}} = \left<3, 7, 5, 11\right> \]
 Notice that our corollary says that this double transpose should be
-equal to the transpose $\Tran(A, \remainder(2+3, 4))$ which would
-be $\Tran(A, 1)$ and indeed it is:
+equal to the transpose $\transpose{A}{\remainder(2+3, 4)}$ which would
+be $\transpose{A}{1}$ and indeed it is:
 \begin{align*}
-  \shape{\Tran(A, 1)}
+  \shape{\transpose{A}{1}}
   &= \left<3, 7, 5, 11\right> \\
-  &= \shape{\Tran(\Tran(A, 2), 3)}
+  &= \shape{\transpose{\transpose{A}{2}}{3}}
 \end{align*}
 \end{example}
 
@@ -2763,20 +3112,20 @@ undo transposition operations with other transposition operations.
 Let $A$ be a multimatrix such that $\shape{\shape{A}} = n$. And let
 $x$ be some integer. Then, the inverse of $\Tran_x$ is
 $\Tran_{-x}$. That is,
-\[ \Tran(\Tran(A, x), -x) = X \]
+\[ \transpose{\transpose{A}{x}}{-x} = X \]
 \end{corollary}
 
 \begin{example}
 Say you have a multimatrix, $A$, of shape $\left<2,7,1,8,3\right>$.
 Let's apply a transpose to it, $\Tran_3$, and we'll get the shape,
-\[ \shape{\Tran(A, 3)} = \left<8,3,2,7,1\right> \]
+\[ \shape{\transpose{A}{3}} = \left<8,3,2,7,1\right> \]
 Now, to get back to $A$ we can apply another transpose $\Tran_{-3}$ according
 to the above corollary.
 Our extended definition of transposition (Def. \ref{tran_ext})
 tells us that this is equal to $\Tran_{\remainder(-3, 5)} = \Tran_{2}$.
 So the inverse of $\Tran_3$ is $\Tran_2$, which we can see here:
 \begin{align*}
-  \shape{\Tran(\Tran(A, 3), 2)}
+  \shape{\transpose{\transpose{A}{3}}{2}}
   &= \left<2,7,1,8,3\right> \\
   &= \shape{A}
 \end{align*}
@@ -2791,7 +3140,7 @@ at some theorems involving it.
 \begin{theorem}[Identity Transpose]
 Let $n$ be a positive integer and let $\vec{x}$ be a positive length
 shape vector. Then for any integer $k$,
-\[ \Tran(\Ident^n(\vec{x}), k\shape{\vec{x}}) = \Ident^n(\vec{x}) \]
+\[ \transpose{\Ident^n(\vec{x})}{k\shape{\vec{x}}} = \Ident^n(\vec{x}) \]
 \end{theorem}
 \begin{proof}
 Consider that for some ordered set of indices
@@ -2820,14 +3169,14 @@ Since for the permutation
 $X' = \left\{\bar{x}_{k+1}, \bar{x}_{k+2} \ldots \bar{x}_{n},
 \bar{x}_1, \bar{x}_2 \ldots \bar{x}_k\right\}$
 \begin{align*}
-  \Tran(\Ident^n(\vec{x}), k\shape{\vec{x}})\left[\bigoplus X'\right]
+  \transpose{\Ident^n(\vec{x})}{k\shape{\vec{x}}}\left[\bigoplus X'\right]
 	&=
   \Ident^n(\vec{x})\left[\bigoplus X\right]\\
 	&=
   \Ident^n(\vec{x})\left[\bigoplus X'\right]
 \end{align*}
 Therefore
-$\Tran(\Ident^n(\vec{x}), k\shape{\vec{x}}) = \Ident^n(\vec{x})$
+$\transpose{\Ident^n(\vec{x})}{k\shape{\vec{x}}} = \Ident^n(\vec{x})$
 \end{proof}
 
 The above theorem is useful whenever you come across a transpose of a
@@ -2838,17 +3187,18 @@ multimatrix multiplications is this one,
 
 \begin{theorem}[Transposition of Multimatrix Multiplication]
 \label{mm_tran_mult}
-Let $\shape{A} = \vec{a} \oplus \vec{c}$ and $\shape{B} = \vec{c} \oplus \vec{b}$ then
+Let $\shape{A} = \vec{a} \oplus \vec{c}$ and $\shape{B} = \vec{c} \oplus \vec{b}$ and let,
+$\shape{\vec{a}} = a$, and $\shape{\vec{c}} = c$, then
 \[
- \Tran(A \mmult{\shape{\vec{c}}} B, \shape{\vec{a}})
- =  \Tran(B, \shape{\vec{c}}) \mmult{\shape{\vec{c}}} \Tran(A, \shape{\vec{a}})
+ \transpose{\left(A \mmult{c} B\right)}{a}
+ =  \transpose{B}{c} \mmult{c} \transpose{A}{a}
 \]
 \end{theorem}
 \begin{proof}
 Let $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$.
 Then,
 \begin{align*}
-	\Tran(A \mmult{\shape{\vec{c}}} B, \shape{\vec{a}})[\bar{b} \oplus \bar{a}]
+	\transpose{\left(A \mmult{c} B\right)}{a}[\bar{b} \oplus \bar{a}]
 	&=
 	\left(A \mmult{\shape{\vec{c}}} B \right)[\bar{a} \oplus \bar{b}] \\
 	&=
@@ -2859,10 +3209,10 @@ Then,
 	B[\bar{c} \oplus \bar{b}] A[\bar{a} \oplus \bar{c}] \\
 	&=
 	\sum_{\forall \bar{c} \in \Dim(\vec{c})}
-	\Tran(B, \shape{\vec{c}})[\bar{b} \oplus \bar{c}]
-	\Tran(A, \shape{\vec{a}})[\bar{c} \oplus \bar{a}] \\
+	\transpose{B}{c}[\bar{b} \oplus \bar{c}]
+	\transpose{A}{a}[\bar{c} \oplus \bar{a}] \\
 	&=
-	\left(\Tran(B, \shape{\vec{c}}) \mmult{\shape{\vec{c}}} \Tran(A, \shape{\vec{a}}) \right)
+	\left(\transpose{B}{c} \mmult{c} \transpose{A}{a}\right)
 	[\bar{b} \oplus \bar{a}]
 \end{align*}
 \end{proof}
@@ -2871,20 +3221,20 @@ TODO: exposition here
 
 \begin{theorem}[Communicativity of Scalar Multiplication and Transposition]
 Let $s$ be a scalar, $x$ be in $\mathbb{N} \cup \{0\}$, and $A$ be
-a multimatrix on which $\Tran(A, x)$ is defined. Then,
-\[ s\Tran(A, x) = \Tran(sA, x) \]
+a multimatrix on which $\transpose{A}{x}$ is defined. Then,
+\[ s\left(\transpose{A}{x}\right) = \transpose{(sA)}{x} \]
 \end{theorem}
 \begin{proof}
 Let $\shape{A} = \vec{x} \oplus \vec{a}$ where $\shape{\vec{x}} = x$. Then
 let $\bar{x} \in \Dim(\vec{x})$ and $\bar{a} \in \Dim(\vec{a})$. So,
 \begin{align*}
-  (s\Tran(A, x))[\bar{a} \oplus \bar{x}]
-  &= s \Tran(A, x)[\bar{a} \oplus \bar{x}] \\
+  \left(s\left(\transpose{A}{x}\right)\right)[\bar{a} \oplus \bar{x}]
+  &= s \left(\transpose{A}{x}\right)[\bar{a} \oplus \bar{x}] \\
   &= s A[\bar{x} \oplus \bar{a}] \\
   &= (s A)[\bar{x} \oplus \bar{a}] \\
-  &= \Tran(sA, x)[\bar{a} \oplus \bar{x}]
+  &= \transpose{(sA)}{x}[\bar{a} \oplus \bar{x}]
 \end{align*}
-Therefore $s\Tran(A, x) = \Tran(sA, x)$.
+Therefore $s\left(\transpose{A}{x}\right) = \transpose{(sA)}{x}$.
 \end{proof}
 
 TODO: exposition here
@@ -2892,9 +3242,9 @@ TODO: exposition here
 \begin{theorem}[Communicativity of Addition and Transposition]
 \label{com_add_tran_thm}
 Let $x$ be in $\mathbb{N} \cup \{0\}$ and let $A$ and $B$ be
-multimatrices such that $\shape{A} = \shape{B}$ and $\Tran(A, x)$ is defined.
+multimatrices such that $\shape{A} = \shape{B}$ and $\transpose{A}{x}$ is defined.
 Then,
-\[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
+\[ \transpose{A}{x} + \transpose{B}{x} = \transpose{(A+B)}{x} \]
 \end{theorem}
 \begin{proof}
 Left as an exercise for the reader (Exercise \ref{com_add_tran_ex}).
@@ -2911,28 +3261,28 @@ Prove Theorem \ref{eq_add_sub_thm} which is that,
 \begin{exercise}
 \label{com_add_tran_ex}
 Prove Theorem \ref{com_add_tran_thm} which is that,
-\[ \Tran(A, x) + \Tran(B, x) = \Tran(A+B, x) \]
+\[ \transpose{A}{x} + \transpose{B}{x} = \transpose{(A+B)}{x} \]
 \end{exercise}
 
 \begin{exercise}
-Let $A$ be a multimatrix such that $\shape{A} = <1,2,3,4,5>$,
+Let $A$ be a multimatrix such that $\shape{A} = \left<1,2,3,4,5\right>$,
 Find the shape of the following transposes:
 \begin{enumerate}
-\item $\shape{\Tran(A, 3)} = ?$
-\item $\shape{\Tran(A, 4)} = ?$
-\item $\shape{\Tran(A, 5)} = ?$
-\item $\shape{\Tran(A, 0)} = ?$
+\item $\shape{\transpose{A}{3}} = ?$
+\item $\shape{\transpose{A}{4}} = ?$
+\item $\shape{\transpose{A}{5}} = ?$
+\item $\shape{\transpose{A}{0}} = ?$
 \end{enumerate}
 \end{exercise}
 
 \begin{exercise}
 Let $M$ be any multimatrix.
 Find the value, in terms of $M$, of the following equations.
-For example $\Tran(M, 1)[2,3,4,5,1] = M[1,2,3,4,5]$
+For example $\transpose{M}{1}[2,3,4,5,1] = M[1,2,3,4,5]$
 \begin{enumerate}
-\item $\Tran(M, 3)[1,2,3,4] = ?$
-\item $\Tran(M, 0)[6,5,3] = ?$
-\item $\Tran(M, 2)[1,1,1] = ?$
+\item $\transpose{M}{3}[1,2,3,4] = ?$
+\item $\transpose{M}{0}[6,5,3] = ?$
+\item $\transpose{M}{2}[1,1,1] = ?$
 \end{enumerate}
 \end{exercise}
 
@@ -2946,35 +3296,37 @@ naturally bear all responsibility for any errors contained herein...''
 
 \begin{theorem}[Transpose Derivative]
 \label{tran_derivative}
-$\shape{X} = \vec{l} \oplus \vec{r}$
+Let $\shape{X} = \vec{l} \oplus \vec{r}$ with $\shape{\vec{l}} = l$ and $\shape{\vec{r}} = r$ then,
 \[
- \frac{d\Tran(X, \shape{\vec{l}})}{dX} =
- \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), \shape{\vec{r}})
+ \frac{d\transpose{X}{l}}{dX} =
+ \transpose{\left(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l})\right)}{r}
 \]
 \end{theorem}
 \begin{proof}
+Let $\shape{X} = \vec{l} \oplus \vec{r}$ with $\shape{\vec{l}} = l$ and $\shape{\vec{r}} = r$.
+Then for all $\bar{r}_1, \bar{r}_2 \in \Dim(\vec{\vec{r}})$ and $\bar{l}_1, \bar{l}_2 \in \Dim(\vec{\vec{l}})$,
 \begin{align*}
- \frac{d\Tran(X, \shape{\vec{l}})}{dX}
- [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
- &= \delta_{\bar{r_1}\bar{r_2}} \delta_{\bar{l_1}\bar{l_2}} \\
- &= \delta_{\bar{r_2}\bar{r_1}} \delta_{\bar{l_1}\bar{l_2}} \\
+ \frac{d\transpose{X}{l}}{dX}
+ [\bar{r}_1 \oplus \bar{l}_1 \oplus \bar{l}_2 \oplus \bar{r}_2]
+ &= \delta_{\bar{r}_1\bar{r}_2} \delta_{\bar{l}_1\bar{l}_2} \\
+ &= \delta_{\bar{r}_2\bar{r}_1} \delta_{\bar{l}_1\bar{l}_2} \\
  &=
-  \Ident^2(\shape{\vec{r}})[\bar{r_2}\oplus\bar{r_1}]
-  \Ident^2(\shape{\vec{l}})[\bar{l_1}\oplus\bar{l_2}] \\
+  \Ident^2(\vec{r})[\bar{r_2}\oplus\bar{r_1}]
+  \Ident^2(\vec{l})[\bar{l_1}\oplus\bar{l_2}] \\
  &=
    \left(
-    \Ident^2(\shape{\vec{r}})
+    \Ident^2(\vec{r})
     \mmult{0}
-    \Ident^2(\shape{\vec{l}})
+    \Ident^2(\vec{l})
   \right)
-  [\bar{r_2}\oplus\bar{r_1}\oplus\bar{l_1}\oplus\bar{l_2}] \\
+  [\bar{r}_2 \oplus \bar{r}_1 \oplus \bar{l}_1 \oplus \bar{l}_2] \\
  &=
-  \Tran(
-    \Ident^2(\shape{\vec{r}})
+  \transpose{\left(
+    \Ident^2(\vec{r})
     \mmult{0}
-    \Ident^2(\shape{\vec{l}})
-  , \shape{\vec{r}}) 
- [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
+    \Ident^2(\vec{l})
+  \right)}{r}
+  [\bar{r_1} \oplus \bar{l_1} \oplus \bar{l_2} \oplus \bar{r_2}]
 \end{align*}
 \end{proof}
 
@@ -3092,7 +3444,7 @@ For all $\bar{a}$, $\bar{x}_1$, $\bar{n}$ and $\bar{x}_2$. Therefore,
 \label{left_mult_derivative}
 If $\shape{X} = \vec{x} \oplus \vec{n}$ and $\shape{A} = \vec{n} \oplus \vec{a}$
 and $n = \shape{\vec{n}}$ and $a = \shape{\vec{a}}$ then,
-\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n) \]
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(\shape{X \mmult{n} A}) \mmult{a} \transpose{A}{n} \]
 \end{theorem}
 \begin{proof}
 Let $\shape{X} = \vec{x} \oplus \vec{n}$ and $\shape{A} = \vec{n} \oplus \vec{a}$. Then,
@@ -3131,16 +3483,16 @@ $\bar{x}_1, \bar{x}_2 \in \Dim(\vec{x}), \bar{a}_1 \in \Dim(\vec{a}),
 \end{align*}
 We can also show that,
 \begin{align*}
-	\left(\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n)\right)
+	\left(\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \transpose{A}{n}\right)
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 	&=
 	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a}_1)}
 	\Ident^2(\shape{X \mmult{n} A})[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{a}_2]
-	\Tran(A, n)[\bar{a}_2 \oplus \bar{n}_1] \\
+	\transpose{A}{n}[\bar{a}_2 \oplus \bar{n}_1] \\
 	&=
 	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a})}
 	\delta_{\bar{x}_1 \bar{x}_2} \delta_{\bar{a}_1 \bar{a}_2}
-	\Tran(A, n)[\bar{a}_2 \oplus \bar{n}_1] \\
+	\transpose{A}{n}[\bar{a}_2 \oplus \bar{n}_1] \\
 	&=
 	\sum_{\forall \bar{a}_2 \in \Dim(\vec{a})}
 	\delta_{\bar{x}_1 \bar{x}_2} \delta_{\bar{a}_1 \bar{a}_2}
@@ -3154,14 +3506,14 @@ Then since,
 	\frac{d(X \mmult{n} A)}{dX}
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 	=
-	\left(\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n)\right)
+	\left(\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \transpose{A}{n}\right)
 	[\bar{x}_1 \oplus \bar{a}_1 \oplus \bar{x}_2 \oplus \bar{n}_1]
 \]
 we have shown that,
 \[
 	\frac{d(X \mmult{n} A)}{dX}
 	=
-	\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \Tran(A, n)
+	\Ident^2(\shape{X \mmult{n} A}) \mmult{a} \transpose{A}{n}
 \]
 \end{proof}
 \end{landscape}
@@ -3220,16 +3572,18 @@ Therefore $d(sF(X))/dX = s(dF(X)/dX)$
 \begin{theorem}[Multiplication Rule]
 \label{multiplication_rule}
 Let $\shape{F} = \vec{f} \oplus \vec{c}$, $\shape{G} = \vec{c} \oplus \vec{g}$,
-and $\shape{X} = \vec{x}$. Then,
+and $\shape{X} = \vec{x}$.
+Also let $\shape{\vec{f}} = f$, $\shape{\vec{c}} = c$ and $\shape{\vec{g}} = g$.
+Then,
 \begin{align*}
- \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX} =
- F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} +
- \Tran\left(
-   \Tran(G(X), \shape{\vec{c}})
-     \mmult{\shape{\vec{c}}}
-   \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right),
-   \shape{\vec{g} \oplus \vec{x}}
- \right)
+  \frac{d\left(F(X) \mmult{c} G(X)\right)}{dX} =
+  F(X) \mmult{c} \frac{dG(X)}{dX} +
+  \transpose{\left(
+     \transpose{G(X)}{c}
+       \mmult{c}
+     \transpose{\left( \frac{dF(X)}{dX} \right)}{f}
+  \right)}
+  {g+x}
 \end{align*}
 \end{theorem}
 \begin{proof}
@@ -3241,10 +3595,10 @@ and $\shape{X} = \vec{x}$. Then,
  :
 \]
 \begin{align*}
- \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX}
+ \frac{d\left(F(X) \mmult{c} G(X)\right)}{dX}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
  &= \frac{
-       \partial \left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)[\bar{f} \oplus \bar{g}]
+       \partial \left(F(X) \mmult{c} G(X)\right)[\bar{f} \oplus \bar{g}]
     }{
        \partial X[\bar{x}]
     } \\
@@ -3295,7 +3649,7 @@ Which each become,
     F(X)[\bar{f} \oplus \bar{c}]
     \frac{dG(X)}{dX}[\bar{c} \oplus \bar{g} \oplus \bar{x}] \\
  &=
-   \left( F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} \right)
+   \left( F(X) \mmult{c} \frac{dG(X)}{dX} \right)
    [\bar{f} \oplus \bar{g} \oplus \bar{x}]
 \end{align*}
 \begin{align*}
@@ -3310,49 +3664,48 @@ Which each become,
     G(X)[\bar{c} \oplus \bar{g}] \\
  &=
   \sum_{\forall \bar{c}}
-    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
+    \transpose{\left(\frac{dF(X)}{dX}\right)}{f}
       [\bar{c} \oplus \bar{x} \oplus \bar{f}]
-    \Tran(G(X), \shape{\vec{c}})[\bar{g} \oplus \bar{c}] \\
+    \transpose{G(X)}{c}[\bar{g} \oplus \bar{c}] \\
  &=
   \sum_{\forall \bar{c}}
-    \Tran(G(X), \shape{\vec{c}})[\bar{g} \oplus \bar{c}]
-    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
+    \transpose{G(X)}{c}[\bar{g} \oplus \bar{c}]
+    \transpose{\left(\frac{dF(X)}{dX}\right)}{f}
       [\bar{c} \oplus \bar{x} \oplus \bar{f}] \\
  &=
   \left(
-    \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
-    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
+    \transpose{G(X)}{c} \mmult{c}
+    \transpose{\left(\frac{dF(X)}{dX}\right)}{f}
   \right)[\bar{g} \oplus \bar{x} \oplus \bar{f}] \\
  &= 
-  \Tran\left(
-    \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
-    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
-    , \shape{\vec{g} \oplus \vec{x}}
-  \right)[\bar{f} \oplus \bar{g} \oplus \bar{x}]
+  \transpose{\left(
+    \transpose{G(X)}{c} \mmult{c}
+    \transpose{\left(\frac{dF(X)}{dX}\right)}{f}
+  \right)}{g+x}
+  [\bar{f} \oplus \bar{g} \oplus \bar{x}]
 \end{align*}
 Therefore 
 \begin{alignat*}{3}
- \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX}
+ \frac{d\left(F(X) \mmult{c} G(X)\right)}{dX}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
   &=&&
-  \left( F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} \right)
+  \left( F(X) \mmult{c} \frac{dG(X)}{dX} \right)
   [\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
   &&&+
-  \Tran\left(
-    \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
-    \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
-    , \shape{\vec{g} \oplus \vec{x}}
-  \right)[\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
+  \transpose{\left(
+    \transpose{G(X)}{c} \mmult{c}
+    \transpose{\left(\frac{dF(X)}{dX}\right)}{f}
+  \right)}{g+x}
+  [\bar{f} \oplus \bar{g} \oplus \bar{x}] \\
   &=&&
   \left\{
     \begin{array}{l}
-      \left( F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} \right) \\
+      \left( F(X) \mmult{c} \frac{dG(X)}{dX} \right) \\
       +
-      \Tran\left(
-        \Tran(G(X), \shape{\vec{c}}) \mmult{\shape{\vec{c}}}
-        \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right)
-        , \shape{\vec{g} \oplus \vec{x}}
-      \right)
+      \transpose{\left(
+        \transpose{G(X)}{c} \mmult{c}
+        \transpose{\left(\frac{dF(X)}{dX}\right)}{f}
+      \right)}{g+x}
     \end{array}
   \right\}
   [\bar{f} \oplus \bar{g} \oplus \bar{x}]
@@ -3363,37 +3716,38 @@ Therefore
 \begin{theorem}[Hadamard Multiplication Rule]
 \label{hadamard_rule}
 Let $F(X)$ and $G(X)$ be functions of $X$ where
-$\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$
-then,
+$\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$.
+And let $\shape{\shape{X}} = x$, $\shape{\shape{F(X)}} = f$, and $\shape{\vec{c}} = c$.
+Then,
 \[
-  \frac{d(F(X) \dmult{\shape{\vec{c}}} G(X))}{dX} =
-    F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX} +
-    \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right)
+  \frac{d(F(X) \dmult{c} G(X))}{dX} =
+    F(X) \dmult{c} \frac{dG}{dX} +
+    \transpose{\left(\transpose{\left(\frac{dF}{dX}\right)}{f} \dmult{c} G(X)\right)}{x}
 \]
 \end{theorem}
 \begin{landscape}
 \begin{proof}
 For $\vec{x} = \shape{X}$ and for $\bar{a} \in \Dim(\vec{a})$ etc,
 \begin{align*}
-\frac{d(F(X) \dmult{\shape{\vec{c}}} G(X))}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
-  &= \frac{\partial (F(X) \dmult{\shape{\vec{c}}} G(X))[\bar{a} \oplus \bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
+\frac{d(F(X) \dmult{c} G(X))}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+  &= \frac{\partial (F(X) \dmult{c} G(X))[\bar{a} \oplus \bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
   &= \frac{\partial (F(X)[\bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{a}])}{\partial X[\bar{x}]} \\
   &= \frac{\partial F(X)[\bar{a} \oplus \bar{c}]}{\partial X[\bar{x}]} G(X)[\bar{c} \oplus \bar{b}]
     + F(X)[\bar{a} \oplus \bar{c}] \frac{\partial G(X)[\bar{c} \oplus \bar{b}]}{\partial X[\bar{x}]} \\
   &= \frac{dF}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{x}] G(X)[\bar{c} \oplus \bar{b}]
     + F(X)[\bar{a} \oplus \bar{c}] \frac{dG}{dX}[\bar{c} \oplus \bar{b} \oplus \bar{x}] \\
   &= \frac{dF}{dX}[\bar{a} \oplus \bar{c} \oplus \bar{x}] G(X)[\bar{c} \oplus \bar{b}]
-    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right)[\bar{x} \oplus \bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{b}]
-    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X)\right) [\bar{x} \oplus \bar{a} \oplus \bar{c} \oplus \bar{b}]
-    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
-    + \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \left(F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
-    + \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right) [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
-  &= \left\{ F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}
-    + \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right) \right\}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \left(F(X) \dmult{c} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \transpose{\left(\frac{dF}{dX}\right)}{f}[\bar{x} \oplus \bar{a} \oplus \bar{c}] G(X)[\bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{c} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left(\transpose{\left(\frac{dF}{dX}\right)}{f} \dmult{c} G(X)\right) [\bar{x} \oplus \bar{a} \oplus \bar{c} \oplus \bar{b}]
+    + \left(F(X) \dmult{c} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \transpose{\left(\transpose{\left(\frac{dF}{dX}\right)}{f} \dmult{c} G(X)\right)}{x}[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \left(F(X) \dmult{c} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left(F(X) \dmult{c} \frac{dG}{dX}\right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
+    + \transpose{\left(\transpose{\left(\frac{dF}{dX}\right)}{f} \dmult{c} G(X)\right)}{x} [\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}] \\
+  &= \left( F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX}
+    + \transpose{\left(\transpose{\left(\frac{dF}{dX}\right)}{f} \dmult{c} G(X)\right)}{x} \right)[\bar{a} \oplus \bar{c} \oplus \bar{b} \oplus \bar{x}]
 \end{align*}
 \end{proof}
 \end{landscape}
@@ -3528,34 +3882,28 @@ Then, by the multiplication rule (Thm. \ref{multiplication_rule}),
   \frac{d\left(X \mmult{\shape{\vec{x}}} X\right)}{dX}
   &=
   X \mmult{\shape{\vec{x}}} \frac{dX}{dX} +
-  \Tran\left(
-    \Tran(X, \shape{\vec{x}})
+  \transpose{\left(
+    \transpose{X}{\shape{\vec{x}}}
       \mmult{\shape{\vec{x}}}
-    \Tran\left(\frac{dX}{dX}, \shape{\vec{x}}\right),
-    \shape{\vec{x} \oplus \vec{x}}
-  \right) \\
+    \transpose{\left(\frac{dX}{dX}\right)}{\shape{\vec{x}}}
+  \right)}{\shape{\vec{x} \oplus \vec{x}}} \\
   &=
   X \mmult{\shape{\vec{x}}} \Ident^2(\shape{X}) +
-  \Tran\left(
+  \transpose{\left(
     X
       \mmult{\shape{\vec{x}}}
-    \Tran\left(\Ident^2(\shape{X}), \shape{\vec{x}}\right),
-    \shape{\vec{x} \oplus \vec{x}}
-  \right) \\
+    \transpose{\Ident^2(\shape{X})}{\shape{\vec{x}}}
+  \right)}{\shape{\vec{x} \oplus \vec{x}}} \\
   &=
   X +
-  \Tran\left(
+  \transpose{\left(
     X
       \mmult{\shape{\vec{x}}}
-    \Ident^2(\shape{X}),
-    \shape{\vec{x} \oplus \vec{x}}
-  \right) \\
+    \Ident^2(\shape{X})
+  \right)}{\shape{\vec{x} \oplus \vec{x}}} \\
   &=
   X +
-  \Tran\left(
-    X,
-    \shape{\vec{x} \oplus \vec{x}}
-  \right) \\
+  \transpose{X}{\shape{\vec{x} \oplus \vec{x}}} \\
   &= X + X \\
   &= 2X
 \end{align*}
@@ -3601,30 +3949,33 @@ Next,
 	&=&&
 	\exp(X) \mmult{0} \frac{d \left( \Sum(\exp(X)) \right)^{-1}}{dX}
 	\nonumber\\&&&+
-	\Tran\left(
-		\Tran\left(
+	\transpose{\left(
+		\transpose{\left(
 			\left( \Sum(\exp(X)) \right)^{-1}
-			,0
-		\right)
+    \right)}{0}
 		\mmult{0}
-		\Tran\left(
+		\transpose{\left(
 			\frac{d \exp(X)}{dX}
-			,\shape{\vec{x}}
-		\right)
-		,\shape{\left<\right> \oplus \vec{x}}
-	\right) \\
+    \right)}{
+		  \shape{\vec{x}}
+    }
+  \right)}{
+	  \shape{\left<\right> \oplus \vec{x}}
+	} \\
 	&=&&
 	\exp(X) \mmult{0} \frac{d \left( \Sum(\exp(X)) \right)^{-1}}{dX}
 	\nonumber\\&&&+
-	\Tran\left(
+	\transpose{\left(
 		\left( \Sum(\exp(X)) \right)^{-1}
 		\mmult{0}
-		\Tran\left(
+		\transpose{\left(
 			\frac{d \exp(X)}{dX}
-			,\shape{\vec{x}}
-		\right)
-		,\shape{\vec{x}}
-	\right) \\
+    \right)}{
+			\shape{\vec{x}}
+	  }
+  \right)}{
+		\shape{\vec{x}}
+	}  \\
 	&=&&
 	\exp(X) \mmult{0} \left(
 		-\left( \Sum(\exp(X)) \right)^{-2}
@@ -3632,15 +3983,17 @@ Next,
 		\frac{d\Sum(\exp(X))}{dX}
 	\right)
 	\nonumber\\&&&+
-	\Tran\left(
+	\transpose{\left(
 		\left( \Sum(\exp(X)) \right)^{-1}
 		\mmult{0}
-		\Tran\left(
+		\transpose{\left(
 			\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \exp(X)
-			,\shape{\vec{x}}
-		\right)
-		,\shape{\vec{x}}
-	\right) \\
+    \right)}{
+			\shape{\vec{x}}
+		}
+  \right)}{
+		\shape{\vec{x}}
+	} \\
 	&=&&
 	\exp(X) \mmult{0} \left(
 		-\left( \Sum(\exp(X)) \right)^{-2}
@@ -3652,15 +4005,17 @@ Next,
 		\exp(X)
 	\right)
 	\nonumber\\&&&+
-	\Tran\left(
-		\Tran\left(
+	\transpose{\left(
+		\transpose{\left(
 			\left( \Sum(\exp(X)) \right)^{-1}
 			\mmult{0}
 			\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \exp(X)
-		,\shape{\vec{x}}
-		\right)
-		,\shape{\vec{x}}
-	\right) \\
+    \right)}{
+		  \shape{\vec{x}}
+	  }	
+  \right)}{
+		\shape{\vec{x}}
+	} \\
 	&=&&
 	-\Softmax(X) \mmult{0} \left(
 		\left( \Sum(\exp(X)) \right)^{-1}
@@ -3670,20 +4025,23 @@ Next,
 		\exp(X)
 	\right)
 	\nonumber\\&&&+
-	\Tran\left(
-		\Tran\left(
+	\transpose{\left(
+		\transpose{\left(
 			\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
-		,\shape{\vec{x}}
-		\right)
-	,\shape{\vec{x}}
-	\right) \\
+    \right)}{
+		  \shape{\vec{x}}
+		}
+  \right)}{
+	  \shape{\vec{x}}
+	} \\
 	&=&&
 	-\Softmax(X) \mmult{0} \Softmax(X)
 	+
-	\Tran\left(
+	\transpose{\left(
 		\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
-		,2\shape{\vec{x}}
-	\right) \\
+  \right)}{
+		2\shape{\vec{x}}
+	} \\
 	&=&&
 	\Ident^3(\shape{X}) \mmult{\shape{\shape{X}}} \Softmax(X)
   -\Softmax(X) \mmult{0} \Softmax(X) \\
@@ -3779,7 +4137,7 @@ definition.
 	  & \mbox{if } i = j \\
     \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
     \mmult{\shape{\shape{L_i}}}
-    \Tran(W_i, \shape{\shape{L_{i-1}}})
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}}
     \mmult{\shape{\shape{L_{i-1}}}}
     \frac{d L_{i-1}}{dW_j}
 		& \mbox{if } i > j
@@ -3847,7 +4205,7 @@ left multiplicative rule to find that,
       \left(
         \Ident^2(\shape{L_{i}})
         \mmult{\shape{\shape{W_i}}-\shape{\shape{L_{i-1}}}}
-        \Tran(W_i, \shape{\shape{L_{i-1}}})
+        \transpose{W_i}{\shape{\shape{L_{i-1}}}}
       \right)
       \mmult{\shape{\shape{L_{i-1}}}}
       \frac{d L_{i-1}}{dW_j}
@@ -3859,7 +4217,7 @@ left multiplicative rule to find that,
       \left(
         \Ident^2(\shape{L_{i}})
         \mmult{\shape{\shape{L_i}}}
-        \Tran(W_i, \shape{\shape{L_{i-1}}})
+        \transpose{W_i}{\shape{\shape{L_{i-1}}}}
       \right)
       \mmult{\shape{\shape{L_{i-1}}}}
       \frac{d L_{i-1}}{dW_j}
@@ -3868,14 +4226,14 @@ left multiplicative rule to find that,
     \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
     \mmult{\shape{\shape{L_i}}}
     \left(
-      \Tran(W_i, \shape{\shape{L_{i-1}}})
+      \transpose{W_i}{\shape{\shape{L_{i-1}}}}
       \mmult{\shape{\shape{L_{i-1}}}}
       \frac{d L_{i-1}}{dW_j}
     \right) \\
   &=
     \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
     \mmult{\shape{\shape{L_i}}}
-    \Tran(W_i, \shape{\shape{L_{i-1}}})
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}}
     \mmult{\shape{\shape{L_{i-1}}}}
     \frac{d L_{i-1}}{dW_j}
 \end{align*}
@@ -4171,265 +4529,38 @@ Let $\bar{c} \in \Dim(\vec{c})$ and $\bar{f} \in \Dim(\vec{f})$ then,
 
 \end{proof}
 
-\end{landscape}
 
-
-\begin{theorem}[Bla]
-For any natural number $m$ where $m < n$,
-if and only if $C$ is a multimatrix for which $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid then,
-\[ C \mmult{m} \left(A \mconcat{n} B\right) = \left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right) \]
-
-And if $m \le \shape{\shape{A}}-n$
-then if and only if  $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid then,
+\begin{theorem}[Multiplication Over Concatenation Rule 3]
+Let $A$, $B$, and $C$ be multimatrices, and let $m$ and $n$ be
+natural numbers where $0 < m \le \shape{\shape{A}}-n$. 
+If either of the following computations  is valid, then it is equivalent to the other:
 \[ \left(A \mconcat{n} B\right) \mmult{m} C = \left(A \mmult{m} C\right) \mconcat{n} \left(B \mmult{m} C\right) \]
+\end{theorem}
 
-And when $m \ge n$, if and only if $C$ is a multimatrix for which $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid,
-then for the multimatrices $C_1$ and $C_2$ defined by,
-\[ \Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) = \{C_1, C_2\} \]
-\[
-  C \mmult{m} \left(A \mconcat{n} B\right)
-  =
-  \left( C_1 \mmult{m} A \right) + 
-  \left( C_1 \mmult{m} B \right)
-\]
-
-Lastly, when $m > \shape{\shape{A}}-n$, if and only if $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid,
-then for multimatrices $C_1$ and $C_2$ defined by,
-\[ \Part(C, m+n-\shape{\shape{A}}+1, \shape{A}[n]) = \{C_1, C_2\} \]
+\begin{theorem}[Multiplication Over Concatenation Rule 4]
+Let $A$, $B$, and $C$ be multimatrices, and let $m$ and $n$ be
+natural numbers where $0 < \shape{\shape{A}}-n < m$. 
+If either of the following computations is valid, then it is equivalent to the other:
 \[
   \left(A \mconcat{n} B\right) \mmult{m} C
   =
   \left( A \mmult{m} C_1 \right) + 
-  \left( B \mmult{m} C_1 \right)
+  \left( B \mmult{m} C_2 \right)
 \]
+\[ \Part(C, m+n-\shape{\shape{A}}+1, \shape{A}[n]) = \left\{ C_1, C_2 \right\} \]
 \end{theorem}
-\begin{proof}
-\begin{ppart}
-Let $A$ and $B$ be multimatrices where $A \mconcat{n} B$ is valid. 
-Let $m$ be a natural number where $m < n$, and let $C$ be a multimatrix where
-$C \mmult{m} \left(A \mconcat{n} B\right)$ is valid.
 
-Since $A \mconcat{n} B$ is valid, we can describe the shapes of $A$ and $B$ thus,
-\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
-\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
-Where $a$ and $b$ are both natural numbers, $\shape{\vec{l}} = n-1$, and
-$\shape{\vec{r}} = \shape{\shape{A}} - n$. So,
-\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{r} \]
-
-Now, because $C \mmult{m} \left(A \mconcat{n} B\right)$ is valid, we know that
-there is some division in the shape of $C$ such that,
-\[ \shape{C} = \vec{c} \oplus \vec{m} \]
-For some shape vectors $\vec{c}$ and $\vec{m}$ where $\shape{\vec{m}} = m$ and
-$\shape{\vec{c}} = \shape{\shape{C}}-m$
-We also know that there exists some similar subdivision of $\shape{A \mconcat{n} B}$.
-\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} \]
-For some $\vec{d}$. Therefore,
-\[ \vec{m} \oplus \vec{d} = \vec{l} \oplus \left<a + b\right> \oplus \vec{r} \]
-
-Since $m < n$, $\shape{\vec{m}} \le \shape{\vec{l}}$ so $\vec{l}$ can be subdivided
-into,
-\[ \vec{l} = \vec{m} \oplus \vec{e} \]
-For some shape vector $\vec{e}$ where $\shape{\vec{e}} = n-1-m$.
-
-So,
-\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r} \]
-\[ \shape{A} = \vec{m} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
-\[ \shape{B} = \vec{m} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
-
-Therefore $C \mmult{m} A$ and $C \mmult{m} B$ are both valid operations and,
-\[ \shape{C \mmult{m} A} = \vec{c} \oplus \vec{e} \oplus \left<a\right> \oplus \vec{r} \]
-\[ \shape{C \mmult{m} B} = \vec{c} \oplus \vec{e} \oplus \left<b\right> \oplus \vec{r} \]
-
-Which shows that $(C \mmult{m} A) \mconcat{\shape{\vec{c} \oplus \vec{e}}+1} (C \mmult{m} B)$
-is also valid.
-\[
-  (C \mmult{m} A) \mconcat{(\shape{\shape{C}}-m)+(n-1-m)+1} (C \mmult{m} B)
-  = 
-  (C \mmult{m} A) \mconcat{\shape{\shape{C}}+n-2m} (C \mmult{m} B)
-\]
-
-\begin{landscape}
-Which means that,
-\begin{align*}
-  \shape{C \mmult{m} \left(A \mconcat{n} B\right)}
-  &= \shape{(C \mmult{m} A) \mconcat{\shape{\shape{C}}+n-2m} (C \mmult{m} B)} \\
-  &= \vec{c} \oplus \vec{e} \oplus \left<a+b\right> \oplus \vec{r}
-\end{align*}
-
-Now for any $\bar{c}$, $\bar{e}$, and $\bar{r}$ be in $\Dim(\vec{c})$, $\Dim(\vec{e})$,
-and $\Dim(\vec{r})$ respectively and $k \in [1,a+b]$, then,
-\begin{align*}
-  \left(C \mmult{m} \left(A \mconcat{n} B\right)\right)[\bar{c} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
-  &= \sum_{\forall \bar{m} \in \Dim(\vec{m})} C[\bar{c} \oplus \bar{m}] \left(A \mconcat{n} B\right)[\bar{m} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}] \\
-  &= \left\{
-  \begin{array}{ll}
-    \sum_{\forall \bar{m}} C[\bar{c} \oplus \bar{m}] A[\bar{m} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
-    & \mbox{if } k \le a \\
-    \sum_{\forall \bar{m}} C[\bar{c} \oplus \bar{m}] B[\bar{m} \oplus \bar{e} \oplus \left<k-a\right> \oplus \bar{r}]
-    & \mbox{if } k > a
-  \end{array}
-  \right. \\
-  &= \left\{
-  \begin{array}{ll}
-    (C \mmult{m} A)[\bar{c} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
-    & \mbox{if } k \le a \\
-    (C \mmult{m} B)[\bar{c} \oplus \bar{e} \oplus \left<k-a\right> \oplus \bar{r}]
-    & \mbox{if } k > a
-  \end{array}
-  \right. \\
-  &= \left(\left(C \mmult{m} A\right) \mconcat{\shape{\shape{C}}+n-2m} \left(C \mmult{m} B\right)\right)[\bar{c} \oplus \bar{e} \oplus \left<k\right> \oplus \bar{r}]
-\end{align*}
 \end{landscape}
-\end{ppart}
-\begin{ppart}
-TODO: Prove the converse.
-\end{ppart}
-\begin{ppart}
-Let $A$ and $B$ be multimatrices where $A \mconcat{n} B$ is valid. 
-Let $m$ be a natural number where $m \le \shape{\shape{A}}-n$
-and $C$ is a multimatrix for which $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid.
-Then there exit shape vectors $\vec{l}$ and $\vec{r}$ and integers $a$ and $b$ such that,
 
-\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
-\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
-\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{r} \]
-
-Where $\shape{\vec{l}} = n-1$ and $\shape{\vec{r}} = \shape{\shape{A}}-n$.
-
-Then since $\left(A \mconcat{n} B\right) \mmult{m} C$ is valid, $\shape{C}$ can
-be partitioned into $\vec{m}$ and $\vec{c}$ where,
-
-\[ \shape{C} = \vec{m} \oplus \vec{c} \]
-
-And $\shape{\vec{m}} = m$. This also means that,
-
-\[ \shape{A \mconcat{n} B} = \vec{d} \oplus \vec{m} \]
-
-Now since $m \le \shape{\shape{A}}-n$ we can partition $\vec{r}$ like this,
-
-\[ \vec{r} = \vec{e} \oplus \vec{m} \]
-
-So we can use that repartition in our original shape definitions,
-
-\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{e} \oplus \vec{m} \]
-\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{e} \oplus \vec{m} \]
-\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{e} \oplus \vec{m} \]
-
-So $A \mmult{m} C$ and $B \mmult{m} C$ are both valid and,
-
-\[ \shape{A \mmult{m} C} = \vec{l} \oplus \left<a\right> \oplus \vec{e} \oplus \vec{c} \]
-\[ \shape{B \mmult{m} C} = \vec{l} \oplus \left<b\right> \oplus \vec{e} \oplus \vec{c} \]
-
-And finally we can see that $(A \mmult{m} C) \mconcat{\shape{\vec{l}}+1} (B \mmult{m} C)$
-is valid and,
-
-\[
-  (A \mmult{m} C) \mconcat{\shape{\vec{l}}+1} (B \mmult{m} C)
-  =
-  (A \mmult{m} C) \mconcat{n} (B \mmult{m} C)
-\]
-
-\begin{align*}
-  \shape{(A \mmult{m} C) \mconcat{n} (B \mmult{m} C)}
-  &= \vec{l} \oplus \left<a+b\right> \oplus \vec{e} \oplus \vec{c} \\
-  &= \shape{(A \mconcat{n} B) \mmult{m} C}
-\end{align*}
-
-\begin{landscape}
-Now for all $\bar{l}$, $\bar{e}$, and $\bar{c}$ are in $\Dim(\vec{l})$, $\Dim(\vec{e})$,
-and $\Dim(\vec{c})$ respectively and all $k \in [1,a+b]$,
-
-\begin{align*}
-  \left(\left(A \mconcat{n} B\right) \mmult{m} C\right)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{c}]
-  &= \sum_{\forall \bar{m} \in \Dim(\vec{m})} \left(A \mconcat{n} B\right)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{m}] C[\bar{m} \oplus \bar{c}] \\
-  &= \left\{
-  \begin{array}{ll}
-    \sum_{\forall \bar{m}} A[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{m}] C[\bar{m} \oplus \bar{c}] 
-    & \mbox{if } k \le a \\
-    \sum_{\forall \bar{m}} B[\bar{l} \oplus \left<k-a\right> \oplus \bar{e} \oplus \bar{m}] C[\bar{m} \oplus \bar{c}] 
-    & \mbox{if } k > a
-  \end{array}
-  \right. \\
-  &= \left\{
-  \begin{array}{ll}
-    (A \mmult{m} C)[\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{c}]
-    & \mbox{if } k \le a \\
-    (B \mmult{m} C)[\bar{l} \oplus \left<k-a\right> \oplus \bar{e} \oplus \bar{c}]
-    & \mbox{if } k > a
-  \end{array}
-  \right. \\
-  &= 
-    \left(\left(A \mmult{m} C\right) \mconcat{n} \left(B \mmult{m} C\right)\right)
-    [\bar{l} \oplus \left<k\right> \oplus \bar{e} \oplus \bar{c}]
-\end{align*}
-\end{landscape}
-\end{ppart}
-
-\begin{ppart}
-TODO: Prove the converse.
-\end{ppart}
-
-\begin{ppart}
-Let $A$ and $B$ be multimatrices where $A \mconcat{n} B$ is valid. 
-Let $m$ be a natural number where $m \ge n$, and let $C$ be a multimatrix where
-$C \mmult{m} (A \mconcat{n} B)$ is valid.
-
-Then we can partition the shapes of $A$ and $B$ thus,
-
-\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{r} \]
-\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{r} \]
-\[ \shape{A \mconcat{n} B} = \vec{l} \oplus \left<a+b\right> \oplus \vec{r} \]
-
-Where $\shape{\vec{l}} = n-1$. 
-
-We can also partition the shapes of $C$ and $(A \mconcat{n} B)$ like this,
-
-\[ \shape{C} = \vec{c} \oplus \vec{m} \]
-\[ \shape{A \mconcat{n} B} = \vec{m} \oplus \vec{d} \]
-
-Where $\shape{\vec{m}} = m$. Now since $m \ge n$ we can know that
-$\shape{\vec{m}} \ge \shape{\vec{l} \oplus \left<a+b\right>}$ 
-so $\vec{m}$ encompasses $\vec{l}$, the $n$'th index and potentially part of $\vec{r}$.
-There for if we partition $\vec{r}$ like this,
-
-\[ \vec{r} = \vec{p} \oplus \vec{q} \]
-
-Where,
-
-\[ \vec{m} = \vec{l} \oplus \left<a+b\right> \oplus \vec{p} \]
-
-Then we can define the resulting shape of $C$ like this,
-
-\[ \shape{C} = \vec{c} \oplus \vec{l} \oplus \left<a+b\right> \oplus \vec{p} \]
-
-Since $\shape{\vec{c}} = \shape{\shape{C}}-m$, if we let $C_1$ and $C_2$ be defined by,
-\[ \Part(C, \shape{\shape{C}}-m+n, \shape{A}[n]) = \{C_1, C_2\} \]
-Then,
-\[ \shape{C_1} = \vec{c} \oplus \vec{l} \oplus \left<a\right> \oplus \vec{p} \]
-\[ \shape{C_2} = \vec{c} \oplus \vec{l} \oplus \left<b\right> \oplus \vec{p} \]
-
-Now, let us define $\vec{m}_1$ and $\vec{m}_2$ such that,
-\[ \vec{m}_1 = \vec{l} \oplus \left<a\right> \oplus \vec{p} \]
-\[ \vec{m}_2 = \vec{l} \oplus \left<b\right> \oplus \vec{p} \]
-And notice that $\shape{\vec{m}_1} = \shape{\vec{m}_2} = m$
-
-Next, since $\vec{r} = \vec{p} \oplus \vec{q}$ the shapes of $A$ and $B$ and be described,
-\[ \shape{A} = \vec{l} \oplus \left<a\right> \oplus \vec{p} \oplus \vec{q} = \vec{m}_1 \oplus \vec{q} \]
-\[ \shape{B} = \vec{l} \oplus \left<b\right> \oplus \vec{p} \oplus \vec{q} = \vec{m}_2 \oplus \vec{q} \]
-
-So $C_1 \mmult{m} A$ and $C_2 \mmult{m} B$ are both valid.
-
-\end{ppart}
-\begin{ppart}
-TODO: Prove the converse.
-\end{ppart}
-
-TODO
-\end{proof}
 
 \begin{definition}[Multimatrix Wildcard Notation]
-Example:
-$\shape{X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}]} = \vec{s}$
+Let $X$ be a multimatrix of where $\shape{X} = \vec{a} \oplus \vec{s} \oplus \vec{b}$,
+And let $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$. Then,
+$X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}]$ defines a multimatrix that is a
+subset of $X$ where,
+\[ \shape{X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}]} = \vec{s} \]
+And for all $\bar{s} \in \Dim(\vec{s})$,
+\[ X[\bar{a} \oplus *^{\vec{s}} \oplus \bar{b}][\bar{s}] = X[\bar{a} \oplus \bar{s} \oplus \bar{b}] \]
 \end{definition}
 
 \begin{theorem}[Wildcard Multiplication]
@@ -4495,13 +4626,13 @@ For which we can write out the Riemann integral \cite{wiki:riemann_int}:
 \begin{align*}
   \int_0^1 G(C(t))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt} dt
   &=
-  \lim_{n \to \inf} \sum_{i=1}^n G(C(i/n))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt}(i/n) \frac{1}{n} \\
+  \lim_{n \to \infty} \sum_{i=1}^n G(C(i/n))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{dC}{dt}(i/n) \frac{1}{n} \\
   &=
-  \lim_{n \to \inf} \sum_{i=1}^n G(A + \frac{i}{n}(B-A))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{B-A}{n} \\
+  \lim_{n \to \infty} \sum_{i=1}^n G(A + \frac{i}{n}(B-A))[\bar{g} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} \frac{B-A}{n} \\
   &=
-  \lim_{n \to \inf} \sum_{i=1}^n \left( G(A + \frac{i}{n}(B-A)) \mmult{\shape{\shape{X}}} \frac{B-A}{n} \right)[\bar{g}] \\
+  \lim_{n \to \infty} \sum_{i=1}^n \left( G(A + \frac{i}{n}(B-A)) \mmult{\shape{\shape{X}}} \frac{B-A}{n} \right)[\bar{g}] \\
   &=
-  \left( \lim_{n \to \inf} \sum_{i=1}^n G(A + \frac{i}{n}(B-A)) \mmult{\shape{\shape{X}}} \frac{B-A}{n} \right)[\bar{g}] \\
+  \left( \lim_{n \to \infty} \sum_{i=1}^n G(A + \frac{i}{n}(B-A)) \mmult{\shape{\shape{X}}} \frac{B-A}{n} \right)[\bar{g}] \\
   &=
   \left(\int_A^B G(X) dX\right)[\bar{g}] 
 \end{align*}
@@ -4517,8 +4648,8 @@ For any multimatrix function $F(X)$,
 \begin{proof}
 We know from the above theorem \ref{line_inside} that for all $\bar{f} \in \Dim(\vec{f})$
 \[ \left(\int_A^B \frac{dF}{dX}(X) dX\right)[\bar{f}] = \int_C \frac{dF}{dX}(X)[\bar{f} \oplus *^{\shape{X}}] \mmult{\shape{\shape{X}}} dX \]
-Notice that $\frac{dF}{dX}(X)[\bar{f} \oplus *^{\shape{X}}]$ is the equivalent
-to the gradient of $F(X)[\bar{f}]$ at $X$ since for all $\bar{x} \in \Dim(\vec{x})$,
+Notice that $\frac{dF}{dX}(X)[\bar{f} \oplus *^{\shape{X}}]$ is equivalent
+to the gradient of $F(X)[\bar{f}]$ at $X$ since for all $\bar{x} \in \Dim(\shape{X})$,
 \[ \frac{dF}{dX}(X)[\bar{f} \oplus \bar{x}] = \frac{\partial F[\bar{f}]}{\partial X[\bar{x}]} \]
 Then by the Gradient theorem \cite{wiki:gradient_thm} we can conclude that,
 \[ \left(\int_A^B \frac{dF}{dX}(X) dX\right)[\bar{f}] =  F(B)[\bar{f}] - F(A)[\bar{f}] = \left( F(B)-F(A) \right)[\bar{f}] \]
@@ -4601,10 +4732,12 @@ Implies,
 Transpose Derivative
 (Thm. \ref{tran_derivative})
 \[ \shape{X} = \vec{l} \oplus \vec{r} \]
+\[ \shape{\vec{l}} = l \]
+\[ \shape{\vec{r}} = r \]
 Implies,
 \[
- \frac{d\Tran(X, \shape{\vec{l}})}{dX} =
- \Tran(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l}), \shape{\vec{r}})
+  \frac{d\transpose{X}{l}}{dX} =
+  \transpose{\left(\Ident^2(\vec{r}) \mmult{0} \Ident^2(\vec{l})\right)}{r}
 \]
 \end{drule}
 
@@ -4617,7 +4750,7 @@ Right Multiplicative Derivative
 \begin{drule}
 Left Multiplicative Derivative
 (Thm. \ref{left_mult_derivative})
-\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(\shape{X \mmult{n} A}) \mmult{\shape{\shape{A}}-n} \Tran(A, n) \]
+\[ \frac{d(X \mmult{n} A)}{dX} = \Ident^2(\shape{X \mmult{n} A}) \mmult{\shape{\shape{A}}-n} \transpose{A}{n} \]
 \end{drule}
 
 \begin{drule}
@@ -4637,27 +4770,31 @@ Multiplication Rule
 (Thm. \ref{multiplication_rule})
 
 Let $\shape{F} = \vec{f} \oplus \vec{c}$, $\shape{G} = \vec{c} \oplus \vec{g}$,
-and $\shape{X} = \vec{x}$. Then,
+$\shape{X} = \vec{x}$, $\shape{\vec{x}} = x$, $\shape{\vec{c}} = c$, $\shape{\vec{f}} = f$, and $\shape{\vec{g}} = g$. Then,
 \begin{align*}
- \frac{d\left(F(X) \mmult{\shape{\vec{c}}} G(X)\right)}{dX} =&
- F(X) \mmult{\shape{\vec{c}}} \frac{dG(X)}{dX} + \\
- &\Tran\left(
-   \Tran(G(X), \shape{\vec{c}})
-     \mmult{\shape{\vec{c}}}
-   \Tran\left(\frac{dF(X)}{dX}, \shape{\vec{f}}\right),
-   \shape{\vec{g} \oplus \vec{x}}
- \right)
+ \frac{d\left(F(X) \mmult{c} G(X)\right)}{dX} =&
+ F(X) \mmult{c} \frac{dG(X)}{dX} + \\
+ &\transpose{\left(
+   \transpose{G(X)}{c}
+     \mmult{c}
+   \transpose{\left(
+      \frac{dF(X)}{dX}
+   \right)}{f}
+  \right)}{g+x}
 \end{align*}
 \end{drule}
 
 \begin{drule}
 Hadamard Multiplication Rule
 (Thm. \ref{hadamard_rule})
-If $\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$, then,
+If $\shape{F(X)} = \vec{a} \oplus \vec{c}$ and $\shape{G(X)} = \vec{c} \oplus \vec{b}$,
+and $\shape{\shape{X}} = x$, $\shape{\vec{c}} = c$, and $\shape{\shape{F(X)}} = f$ then,
 \[
-  \frac{d(F(X) \dmult{\shape{\vec{c}}} G(X))}{dX} =
-    F(X) \dmult{\shape{\vec{c}}} \frac{dG}{dX} +
-    \Tran\left(\Tran\left(\frac{dF}{dX}, \shape{\shape{F}}\right) \dmult{\shape{\vec{c}}} G(X), \shape{\shape{X}}\right)
+  \frac{d(F(X) \dmult{c} G(X))}{dX} =
+    F(X) \dmult{c} \frac{dG}{dX} +
+    \transpose{\left(
+      \transpose{\left(\frac{dF}{dX}\right)}{f} \dmult{c} G(X)
+    \right)}{x}
 \]
 \end{drule}
 
@@ -4711,165 +4848,650 @@ Note that $ProdSpace(A, n) \subset R^{\vec{a}}$ and $NullSpace(A, n) \subset R^{
 
 Now for any multimatrices $B$ and $C$ of the same shape, $\shape{B} = \shape{C} = \vec{s}$,
 they are defined as 'orthogonal', i.e. $B \bot C$ iff $B \mmult{\shape{s}} C = 0$.
-And two sets are orthogonal if all any member from one is orthogonal to any member of the other.
+
+If $V$ is a vector space in $\mathbb{R}^{\vec{v}}$ then $V^{\bot}$ is the
+orthoganal complement of $V$ composed of all multimatrices in $\mathbb{R}^{\vec{v}}$, $X$, 
+such that for all $Y \in V$, $X \bot Y$. 
 
 I hypothesize that,
-\[ProdSpace(A, n) \bot NullSpace(\Tran(A, a), a)\]
+\[ProdSpace(A, n) \bot NullSpace(\transpose{A}{a}, a)\]
 and
-\[NullSpace(A, n) \bot ProdSpace(\Tran(A, a), a)\]
+\[NullSpace(A, n) \bot ProdSpace(\transpose{A}{a}, a)\]
 based on a similar theory for 2d matrices \cite{youtube:orthogonal} (and the fact that the shapes line up nicely).
 
 And from there I think you can derive a solution to the least squares problem for multimatrices.
 
 If $B - A \mmult{n} X = E$ and where you want to minimize $SS(E)$, you could solve this with derivatives
 but, notice that a shortest $E$ is necessarily orthogonal $ProdSpace(A,n)$ by simple geometry since it is a shortest
-vector from $ProdSpace(A,n)$ to $B$. So if our above hypothesis is correct, $B$ is in $NullSpace(\Tran(A,a), a)$
+vector from $ProdSpace(A,n)$ to $B$. So if our above hypothesis is correct, $B$ is in $NullSpace(\transpose{A}{a}, a)$
 
-Therefore the solution to $\Tran(A,a) \mmult{a} E = 0$ for $E$ will be the one that minimizes $SS(E)$. So,
+Therefore the solution to $\transpose{A}{a} \mmult{a} E = 0$ for $E$ will be the one that minimizes $SS(E)$. So,
 \begin{align*}
-  \Tran(A,a) \mmult{a} E &= 0 \\
-  \Tran(A,a) \mmult{a} (B - A \mmult{n} X) &= 0 \\
-  \Tran(A,a) \mmult{a} B - \Tran(A,a) \mmult{a} (A \mmult{n} X) &= 0 \\
-  \Tran(A,a) \mmult{a} B - \Tran(A,a) \mmult{a} A \mmult{n} X &= 0 \\
-  \Tran(A,a) \mmult{a} B &= \Tran(A,a) \mmult{a} A \mmult{n} X \\
-  \Tran(A,a) \mmult{a} A \mmult{n} X &= \Tran(A,a) \mmult{a} B
+  \transpose{A}{a} \mmult{a} E &= 0 \\
+  \transpose{A}{a} \mmult{a} (B - A \mmult{n} X) &= 0 \\
+  \transpose{A}{a} \mmult{a} B - \transpose{A}{a} \mmult{a} (A \mmult{n} X) &= 0 \\
+  \transpose{A}{a} \mmult{a} B - \transpose{A}{a} \mmult{a} A \mmult{n} X &= 0 \\
+  \transpose{A}{a} \mmult{a} B &= \transpose{A}{a} \mmult{a} A \mmult{n} X \\
+  \transpose{A}{a} \mmult{a} A \mmult{n} X &= \transpose{A}{a} \mmult{a} B
 \end{align*}
 
 This brings to mind the fact that multimatrices themselves form a vector space. Basically, for any shape $\vec{x}$
 there is an associated vector space of multimatrices $R^{\vec{x}}$. And I haven't yet explicitly stated that. Need to do
 that because I'm pretty sure that's necessary for the shortest path being the one that's orthogonal.
 
-I think need to prove, in the abstract, that if you have a vector field $F$
-and a distance metric $d(u,v)$ and a bilinear form \cite{wiki:bilinear}, $b(u,v)$, such that
-\[ v \bot u \iff b(u,v) = 0 \]
-Then for any $v \in F$ and any sub field $f \subset F$, for all $u \in f$,
-\[ (v-u) \bot u \iff \forall u' \in f - \{u\} : d(u', v) < d(u,v) \]
-That is, $u$ is the closest vector in $f$ to $v$ if and only if it is the orthogonal project of $v$ onto $f$.
-
 \chapter{Scratch}
 
-What is $A \dmult{m} (B \mmult{n} C)$ ?
+Investigating the determinant.
 
-\[ \shape{A} = \vec{a} \oplus \vec{m} \]
-\[ \shape{B} = \vec{b} \oplus \vec{n} \]
-\[ \shape{C} = \vec{n} \oplus \vec{c} \]
+I think, unfortunately, that the determinant of a multimatrix will best be defined as
+equal to the determinant of the equivalent 2d matrix.
 
-if $\vec{m} = \vec{b}$ then,
+Because if $M$ is a multimatrix of shape $\shape{M} = \vec{a} \oplus \vec{b}$ where
+\[\prod \vec{a}[i] = \prod \vec{b}[j]\]
+Then $\RMult[\shape{\vec{a}},M]$ has an inverse $\RMult[\shape{\vec{b}},N]$
+where $\shape{N} = \vec{b} \oplus \vec{a}$ if and only if the
+equivalent square 2d matrix to $M$ has an inverse, i.e. it's determinant is non-zero and defined.
 
-\[ \shape{A \dmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{c} \]
+That depends on proving that inverses of smaller product overlaps always imply
+that there is a square inverse, however.
 
+\begin{landscape}
+
+For any given $\vec{a} \oplus \vec{b}$ there always exist a function $f(m, n)$ such that,
 \begin{align*}
-(A \dmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{b} \oplus \bar{c}]
-  &=
-  A[\bar{a} \oplus \bar{b}] \sum_{\forall \bar{n}} B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
-  &=
-  \sum_{\forall \bar{n}} A[\bar{a} \oplus \bar{b}] B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
-  &=
-  \sum_{\forall \bar{n}} (A \dmult{m} B)[\bar{a} \oplus \bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
-  &= ((A \dmult{m} B) \mmult{n} C)[\bar{a} \oplus \bar{b} \oplus \bar{c}]
+  \Idx^{-1}[\vec{a} \oplus \vec{b}]\left(f(\Idx[\vec{a}](\bar{a}), \Idx[\vec{b}](\bar{b}))\right) &= \bar{a} \oplus \bar{b} \\
+  f(\Idx[\vec{a}](\bar{a}), \Idx[\vec{b}](\bar{b})) &= \Idx[\vec{a} \oplus \vec{b}](\bar{a} \oplus \bar{b}) \\
+  f(m, n) &= \Idx[\vec{a} \oplus \vec{b}](\Idx^{-1}[\vec{a}](m) \oplus \Idx^{-1}[\vec{b}](n))
 \end{align*}
 
-If $m < \shape{\vec{b}}$ then
-\[ \vec{b} = \vec{m} \oplus \vec{d} \]
-\[ \shape{B} = \vec{m} \oplus \vec{d} \oplus \vec{n} \]
-\[ \shape{A \dmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{m} \oplus \vec{d} \oplus \vec{c} \]
+For an indexing function to be valid for reshaping it must be true that,
+for any $\alpha$ and $\beta$ in $\mathbb{N}$ there exists a function $f(m, n)$ with domain $m \in [0,\alpha-1]$ and $n \in [0,\beta-1]$
+and range $[0, \alpha \beta - 1]$ such that if $\vec{a}$ and $\vec{b}$ satisfy $\size(\Dim(\vec{a})) = \alpha$ and $\size(\Dim(\vec{b})) = \beta$
+then for all $\bar{a} \in \Dim(\vec{a})$ and $\bar{b} \in \Dim(\vec{b})$,
+\[ \Idx^{-1}[\vec{a} \oplus \vec{b}]\left(f(\Idx[\vec{a}](\bar{a}), \Idx[\vec{b}](\bar{b}))\right) = \bar{a} \oplus \bar{b} \]
 
 \begin{align*}
-(A \dmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{m} \oplus \bar{d} \oplus \bar{c}]
+  C[\bar{a} \oplus \bar{b}]
   &=
-  A[\bar{a} \oplus \bar{m}] \sum_{\forall \bar{n}} B[\bar{m} \oplus \bar{d} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  \sum_{\forall \bar{c} \in \Dim(\vec{c})} A[\bar{a} \oplus \bar{c}] B[\bar{c} \oplus \bar{b}] \\
   &=
-  \sum_{\forall \bar{n}} A[\bar{a} \oplus \bar{m}] B[\bar{m} \oplus \bar{d} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
+  \sum_{\forall \bar{c}}
+  A[\Idx^{-1}[\vec{a} \oplus \vec{c}](
+    f(
+      \Idx[\vec{a}](\bar{a}),
+      \Idx[\vec{c}](\bar{c})
+    )
+  )]
+  B[\Idx^{-1}[\vec{c} \oplus \vec{b}](
+    g(
+      \Idx[\vec{c}](\bar{c}),
+      \Idx[\vec{b}](\bar{b})
+    )
+  )] \\
   &=
-  \sum_{\forall \bar{n}} (A \dmult{m} B)[\bar{a} \oplus \bar{m} \oplus \bar{d} \oplus \bar{n}] C[\bar{n} \oplus \bar{c}] \\
-  &= ((A \dmult{m} B) \mmult{n} C)[\bar{a} \oplus \bar{b} \oplus \bar{c}]
+  \sum_{\forall i_c \in [0:\size(\Dim(\vec{c}))-1]}
+  A[\Idx^{-1}[\vec{a} \oplus \vec{c}](
+    f(
+      \Idx[\vec{a}](\bar{a}),
+      i_c
+    )
+  )]
+  B[\Idx^{-1}[\vec{c} \oplus \vec{b}](
+    g(
+      i_c,
+      \Idx[\vec{b}](\bar{b})
+    )
+  )] \\
+  &=
+  \sum_{\forall i_c \in [0:\size(\Dim(\vec{c}))-1]}
+  X[\Idx^{-1}[\vec{x} \oplus \vec{z}](
+    f(
+      \Idx[\vec{a}](\bar{a}),
+      i_c
+    )
+  )]
+  Y[\Idx^{-1}[\vec{z} \oplus \vec{y}](
+    g(
+      i_c,
+      \Idx[\vec{b}](\bar{b})
+    )
+  )] \\
+  &=
+  \sum_{\forall i_z \in [0:\size(\Dim(\vec{z}))-1]}
+  X[\Idx^{-1}[\vec{x} \oplus \vec{z}](
+    f(
+      \Idx[\vec{a}](\bar{a}),
+      i_z
+    )
+  )]
+  Y[\Idx^{-1}[\vec{z} \oplus \vec{y}](
+    g(
+      i_z,
+      \Idx[\vec{b}](\bar{b})
+    )
+  )] \\
+  &=
+  \sum_{\forall i_z \in [0:\size(\Dim(\vec{z}))-1]}
+  X[\Idx^{-1}[\vec{x} \oplus \vec{z}](
+    f(
+      \Idx[\vec{x}](\bar{x}),
+      i_z
+    )
+  )]
+  Y[\Idx^{-1}[\vec{z} \oplus \vec{y}](
+    g(
+      i_z,
+      \Idx[\vec{y}](\bar{y})
+    )
+  )] \\
+  &=
+  \sum_{\forall \bar{z} \in \Dim(\vec{z})}
+  X[\Idx^{-1}[\vec{x} \oplus \vec{z}](
+    f(
+      \Idx[\vec{x}](\bar{x}),
+      \Idx[\vec{z}](\bar{z})
+    )
+  )]
+  Y[\Idx^{-1}[\vec{z} \oplus \vec{y}](
+    g(
+      \Idx[\vec{z}](\bar{z}),
+      \Idx[\vec{y}](\bar{y})
+    )
+  )] \\
+  &=
+  \sum_{\forall \bar{z} \in \Dim(\vec{z})}
+  X[\bar{x} \oplus \bar{z}]
+  Y[\bar{z} \oplus \bar{y}]
 \end{align*}
 
-If $m > \shape{\vec{b}}$ then
-\[ \vec{c} = \vec{l} \oplus \vec{r} \]
-\[ \vec{m} = \vec{b} \oplus \vec{l} \]
-\[ \shape{A \dmult{m} (B \mmult{n} C)} = \vec{a} \oplus \vec{b} \oplus \vec{l} \oplus \vec{r} \]
+So, let's investigate if a `smaller' inverse can be transformed into a larger one.
+Consider $\RMult[a, X]$ with inverse $\RMult[b, Y]$ such that $b < \shape{\shape{X}}-a$
 
+Then for all multimatrices $A$,
+\[ A \mmult{a} X \mmult{b} Y = A \]
+By definition.
+
+Now, can we construct a $\RMult[c, Z]$ where $c = \shape{\shape{X}}-a$ from $\RMult[b,Y]$?
+
+Let's have $\shape{X} = \vec{a} \oplus \vec{x}$, $\shape{\vec{a}} = a$.
+And, for our base case, assume that $\size(\Dim(\vec{a})) = \size(\Dim(\vec{x}))$.
+
+\[ X \mmult{b} Y = \Ident^2(\vec{a}) \]
+\[ \shape{X \mmult{b} Y} = \vec{a} \oplus \vec{a} \]
+\[ \shape{X} = \vec{l} \oplus \vec{b} \]
+\[ \shape{Y} = \vec{b} \oplus \vec{y} \]
+\[ \vec{l} \oplus \vec{y} = \vec{a} \oplus \vec{a} \]
 \begin{align*}
-(A \dmult{m} (B \mmult{n} C))[\bar{a} \oplus \bar{b} \oplus \bar{l} \oplus \bar{r}]
-  &=
-  A[\bar{a} \oplus \bar{b} \oplus \bar{l}] \sum_{\forall \bar{n}} B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{l} \oplus \bar{r}] \\
-  &=
-  \sum_{\forall \bar{n}} A[\bar{a} \oplus \bar{b} \oplus \bar{l}] B[\bar{b} \oplus \bar{n}] C[\bar{n} \oplus \bar{l} \oplus \bar{r}] \\
+  \shape{\vec{b}} &< \shape{\vec{a} \oplus \vec{x}}-a \\
+  b &< x \\
 \end{align*}
+\[ \vec{l} \oplus \vec{b} = \vec{a} \oplus \vec{x} \]
+\[ \vec{l}_l \oplus \vec{l}_r \oplus \vec{b} = \vec{a} \oplus \vec{x} \]
+\[ \vec{l}_l = \vec{a} \]
+\[ \vec{l}_r \oplus \vec{b} = \vec{x} \]
+\[ \vec{l}_r \oplus \vec{b} = \vec{x}_l \oplus \vec{x}_r \]
+\[ \vec{b} = \vec{x}_r \]
 
-What about $A \mmult{a} \Ident^2(\vec{a} \oplus \vec{b})$
+Therefore, not only is $\size(\Dim(\vec{b})) < \size(\Dim(\vec{x}))$, but $\size(\Dim(\vec{b}))$ divides $\size(\Dim(\vec{x}))$.
+
+Since,
+\begin{align*}
+  c &= \shape{\shape{X}}-a \\
+  c &= \shape{\vec{a} \oplus \vec{x}}-a \\
+  c &= \shape{\vec{x}}
+\end{align*}
+\[ X \mmult{c} Z = \Ident^2(\vec{a}) \]
+\[ \shape{X \mmult{c} Z} = \vec{a} \oplus \vec{a} \]
+\[ \shape{X} = \vec{p} \oplus \vec{c} \]
+\[ \shape{Z} = \vec{c} \oplus \vec{z} \]
+\[ \vec{p} \oplus \vec{z} = \vec{a} \oplus \vec{a} \]
+\[ \vec{p} \oplus \vec{c} = \vec{a} \oplus \vec{x} \]
+And since $c = \shape{\vec{x}}$
+\[ \vec{p} = \vec{a} \]
+\[ \vec{c} = \vec{x} \]
+So,
+\[ \vec{z} = \vec{a} \]
+\[ \shape{Z} = \vec{x} \oplus \vec{a} = \shape{\transpose{X}{a}} \]
+
+If $Z$ exists, then,
+\[ X \mmult{b} Y = X \mmult{c} Z \]
+
+I think I need to look at the rank of the multimatrices. Do multimatrices even have a fixed rank? I think multiplication operations do, but not multimatrices.
+
+So the rank of $\RMult[a, X]$ is the rank of the associated 2d matrix formed of shape
+\[ \left<\size(\Dim(\vec{a})), \size(\Dim(\vec{x}))\right> \]
+
+Now, for $A$ in $\mathbb{R}^{\vec{a}}$, $A \mmult{a} X \mmult{b} Y = A$. Therefore the range of $\RMult[a,X]$ must be of the same dimensionality of $\mathbb{R}^{\vec{a}}$.
+
+Ooooo, got a brain bomb,
+\[ |X| = \vec{a} \oplus \vec{x} \oplus \vec{a} \oplus \vec{x} \]
+I think this shape is necessary for $Y$ (an inverse that doesn't cover the full shape) to exists,
+\[ |Y| = \vec{x} \oplus \vec{x} \]
+\[ |Z| = \vec{a} \oplus \vec{x} \oplus \vec{a} \oplus \vec{x} \]
+\[ Z[\bar{a}_1 \oplus \bar{x}_1 \oplus \bar{a}_2 \oplus  \vec{x}_2] = \delta_{\bar{a}_1, \bar{a}_2} Y[\bar{x}_1 \oplus \bar{x}_2] \]
+
+And $\det(Z) = \det(Y)^{\size(\Dim(\vec{a}))}$
+
+If $\shape{A} = \vec{b} \oplus \vec{a} \oplus \vec{x}$ then,
+\[ \shape{A \mmult{a} X} = \vec{b} \oplus \vec{a} \oplus \vec{x} \]
+\[ \shape{A \mmult{a} X \mmult{x} Y} = \vec{b} \oplus \vec{a} \oplus \vec{x} \]
+\[ (A \mmult{a} X)[\bar{b} \oplus \bar{a} \oplus *^{\vec{x}}] \mmult{x} Y = A[\bar{b} \oplus \bar{a} \oplus *^{\vec{x}}] \]
+Seems important, but how do we progress?
 
 \begin{align*}
-\left(A \mmult{a} \Ident^2(\vec{a} \oplus \vec{b}) \right)[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2]
+  Z[\bar{a}_1 \oplus \bar{x}_1 \oplus \bar{a}_2 \oplus  \bar{x}_2]
+  &= \delta_{\bar{a}_1, \bar{a}_2} Y[\bar{x}_1 \oplus \bar{x}_2] \\
+  &= \Ident^2(\vec{a})[\bar{a}_2 \oplus \bar{a}_1] Y[\bar{x}_1 \oplus \bar{x}_2] \\
+  &= (\Ident^2(\vec{a}) \mmult{0} Y)[\bar{a}_2 \oplus \bar{a}_1 \oplus \bar{x}_1 \oplus \bar{x}_2]
+\end{align*}
+So, $Z$ is some permutation of $\Ident^2(\vec{a}) \mmult{0} Y$.
+
+Maybe I can prove that, if $C$ is a permutation of $\Ident^2(\vec{a}) \mmult{0} B$ then, $A \mmult{?} C = A \mmult{?} B$ in general?
+
+If $\sigma$ is a permutation, then $\transpose{C}{\sigma}$ is defined as,
+\[ \shape{\transpose{C}{\sigma}}[i] = \shape{C}[\sigma(i)] \]
+\[ \bar{c}_\sigma[i] = \bar{c}[\sigma(i)] \]
+\[ \transpose{C}{\sigma}[\bar{c}_\sigma] = C[\bar{c}] \]
+
+So if $\sigma = (1 ~ 2 ~ 3)$ and $\shape{C} = \left<1,2,3\right>$ then,
+\[ \shape{\transpose{C}{\sigma}} = \left<2, 3, 1\right> \]
+If $\sigma$ is a specific type of cyclic permutation then it just applies a transposition.
+Specifically, if it's a permutation in the group generated by $(1 ~ 2 ~ 3 ~ \ldots ~ n)$.
+
+No wait, I can do this easier if I just show that since,
+\[ (A \mmult{a} X)[\bar{b} \oplus \bar{a} \oplus *^{\vec{x}}] \mmult{x} Y = A[\bar{b} \oplus \bar{a} \oplus *^{\vec{x}}] \]
+If we let $B_i$, and $A_i$ be a partitions of $A \mmult{a} X$ and $A$ respectively for $1 \le i \le \size(\Dim(\vec{a}))$
+where,
+\[ B_i[\bar{b} \oplus (\left<1\right>*\shape{\vec{a}}) \oplus \bar{x}] = (A \mmult{a} X)[\bar{b} \oplus \Idx^{-1}[\vec{a}](i) \oplus \bar{x}] \]
+\[ A_i[\bar{b} \oplus (\left<1\right>*\shape{\vec{a}}) \oplus \bar{x}] = A[\bar{b} \oplus \Idx^{-1}[\vec{a}](i) \oplus \bar{x}] \]
+Then a reshaping of $Y$ into $Y'$ where,
+\[ \shape{Y'} = (\left<1\right>*a) \oplus \vec{x} \oplus (\left<1\right>*a) \oplus \vec{x} \]
+\[ Y'[(\left<1\right>*a) \oplus \bar{x}_1 \oplus (\left<1\right>*a) \oplus \bar{x}_2] = Y[\bar{x}_1 \oplus \bar{x}_2] \]
+Can be multiplied,
+\[ B_i \mmult{a+x} Y' = A_i \]
+And then those partitions can be joined back together in some way that results in $Z$. 
+I think there could be a general rule I could come up with for that process.
+
+\pagebreak
+
+
+\[
+  \frac{dL_i}{dW_{j<i}} =
+      \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+      \mmult{\shape{\shape{L_i}}}
+      \transpose{W_i}{\shape{\shape{L_{i-1}}}}
+      \mmult{\shape{\shape{L_{i-1}}}}
+      \frac{d L_{i-1}}{dW_j}
+\]
+So,
+\begin{align*}
+  \frac{dL_i}{dW_j}[\bar{l}_i \oplus \bar{w}_j]
   &= 
-  \sum_{\forall \bar{x}}
-    A[\bar{x}] \Ident^2(\vec{a} \oplus \vec{b})[\bar{x} \oplus \bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2] \\
+  \left(
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right) 
+    \mmult{\shape{\shape{L_i}}}
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}}
+    \mmult{\shape{\shape{L_{i-1}}}}
+    \frac{d L_{i-1}}{dW_j}
+  \right)[\bar{l}_i \oplus \bar{w}_j] \\
   &= 
-  \sum_{\forall \bar{x}}
-    A[\bar{x}] \delta_{\bar{x},\bar{a}} \delta_{\bar{b}_1,\bar{b}_2} \\
+  \sum_{\bar{m} \in \Dim(\shape{L_i}), \bar{n} \in \Dim(\shape{L_{i-1}})}
+    \left(\Ident^3(\shape{L_i}) \mmult{\shape{\shape{L_i}}} a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i) \right)[\bar{l}_i \oplus \bar{m}]
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}} [\bar{m} \oplus \bar{n}]
+    \frac{d L_{i-1}}{dW_j} [\bar{n} \oplus \bar{w}_j] \\
   &=
-  \delta_{\bar{b}_1,\bar{b}_2}
-  \sum_{\forall \bar{x}}
-    A[\bar{x}] \delta_{\bar{x},\bar{a}} \\
+  \sum_{\bar{m}, \bar{n},\bar{c} \in \Dim(\shape{L_i})}
+    \Ident^3(\shape{L_i})[\bar{l}_i \oplus \bar{m} \oplus \bar{c}]
+    a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)[\bar{c}]
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}} [\bar{m} \oplus \bar{n}]
+    \frac{d L_{i-1}}{dW_j} [\bar{n} \oplus \bar{w}_j] \\
   &=
-  \Ident^2(\vec{b})[\bar{b}_2 \oplus \bar{b}_1]
-  A[\bar{a}] \\
+  \sum_{\bar{n}}
+    a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)[\bar{l}_i]
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}} [\bar{l}_i \oplus \bar{n}]
+    \frac{d L_{i-1}}{dW_j} [\bar{n} \oplus \bar{w}_j] \\
   &=
-  (\Ident^2(\vec{b}) \mmult{0} A) [\bar{b}_2 \oplus \bar{b}_1 \oplus \bar{a}] \\
+  a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)[\bar{l}_i]
+  \sum_{\bar{n}}
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}} [\bar{l}_i \oplus \bar{n}]
+    \frac{d L_{i-1}}{dW_j} [\bar{n} \oplus \bar{w}_j] \\
   &=
-  \Tran(\Ident^2(\vec{b}) \mmult{0} A, \shape{\vec{b}})[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2] \\
+  a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)[\bar{l}_i]
+  \left(
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}} 
+    \mmult{\shape{\shape{L_i}}}
+    \frac{d L_{i-1}}{dW_j}
+  \right) [\bar{l}_i \oplus \bar{w}_j] \\
   &=
-  \Tran(A \mmult{0} \Ident^2(\vec{b}), \shape{\vec{a} \oplus \vec{b}})[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2] \\
-  &= 
-  \sum_{\forall \bar{x}}
-    \delta_{\bar{b}_1,\bar{b}_2} \delta_{\bar{a},\bar{x}} A[\bar{x}] \\
-  &= 
-  \sum_{\forall \bar{x}}
-    \Ident^2(\vec{b} \oplus \vec{a})[\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2 \oplus \bar{x}]
-    A[\bar{x}] \\
-  &= 
-  (\Ident^2(\vec{b} \oplus \vec{a}) \mmult{a} A) [\bar{b}_1 \oplus \bar{a} \oplus \bar{b}_2]
+  \left(
+    a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)
+    \dmult{\shape{\shape{L_i}}}
+    \transpose{W_i}{\shape{\shape{L_{i-1}}}} 
+    \mmult{\shape{\shape{L_i}}}
+    \frac{d L_{i-1}}{dW_j}
+  \right) [\bar{l}_i \oplus \bar{w}_j]
 \end{align*}
+So,
+\[ 
+  \frac{dL_i}{dW_{j<i}}
+  = 
+  a'(L_{i-1} \mmult{\shape{\shape{L_{i-1}}}} W_i)
+  \dmult{\shape{\shape{L_i}}}
+  \transpose{W_i}{\shape{\shape{L_{i-1}}}} 
+  \mmult{\shape{\shape{L_i}}}
+  \frac{d L_{i-1}}{dW_j}
+\]
 
-So
-\[ A \mmult{a} \Ident^2(\vec{a} \oplus \vec{b}) = \Ident^2(\vec{b} \oplus \vec{a}) \mmult{a} A \]
 
-Now what is $A \dmult{a} \Ident^2(\vec{a} \oplus \vec{b})$...
+\pagebreak
+
+Let $\shape{A} = \vec{a}$ and $\shape{B} = \vec{a} \oplus \vec{b}$. Why does,
+\[ (\Ident^3(\vec{a}) \mmult{a} A) \mmult{a} B = A \dmult{a} B \]
+
+% ac xc cb -> bc xc ca -> ba -> ab
 
 \begin{align*}
-\left(A \dmult{a} \Ident^2(\vec{a} \oplus \vec{b})\right) [\bar{a}_1 \oplus \bar{b}_1 \oplus \bar{a}_2 \oplus \bar{b}_2]
+  (\Ident^3(\vec{a}) \mmult{a} A) \mmult{a} B
   &=
-  A [\bar{a}_1] \Ident^2(\vec{a} \oplus \vec{b}) [\bar{a}_1 \oplus \bar{b}_1 \oplus \bar{a}_2 \oplus \bar{b}_2] \\
+  \transpose{(\transpose{A}{a} \mmult{a} \transpose{\Ident^3(\vec{a})}{3*a-a})}{a-a} \mmult{a} B \\
   &=
-  A [\bar{a}_1] \delta_{\bar{a}_1, \bar{a}_2} \delta_{\bar{b}_1, \bar{b}_2}
+  \transpose{(A \mmult{a} \transpose{\Ident^3(\vec{a})}{2a})}{0} \mmult{a} B \\
+  &=
+  A \mmult{a} \Ident^3(\vec{a}) \mmult{a} B \\
+  &=
+  A \dmult{a} B
 \end{align*}
+
+\pagebreak
+
+If $\shape{A} = \vec{a}$ does it follow that,
+\[ \Ident^3(\vec{a}) \mmult{a} A = \Ident^2(\vec{a}) \dmult{a} A \]
 
 \begin{align*}
-\left( A \dmult{a} \Ident^2(\vec{a} \oplus \vec{b}) \mmult{b} B \right)[\bar{a}_1 \oplus \bar{b} \oplus \bar{a}_2]
+  (\Ident^3(\vec{a}) \mmult{a} A)[\bar{a}_1 \oplus \bar{a}_2]
   &=
-  \sum_{\forall \bar{x}} A [\bar{a}_1] \Ident^2(\vec{a} \oplus \vec{b}) [\bar{a}_1 \oplus \bar{b} \oplus \bar{a}_2 \oplus \bar{x}] B[\bar{x}] \\
+  \sum_{\bar{a}_3} \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_3] A[\bar{a}_3] \\
   &=
-  \sum_{\forall \bar{x}} A [\bar{a}_1] \delta_{\bar{a}_1, \bar{a}_2} \delta_{\bar{b}, \bar{x}} B[\bar{x}] \\
+  \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_2] A[\bar{a}_2] \\
   &=
-  A [\bar{a}_1] \delta_{\bar{a}_1, \bar{a}_2} B[\bar{b}] \\
+  \Ident^2(\vec{a})[\bar{a}_1 \oplus \bar{a}_2] A[\bar{a}_2] \\
   &=
-  A [\bar{a}_1] B[\bar{b}] \delta_{\bar{a}_1, \bar{a}_2} \\
-  &=
-  \delta_{\bar{a}_2, \bar{a}_1} A [\bar{a}_2] B[\bar{b}] \\
-  &=
-  \Ident^2(\vec{a})[\bar{a}_2 \oplus \bar{a}_1] A [\bar{a}_1] B[\bar{b}] \\
-  &=
-  \left(\Ident^2(\vec{a}) \dmult{a} A\right) [\bar{a}_2 \oplus \bar{a}_1]B[\bar{b}] \\
-  &=
-  \left(\left(\Ident^2(\vec{a}) \dmult{a} A\right) \dmult{0} B\right) [\bar{a}_2 \oplus \bar{a}_1 \oplus \bar{b}] \\
-  &=
-  \left(\Ident^2(\vec{a}) \dmult{a} A \dmult{0} B\right) [\bar{a}_2 \oplus \bar{a}_1 \oplus \bar{b}] \\
-  &=
-  \Tran\left(\Ident^2(\vec{a}) \dmult{a} A \dmult{0} B, a\right) [\bar{a}_1 \oplus \bar{b} \oplus \bar{a}_2]
+  (\Ident^2(\vec{a}) \dmult{a} A)[\bar{a}_1 \oplus \bar{a}_2]
 \end{align*}
 
-What about $A \dmult{0} \Tran(B, n)$? Is that just $\Tran(A \dmult{0} B, k)$ ?
+\pagebreak
+
+I think, in general, if an identity is consumed by multiples of it's base in multiplication operations, the operation can be reduced to an operation
+involving hadamard products and what's left of the identity.
+
+Let's check edge cases.  Does the identity only consume up the branch?
+
+So if $\shape{A_2} = \vec{a} \oplus \vec{a}$ does,
+
+\[ \Ident^4(\vec{a}) \mmult{2a} (A_2 \mmult{a} A_2)  = A_2 \mmult{a} A_2 \]
+
+Well, yes because, 
+\[ \Ident^4(\vec{a}) \mmult{2a} (A_2 \mmult{a} A_2)  = \Ident^2(\vec{a} \oplus \vec{a}) \mmult{2a} (A_2 \mmult{a} A_2) \]
+
+But maybe that's not a good edge case.
+
+\pagebreak
+
+Is it true that,
+\[ \frac{dX}{dY} = \left(\transpose{\left(\frac{dY}{dX}\right)}{\shape{\shape{Y}}}\right)^{-1} \]
+
+\begin{align*}
+  \transpose{\left(\frac{dY}{dX}\right)}{\shape{\shape{Y}}} [\bar{x} \oplus \bar{y}]
+  &=
+  \frac{dY}{dX}[\bar{y} \oplus \bar{x}] \\
+  &=
+  \frac{\partial Y[\bar{y}]}{\partial X[\bar{x}]} \\
+  \left(\transpose{\left(\frac{dY}{dX}\right)}{\shape{\shape{Y}}}\right)^{-1} [\bar{x} \oplus \bar{y}]
+  &=
+  \frac{\partial X[\bar{x}]}{\partial Y[\bar{y}]} \\
+  &=
+  \frac{dX}{dY}[\bar{x} \oplus \bar{y}] \\
+\end{align*}
+
+\pagebreak
+
+Suppose we have $F$ being a multimatrix that is a result of products of integer size multiples of $\shape{\vec{a}}$.
+Each leaf of the product tree will either be an identity with base shape $\vec{a}$ or an arbitrary multimatrix, $M_k$. 
+Then,
+\[ F[P] = \sum_{\{ \bar{a}_i \}} \prod_{\{ S_j\}} \delta_{S_j} \prod_{\{T_k\}} M_k[ T_k \cup P^{\lnot a}_k ] \]
+
+Where $P$ is an arbitrary vector that is composed of some non-overlapping subvectors in $\Dim(\vec{a})$, $P^a$, and some other non-overlapping subvectors, $P^{\lnot a}$
+
+$P^a$ and $P^{\lnot a}$ are disjoint and $P^a \cup P^{\lnot a} = P$.
+
+Each $S_j$ is a subset of $\{\bar{a}_i\} \cup P^a$.
+
+Each $S_j$ is disjoint from each other $S_l$ because if they were not, they could be combined.
+
+$P^{\lnot a}_k$ is a subset of $P^{\lnot a}$.
+
+Each $T_k$ is a subset of $\{\bar{a}_i\} \cup P^a$.
+
+To total union of all $P^{\lnot a}_k$ is equal to $P^{\lnot a}$.
+
+$P$ and $\{ \bar{a}_i \}$ are disjoint.
+
+Note that the equivalence class I'm working under is such that all instantiations of the values of these variables would make them equal,
+not that just one instantiation may be equal.
+
+Is it true that $\sum_{\{a_i\}} \delta_{S \cup a}  M[T \cup a \cup P^{\lnot a}] = \sum_{a} M[T \cup a \cup P^{\lnot a}]$? Not unless $S$ is disjoint from $P^a$. 
+Then it must be true that, in the reduced form, every for every $S_j$, $S_j \cap P^a \ne \emptyset$
+
+\pagebreak
+
+Alright, I'm not making much traction on that. The more important question seems to be, for the expression,
+\[ F[\gamma(\{\bar{p}_i\})] = \sum_{\{\bar{a}_i\}} \prod_j M_j[\sigma_j(S_j \cup P_j)] \]
+Where $\gamma$ and each $\sigma_j$ are concatenation orderings, $S_j \subseteq \{\bar{a}_i\}$, and $P_j \subseteq \{\bar{p}_i\}$,
+when can this expression be decomposed into products and hadamard products?
+
+\[ \shape{W} = \vec{f} \oplus \vec{a} \oplus \vec{b} \]
+\[ \shape{X} = \vec{b} \oplus \vec{c} \]
+\[ \shape{Y} = \vec{a} \oplus \vec{d} \]
+\[ \shape{Z} = \vec{d} \oplus \vec{c} \oplus \vec{e} \]
+\[ \shape{(W \mmult{b} X) \mmult{a+c} (Y \mmult{d} Z)} = \bar{f} \oplus \vec{e} \]
+\begin{align*}
+  F[\bar{f} \oplus \bar{e}]
+  &=
+  \sum_{\bar{a}, \bar{b}, \bar{c}, \bar{d}}
+  W[\bar{f} \oplus \bar{a} \oplus \bar{b}]
+  X[\bar{b} \oplus \bar{c}]
+  Y[\bar{a} \oplus \bar{d}]
+  Z[\bar{d} \oplus \bar{c} \oplus \bar{e}] \\
+  &=
+  \sum_{\bar{a}, \bar{c}, \bar{d}}
+  \left(
+    \sum_{\bar{b}}
+    W[\bar{f} \oplus \bar{a} \oplus \bar{b}]
+    X[\bar{b} \oplus \bar{c}]
+  \right)
+  Y[\bar{a} \oplus \bar{d}]
+  Z[\bar{d} \oplus \bar{c} \oplus \bar{e}] \\
+  &=
+  \sum_{\bar{a}, \bar{c}, \bar{d}}
+  (W \mmult{b} X)[\bar{f} \oplus \bar{a} \oplus \bar{c}]
+  Y[\bar{a} \oplus \bar{d}]
+  Z[\bar{d} \oplus \bar{c} \oplus \bar{e}] \\
+  &=
+  \sum_{\bar{a}, \bar{c}}
+  (W \mmult{b} X)[\bar{f} \oplus \bar{a} \oplus \bar{c}]
+  \left(
+    \sum_{\bar{d}}
+    Y[\bar{a} \oplus \bar{d}]
+    Z[\bar{d} \oplus \bar{c} \oplus \bar{e}]
+  \right) \\
+  &=
+  \sum_{\bar{a}, \bar{c}}
+  (W \mmult{b} X)[\bar{f} \oplus \bar{a} \oplus \bar{c}]
+  (Y \mmult{d} Z)[\bar{a} \oplus \bar{c} \oplus \bar{e}] \\
+  &=
+  \left((W \mmult{b} X) \mmult{a+c} (Y \mmult{d} Z)\right)[\bar{f} \oplus \bar{e}]
+\end{align*}
+
+\pagebreak
+
+What was that other example I had?
+\[ (\Ident^3(\vec{a}) \mmult{a} A) \mmult{2a} \Ident^3(\vec{a}) = A \]
+Because,
+\begin{align*}
+  ((\Ident^3(\vec{a}) \mmult{a} A) \mmult{2a} \Ident^3(\vec{a}))[\bar{a}_0]
+  &=
+  \sum_{\bar{a}_1, \bar{a}_2} 
+  (\Ident^3(\vec{a}) \mmult{a} A)[\bar{a}_1 \oplus \bar{a}_2]
+  \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_0] \\
+  &=
+  \sum_{\bar{a}_1, \bar{a}_2} 
+  \left(
+    \sum_{\bar{a}_3}
+    \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_3]
+    A[\bar{a}_3]
+  \right)
+  \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_0] \\
+  &=
+  \sum_{\bar{a}_1, \bar{a}_2, \bar{a}_3} 
+  \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_3]
+  A[\bar{a}_3]
+  \Ident^3(\vec{a})[\bar{a}_1 \oplus \bar{a}_2 \oplus \bar{a}_0] \\
+  &=
+  \sum_{\bar{a}_1, \bar{a}_2, \bar{a}_3} 
+  \delta_{\bar{a}_1, \bar{a}_2, \bar{a}_3}
+  A[\bar{a}_3]
+  \delta_{\bar{a}_1, \bar{a}_2, \bar{a}_0} \\
+  &=
+  \sum_{\bar{a}_1, \bar{a}_2, \bar{a}_3} 
+  \delta_{\bar{a}_0, \bar{a}_1, \bar{a}_2, \bar{a}_3}
+  A[\bar{a}_3] \\
+  &=
+  \left(
+    \sum_{\bar{a}_1=\bar{a}_2=\bar{a}_3=\bar{a}_0} 
+    (1)
+    A[\bar{a}_3]
+  \right)
+  +
+  0 \\
+  &=
+  A[\bar{a}_0]
+\end{align*}
+I'm having a hard time even describing what I'm seeing here.
+
+\pagebreak
+Well, what are the rules for adding deltas.
+Consider.
+\[
+  \sum_{\{\bar{a}_i\}} \delta_{S} \delta_{T} X[\{\bar{a}_i\}]
+\]
+What if $S,T \subset \{\bar{a}_i\}$ and $S \cap T \ne \emptyset$?
+\begin{align*}
+  \sum_{\{\bar{a}_i\}} \delta_S \delta_T X[\{\bar{a}_i\}]
+  &=
+  \sum_{\{\bar{a}_i\}-S, \forall x,y \in S : x=y}
+  \delta_T X[(\{\bar{a}_i\}-S) \cup S^{=}] \\
+  &=
+  \sum_{\{\bar{a}_i\}-S-T, \forall x,y \in S : x=y, \forall x,y \in T : x=y}
+  X[(\{\bar{a}_i\}-S-T) \cup S^{=} \cup T^{=}] \\
+  &=
+  \sum_{\{\bar{a}_i\}-(S \cup T), \forall x,y \in S \cup T : x=y}
+  X[(\{\bar{a}_i\}-(S \cup T)) \cup (S \cup T)^{=}] \\
+  &=
+  \sum_{\{\bar{a}_i\}}
+  \delta_{S \cup T}
+  X[\{\bar{a}_i\}]
+\end{align*}
+
+\end{landscape}
+
+I had a bit of a revelation. Using five theorems, you can completely do this identity reduction.
+
+\begin{enumerate}
+\item ``Identity Multiplication and Hadamard Reductions''
+\item ``Hadamard Product Associativity''
+\item ``Associativity of Multimatrix Multiplication''
+\item ``Associativity of Mixed Hadamard and Regular Products''
+\item ``Communicativity of Hadamard Products''
+\end{enumerate}
+
+For example, let $\shape{A} = \shape{B} = \shape{C} = \vec{a}$,
+
+\begin{align*}
+  (A \mmult{a} \Ident^4(\vec{a}) \mmult{a} B) \mmult{a} C
+  &=
+  (A \dmult{a} \Ident^3 \mmult{a} B) \mmult{a} C \\
+  &=
+  (A \dmult{a} \Ident^2 \dmult{a} B) \mmult{a} C \\
+  &=
+  (A \dmult{a} (\Ident^2 \dmult{a} B)) \mmult{a} C \\
+  &=
+  (A \dmult{a} (B \dmult{a} \Ident^2)) \mmult{a} C \\
+  &=
+  A \dmult{a} B \dmult{a} \Ident^2 \mmult{a} C \\
+  &=
+  A \dmult{a} B \dmult{a} (\Ident^2 \mmult{a} C) \\
+  &=
+  A \dmult{a} B \dmult{a} C
+\end{align*}
+
+\pagebreak
+
+I keep having to re-derive this, so I'll record the convolution formula here:
+
+Let $O$ be the output, $I$ be the input, and $K$ be the kernel. 
+\[ \shape{O} = \shape{I} - \shape{K} + \bar{1} \]
+\[ \shape{\shape{O}} = \shape{\shape{I}} = \shape{\shape{K}} = \shape{\shape{\bar{1}}} = d \]
+\[
+  O[\bar{y}] =
+  a\left(
+    \sum_{\forall \bar{x} \text{ s.t } \bar{x}-\bar{y}+\bar{1} \in \Dim(\shape{K})} 
+    I[\bar{y}] K[\bar{x}-\bar{y}+\bar{1}]
+  \right)
+\]
+\[ \shape{C} = \shape{I} \oplus \shape{O} \oplus \shape{K} \]
+\[
+  C[\bar{x} \oplus \bar{y} \oplus \bar{z}] = 
+  \left\{
+    \begin{array}{ll}
+      1  & \mbox{if } \bar{x}-\bar{y}+\bar{1} \in \Dim(\shape{K}) \mbox{ and } \bar{x}-\bar{y}+\bar{1}=\bar{z} \\
+      0 & \mbox{otherwise}
+    \end{array}
+  \right.
+\]
+\[ O = a\left( I \mmult{d} C \mmult{d} K \right) \]
+\[
+  O[\bar{y}] =
+  a\left(
+    \sum_{\forall \bar{x}, \bar{z}}
+      I[\bar{y}]
+      C[\bar{x} \oplus \bar{y} \oplus \bar{z}]
+      K[\bar{z}]
+  \right)
+\]
+
+\begin{landscape}
+\begin{align*}
+  \sum_{\forall \bar{x}, \bar{z}}
+    I[\bar{y}]
+    C[\bar{x} \oplus \bar{y} \oplus \bar{z}]
+    K[\bar{z}]
+  &=
+  \left(
+    \sum_{\forall \bar{x},\bar{z} \text{ s.t } \bar{x}-\bar{y}+\bar{1} \in \Dim(\shape{K}) \text{ and } \bar{z} = \bar{x}-\bar{y}+\bar{1}}
+      I[\bar{y}]
+      (1)
+      K[\bar{z}]
+  \right) + (0) \\
+  &=
+  \sum_{\forall \bar{x},\bar{z} \text{ s.t } \bar{x}-\bar{y}+\bar{1} \in \Dim(\shape{K}) \text{ and } \bar{z} = \bar{x}-\bar{y}+\bar{1}}
+    I[\bar{y}]
+    K[\bar{z}] \\
+  &=
+  \sum_{\forall \bar{x} \text{ s.t } \bar{x}-\bar{y}+\bar{1} \in \Dim(\shape{K})}
+    I[\bar{y}]
+    K[\bar{x}-\bar{y}+\bar{1}]
+\end{align*}
+\end{landscape}
 
 \end{appendices}
 
