@@ -4859,6 +4859,10 @@ and
 \[NullSpace(A, n) \bot ProdSpace(\transpose{A}{a}, a)\]
 based on a similar theory for 2d matrices \cite{youtube:orthogonal} (and the fact that the shapes line up nicely).
 
+(Side note. I found an alternative definition of orthoganal in this video: \url{https://youtu.be/ACZC_XEyg9U?t=1427}
+That said $R^TR = I$ says $R$ is orthoganal because the transformation this matrix represents preserves the inner product
+between two vectors. IE, $(Ra)^T(Rb) = a^Tb$. I wonder how this relates.)
+
 And from there I think you can derive a solution to the least squares problem for multimatrices.
 
 If $B - A \mmult{n} X = E$ and where you want to minimize $SS(E)$, you could solve this with derivatives
@@ -5492,6 +5496,131 @@ Let $O$ be the output, $I$ be the input, and $K$ be the kernel.
     K[\bar{x}-\bar{y}+\bar{1}]
 \end{align*}
 \end{landscape}
+
+The attention mechanisms from \href{https://www.youtube.com/watch?v=yGTUuEx3GkA}{this} webseries
+translates really well into multimatrices.
+
+Let's represent the word embeddings of some sentence as $V$ where $\shape{V} = \left<d, n\right>$ where $d$ is the dimensionality of
+the embeddings and $n$ is the number of words. Then,
+
+\begin{align*}
+  W[i,j]
+  &=
+  \sum_k
+  V[k, i]
+  V[k, j] \\
+  &=
+  \sum_k
+  \transpose{V}{1}[i, k]
+  V[k, j] \\
+  &= (\transpose{V}{1} \mmult{1} V)[i,j]
+\end{align*}
+
+And
+\begin{align*}
+  W'[i,j] &= \frac{
+    W[i,j]
+  }{
+    \sum_k W[k,j]
+  } \\
+  &= 
+  \frac{
+    W[i,j]
+  }{
+   \sum_k 1^{\left<k\right>}[k] W[k,j]
+  } \\
+  &= 
+  \frac{
+    W[i,j]
+  }{
+    (1^{\left<k\right>} \mmult{1} W)[j]
+  } \\
+  &= 
+  W[i,j]
+  (1^{\left<k\right>} \mmult{1} W)^{-1}[j] \\
+  &= 
+  W \dmult{1} (1^{\left<k\right>} \mmult{1} W)^{-1} [i,j]
+\end{align*}
+
+And,
+\begin{align*}
+  Y[i,*]
+  &=
+  \sum_j W'[i,j] V[j,*] \\
+  &=
+  (W \mmult{1} V)[i,*]
+\end{align*}
+
+So our resulting formula are,
+\[ W = \transpose{V}{1} \mmult{1} V \]
+\[ W' = W \dmult{1} (1^{\left<k\right>} \mmult{1} W)^{-1} \]
+\[ Y = W' \mmult{1} V \]
+
+Or in one line,
+
+\[ Y = \transpose{V}{1} \mmult{1} V \dmult{1} (1^{\left<k\right>} \mmult{1} \transpose{V}{1} \mmult{1} V)^{-1} \mmult{1} V \]
+
+\pagebreak
+
+And in the \href{https://www.youtube.com/watch?v=tIvKXrEDMhk}{next} video we see the introduction
+of the $W_k$ key, $W_q$, query, and $W_v$ value matrices such that,
+
+\[ W = \transpose{\left(W_q \mmult{1} V\right)}{1} \mmult{1} \left(W_k \mmult{1} V\right) \]
+\[ W' = W \dmult{1} (1^{\left<k\right>} \mmult{1} W)^{-1} \]
+\[ Y = W' \mmult{1} \left(W_v \mmult{1} V \right) \]
+
+Multiheaded attention simply uses multiple layers of the attention mechanism along with some way to 
+reduce the attention down to a single layer.
+
+\[ \shape{W_k} = \shape{W_q} = \shape{W_v} = \left<h,d,d\right> \]
+\[ \shape{W} = \shape{W'} = \left<h,n,n\right> \]
+\[ \shape{Y} = \left<d,n,h\right> \]
+\[ W = \transpose{\left(W_q \mmult{1} V\right)}{2} \mmult{1} \left(W_k \mmult{1} V\right) \]
+\[ W[h,*^{\left<n,n\right>}] = \transpose{\left(W_q[h,*^{\left<d,d\right>}] \mmult{1} V\right)}{1} \mmult{1} \left(W_k[h,*^{\left<d,d\right>}] \mmult{1} V\right) \]
+\begin{align*}
+  W[\bar{h}, n_1, n_2]
+  &=
+  \sum_k
+  (W_q[\bar{h},*] \mmult{1} V)[k, n_1]
+  (W_k[\bar{h},*] \mmult{1} V)[k, n_2] \\
+  &=
+  \sum_{k}
+  (W_q \mmult{1} V)[\bar{h}, k, n_1]
+  (W_k \mmult{1} V)[\bar{h}, k, n_2] \\
+  &=
+  \sum_{k,l}
+  (W_q \mmult{1} V)[l, k, n_1]
+  (W_k \mmult{1} V)[\bar{h}, k, n_2]
+  \delta_{\bar{h},l} \\
+  &=
+  \sum_{k,l}
+  \transpose{(W_q \mmult{1} V)}{2}[n_1, l, k]
+  \transpose{(W_k \mmult{1} V)}{1}[k, n_2, \bar{h}]
+  \delta_{\bar{h},l} \\
+  &=
+  \sum_{l}
+  \left(
+    \transpose{(W_q \mmult{1} V)}{2}
+    \mmult{1}
+    \transpose{(W_k \mmult{1} V)}{1}
+  \right)[n_1, l, n_2, \bar{h}] 
+  \delta_{\bar{h},l} \\
+  &=
+  \sum_{l}
+  \transpose{\left(
+    \transpose{(W_q \mmult{1} V)}{2}
+    \mmult{1}
+    \transpose{(W_k \mmult{1} V)}{1}
+  \right)}{2}[n_2, \bar{h}, n_1, l] 
+  \delta_{l, \bar{h}} \\
+  &=
+  ?
+\end{align*}
+Ugh, this seems to require a new operation. Because what is,
+\[ C[\bar{a}] = \sum_{\forall \bar{c}} A[\bar{a} \oplus \bar{c}] B[\bar{a} \oplus \bar{c}] \]
+It's like a mix between the regular and hadamard products.
+\[ C = A \otimes B \]
+Maybe?
 
 \end{appendices}
 
